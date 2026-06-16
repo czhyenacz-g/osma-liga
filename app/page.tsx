@@ -8,9 +8,19 @@ import SiteFooter from "@/components/league/SiteFooter";
 export default function HomePage() {
   return (
     <>
-      <LeagueHeader />
-      <main>
+      {/* Sdílené stadionové pozadí pro header + hero */}
+      <div
+        style={{
+          backgroundImage: "url(/top_background.webp)",
+          backgroundSize: "cover",
+          backgroundPosition: "top center",
+        }}
+      >
+        <LeagueHeader />
         <MatchHero />
+      </div>
+
+      <main>
         <NewsSection />
         <LeagueTable />
         <ClubGrid />

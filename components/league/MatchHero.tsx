@@ -6,7 +6,6 @@ export default function MatchHero() {
     <section
       id="uvod"
       className="relative"
-      style={{ backgroundImage: "url(/top_background.webp)", backgroundSize: "cover", backgroundPosition: "center top" }}
     >
       {/* Tmavý overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/75" />

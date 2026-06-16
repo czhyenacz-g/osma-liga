@@ -11,14 +11,17 @@ const NAV = [
 export default function LeagueHeader() {
   return (
     <header
-      className="text-white shadow-xl"
-      style={{
-        background: "linear-gradient(135deg, #052e1a 0%, #0a3d22 60%, #0f4a2a 100%)",
-        borderBottom: "2px solid #2d7a45",
-      }}
+      className="relative text-white shadow-xl"
+      style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
     >
+      {/* Tmavý overlay přes sdílené stadionové pozadí */}
       <div
-        className="mx-auto flex max-w-[1240px] items-center gap-6 px-6"
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to bottom, rgba(3,22,10,0.88) 0%, rgba(5,46,26,0.82) 100%)" }}
+      />
+
+      <div
+        className="relative mx-auto flex max-w-[1240px] items-center gap-6 px-6"
         style={{ minHeight: "120px" }}
       >
         {/* Logo */}
@@ -78,19 +81,19 @@ export default function LeagueHeader() {
         {/* Oddělovač před sloganem */}
         <div className="hidden lg:block h-14 w-px bg-white/10 shrink-0" />
 
-        {/* Slogan — obrázek */}
-        <div className="hidden lg:block shrink-0">
+        {/* SVG slogan */}
+        <div className="hidden lg:flex shrink-0 items-center">
           <Image
-            src="/var_nemame.webp"
+            src="/var-slogan.svg"
             alt="VAR nemáme, hraj dál."
-            width={160}
-            height={120}
-            className="object-contain drop-shadow"
-            style={{ width: "auto", height: 64 }}
+            width={200}
+            height={92}
+            className="object-contain"
+            style={{ width: 200, height: "auto" }}
           />
         </div>
 
-        {/* Navigace — mobil (první 3 položky) */}
+        {/* Navigace — mobil */}
         <nav className="md:hidden flex items-center gap-0.5 ml-auto flex-wrap justify-end">
           {NAV.slice(0, 3).map((item) => (
             <a
