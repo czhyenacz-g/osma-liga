@@ -78,14 +78,16 @@ export default function LeagueHeader() {
         {/* Oddělovač před sloganem */}
         <div className="hidden lg:block h-14 w-px bg-white/10 shrink-0" />
 
-        {/* Slogan */}
-        <div
-          className="hidden lg:block shrink-0 text-right italic font-semibold leading-snug"
-          style={{ color: "#d6a94a", fontSize: "clamp(18px, 1.6vw, 26px)" }}
-        >
-          VAR nemáme,
-          <br />
-          hraj dál.
+        {/* Slogan — obrázek */}
+        <div className="hidden lg:block shrink-0">
+          <Image
+            src="/var_nemame.webp"
+            alt="VAR nemáme, hraj dál."
+            width={160}
+            height={120}
+            className="object-contain drop-shadow"
+            style={{ width: "auto", height: 64 }}
+          />
         </div>
 
         {/* Navigace — mobil (první 3 položky) */}
