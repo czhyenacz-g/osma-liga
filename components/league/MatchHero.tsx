@@ -3,91 +3,164 @@ import Link from "next/link";
 
 export default function MatchHero() {
   return (
-    <section id="uvod" className="bg-gray-50 border-b border-gray-200">
-      <div className="mx-auto max-w-4xl px-4 py-10 md:py-14">
+    <section
+      id="uvod"
+      className="relative"
+      style={{ backgroundImage: "url(/top_background.webp)", backgroundSize: "cover", backgroundPosition: "center top" }}
+    >
+      {/* Tmavý overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/75" />
 
-        {/* Badge + soutěž */}
-        <div className="mb-6 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-green-700 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-white">
-            Poslední utkání
-          </span>
-          <span className="text-xs text-gray-400">Osmá liga · neděle 14:00 · Za hasičárnou</span>
-        </div>
+      <div className="relative mx-auto max-w-[1240px] px-6 py-12 lg:py-16">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
 
-        {/* Výsledkový panel */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm px-6 py-7 md:px-10">
-          <div className="flex items-center justify-between gap-4">
-            {/* Domácí */}
-            <div className="flex flex-col items-center gap-2 text-center w-28 shrink-0">
-              <Image
-                src="/nahoda_banner.webp"
-                alt="Náhoda FC"
-                width={72}
-                height={72}
-                className="object-contain"
-              />
-              <span className="text-sm font-bold text-gray-800 leading-tight">Náhoda FC</span>
+          {/* ── LEVÁ ČÁST: poslední utkání ── */}
+          <div className="text-white space-y-5">
+            {/* Badge */}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full bg-emerald-600/90 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-white">
+                Poslední utkání
+              </span>
+              <span className="text-xs text-white/50">Osmá liga · neděle 14:00 · Hřiště za hasičárnou</span>
             </div>
 
-            {/* Skóre */}
-            <div className="flex flex-col items-center gap-1 flex-1">
-              <div className="text-5xl md:text-6xl font-black tracking-tighter text-gray-900">
-                12 <span className="text-green-700">:</span> 10
+            {/* Výsledek */}
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="flex flex-col items-center gap-1.5 w-20 sm:w-24 shrink-0">
+                <Image
+                  src="/nahoda_banner.webp"
+                  alt="Náhoda FC"
+                  width={72}
+                  height={72}
+                  className="object-contain drop-shadow-lg"
+                />
+                <span className="text-xs font-bold text-white/90 text-center leading-tight">Náhoda FC</span>
               </div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
-                Konečný výsledek
+
+              <div className="flex-1 text-center">
+                <div
+                  className="font-black leading-none text-white"
+                  style={{ fontSize: "clamp(48px, 8vw, 80px)", letterSpacing: "-0.03em" }}
+                >
+                  12 <span style={{ color: "#d6a94a" }}>:</span> 10
+                </div>
+                <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/40">
+                  Konečný výsledek
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-1.5 w-20 sm:w-24 shrink-0">
+                <Image
+                  src="/banners/tj_sokol_tupoljany.webp"
+                  alt="TJ Sokol Tupoljany"
+                  width={72}
+                  height={72}
+                  className="object-contain drop-shadow-lg"
+                />
+                <span className="text-xs font-bold text-white/90 text-center leading-tight">TJ Sokol Tupoljany</span>
               </div>
             </div>
 
-            {/* Hosté */}
-            <div className="flex flex-col items-center gap-2 text-center w-28 shrink-0">
-              <Image
-                src="/banners/tj_sokol_tupoljany.webp"
-                alt="TJ Sokol Tupoljany"
-                width={72}
-                height={72}
-                className="object-contain"
-              />
-              <span className="text-sm font-bold text-gray-800 leading-tight">TJ Sokol Tupoljany</span>
-            </div>
-          </div>
-
-          {/* Zpráva + citace */}
-          <div className="mt-6 border-t border-gray-100 pt-5 space-y-3">
-            <p className="text-sm text-gray-600 leading-relaxed">
+            {/* Report */}
+            <p className="text-sm text-white/70 leading-relaxed max-w-lg">
               Domácí rozhodli zápas v závěru, kdy hosté reklamovali ofsajd, aut i samotnou existenci rozhodčího.
             </p>
-            <blockquote className="rounded-lg bg-green-50 border-l-4 border-green-700 pl-4 pr-3 py-2.5">
-              <p className="text-sm italic text-gray-700">
+
+            {/* Citace */}
+            <blockquote className="rounded-xl bg-black/35 border-l-4 px-4 py-3 max-w-lg" style={{ borderColor: "#d6a94a" }}>
+              <p className="text-sm italic text-white/85">
                 &bdquo;Dvanáct branek doma bereme. Obranu doladíme, až budeme mít obránce.&ldquo;
               </p>
-              <footer className="mt-1 text-xs font-semibold text-green-800">
+              <footer className="mt-1.5 text-xs font-semibold" style={{ color: "#d6a94a" }}>
                 — Hynek Dařbujan, trenér Náhoda FC
               </footer>
             </blockquote>
+
+            {/* CTA */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+              <Link
+                href="/hra"
+                className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+                style={{ background: "#d6a94a", color: "#052e1a" }}
+              >
+                Nastoupit k zápasu
+              </Link>
+              <a
+                href="#kluby"
+                className="inline-flex items-center justify-center rounded-xl border border-white/30 px-6 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+              >
+                Zobrazit kluby
+              </a>
+            </div>
           </div>
 
-          {/* CTA */}
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Link
-              href="/hra"
-              className="inline-flex items-center justify-center rounded-xl bg-green-700 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-green-600"
-            >
-              Nastoupit k zápasu
-            </Link>
-            <a
-              href="#kluby"
-              className="inline-flex items-center justify-center rounded-xl border border-gray-300 px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-            >
-              Zobrazit kluby
-            </a>
+          {/* ── PRAVÁ KARTA: příští zápas ── */}
+          <div className="rounded-2xl bg-white shadow-2xl overflow-hidden">
+            {/* Header karty */}
+            <div className="px-5 py-3" style={{ background: "#052e1a" }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                Příští zápas
+              </p>
+            </div>
+
+            <div className="px-5 py-5 space-y-4">
+              {/* Loga + vs */}
+              <div className="flex items-center justify-center gap-3">
+                <div className="flex flex-col items-center gap-1">
+                  <Image
+                    src="/nahoda_banner.webp"
+                    alt="Náhoda FC"
+                    width={56}
+                    height={56}
+                    className="object-contain"
+                  />
+                  <span className="text-[10px] font-bold text-gray-700 text-center leading-tight">Náhoda FC</span>
+                </div>
+
+                <span className="text-lg font-black text-gray-300">vs.</span>
+
+                <div className="flex flex-col items-center gap-1">
+                  <Image
+                    src="/banners/fk_parezov.webp"
+                    alt="FK Pařezov"
+                    width={56}
+                    height={56}
+                    className="object-contain"
+                  />
+                  <span className="text-[10px] font-bold text-gray-700 text-center leading-tight">FK Pařezov</span>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-gray-100" />
+
+              {/* Detail */}
+              <ul className="space-y-1.5 text-sm text-gray-700">
+                {[
+                  ["📅", "neděle 14:00"],
+                  ["📍", "Hřiště za hasičárnou"],
+                  ["🕐", "Sraz: 13:20"],
+                  ["👕", "Dresy: bere ten, kdo je najde"],
+                ].map(([icon, text]) => (
+                  <li key={text} className="flex items-start gap-2">
+                    <span className="shrink-0 text-base leading-snug">{icon}</span>
+                    <span className="leading-snug text-xs text-gray-600">{text}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <button
+                type="button"
+                className="w-full rounded-xl border-2 py-2 text-xs font-bold uppercase tracking-widest transition hover:bg-gray-50"
+                style={{ borderColor: "#052e1a", color: "#052e1a" }}
+              >
+                Více o zápase
+              </button>
+            </div>
           </div>
+
         </div>
-
-        {/* Slogan */}
-        <p className="mt-4 text-center text-xs text-gray-400 tracking-widest uppercase">
-          VAR nemáme, hraj dál.
-        </p>
       </div>
     </section>
   );
