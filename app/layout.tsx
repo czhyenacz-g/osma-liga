@@ -5,13 +5,13 @@ import Script from "next/script";
 import { GOATCOUNTER_CODE } from "./config/analytics";
 
 export const metadata: Metadata = {
-  title: "Osmá liga — VAR nemáme, hraj dál",
+  title: "Osmá liga — oficiální web soutěže",
   description:
-    "Česká arkádová fotbalová hra z prostředí okresního fotbalu. Veď Náhoda FC z nízké ligy až nahoru.",
+    "Fiktivní web Osmé ligy a připravované arkádové fotbalové hry. Sleduj Náhoda FC a další kluby nižší soutěže.",
   openGraph: {
-    title: "Osmá liga — VAR nemáme, hraj dál",
+    title: "Osmá liga — oficiální web soutěže",
     description:
-      "Česká arkádová fotbalová hra z prostředí okresního fotbalu. Veď Náhoda FC z nízké ligy až nahoru.",
+      "Fiktivní web Osmé ligy a připravované arkádové fotbalové hry. Sleduj Náhoda FC a další kluby nižší soutěže.",
     url: "https://osmaliga.cz",
     siteName: "Osmá liga",
     locale: "cs_CZ",
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Osmá liga — VAR nemáme, hraj dál",
+    title: "Osmá liga — oficiální web soutěže",
     description:
-      "Česká arkádová fotbalová hra z prostředí okresního fotbalu. Veď Náhoda FC z nízké ligy až nahoru.",
+      "Fiktivní web Osmé ligy a připravované arkádové fotbalové hry. Sleduj Náhoda FC a další kluby nižší soutěže.",
   },
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="cs">
-      <body className="bg-slate-900 text-white antialiased">
+      <body className="bg-white text-gray-900 antialiased">
         {children}
         <Analytics />
         {GOATCOUNTER_CODE && (
