@@ -28,6 +28,14 @@ export default function GameCanvas() {
     const onFirstKey = () => { resumeAudio(); };
     window.addEventListener('keydown', onFirstKey, { once: true });
 
+    // Esc navigates back to homepage when match is ended
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.code === 'Escape' && gameState.phase === 'ended') {
+        window.location.href = '/';
+      }
+    };
+    window.addEventListener('keydown', onEsc);
+
     // Attempt start whistle — succeeds only if audio is already unlocked
     playWhistle();
 
@@ -60,6 +68,7 @@ export default function GameCanvas() {
       cancelAnimationFrame(rafId);
       removeInput();
       window.removeEventListener('keydown', onFirstKey);
+      window.removeEventListener('keydown', onEsc);
     };
   }, []);
 
