@@ -1,6 +1,43 @@
 import Image from "next/image";
 import Link from "next/link";
 
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
+function MapPinIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 13 6 13s6-7.75 6-13c0-3.314-2.686-6-6-6z" />
+      <circle cx="12" cy="8" r="2.5" />
+    </svg>
+  );
+}
+
+function ClockIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <polyline points="12 7 12 12 15.5 14.5" />
+    </svg>
+  );
+}
+
+function ShirtIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6l4-3h2a3 3 0 0 0 6 0h2l4 3-2.5 3L17 8v11H7V8L4.5 9 3 6z" />
+    </svg>
+  );
+}
+
 export default function MatchHero() {
   return (
     <section
@@ -113,17 +150,22 @@ export default function MatchHero() {
               <div className="h-px bg-gray-100" />
 
               <ul className="space-y-1.5">
-                {[
-                  ["📅", "neděle 14:00"],
-                  ["📍", "Hřiště za hasičárnou"],
-                  ["🕐", "Sraz: 13:20"],
-                  ["👕", "Dresy: bere ten, kdo je najde"],
-                ].map(([icon, text]) => (
-                  <li key={text} className="flex items-start gap-2">
-                    <span className="shrink-0 text-base leading-snug">{icon}</span>
-                    <span className="text-xs text-gray-600 leading-snug">{text}</span>
-                  </li>
-                ))}
+                <li className="flex items-start gap-2">
+                  <CalendarIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                  <span className="text-xs text-gray-600 leading-snug">neděle 14:00</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <MapPinIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                  <span className="text-xs text-gray-600 leading-snug">Hřiště za hasičárnou</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ClockIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                  <span className="text-xs text-gray-600 leading-snug">Sraz: 13:20</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ShirtIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                  <span className="text-xs text-gray-600 leading-snug">Dresy: bere ten, kdo je najde</span>
+                </li>
               </ul>
 
               <button
