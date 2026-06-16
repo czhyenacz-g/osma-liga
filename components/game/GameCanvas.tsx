@@ -6,6 +6,7 @@ import { createInitialState } from '@/game/createInitialState';
 import { createInputState, attachInputListeners } from '@/game/input';
 import { updateGame } from '@/game/updateGame';
 import { renderGame } from '@/game/renderGame';
+import { playWhistle, resumeAudio } from '@/game/audio';
 import type { GameState, InputState } from '@/game/types';
 
 export default function GameCanvas() {
@@ -23,15 +24,31 @@ export default function GameCanvas() {
 
     const removeInput = attachInputListeners(input);
 
+    // Unlock AudioContext on first keypress (required by browser autoplay policy)
+    const onFirstKey = () => { resumeAudio(); };
+    window.addEventListener('keydown', onFirstKey, { once: true });
+
+    // Attempt start whistle — succeeds only if audio is already unlocked
+    playWhistle();
+
     let rafId: number;
     let lastTime = performance.now();
+    let prevPhase = gameState.phase;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
       const dt = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
 
+      const wasRestart = input.restart;
       gameState = updateGame(gameState, input, dt);
+
+      // Whistle on restart (R key) or when goal phase resolves to playing
+      if (wasRestart || (prevPhase === 'goal' && gameState.phase === 'playing')) {
+        playWhistle();
+      }
+      prevPhase = gameState.phase;
+
       renderGame(ctx, gameState);
 
       rafId = requestAnimationFrame(loop);
@@ -42,6 +59,7 @@ export default function GameCanvas() {
     return () => {
       cancelAnimationFrame(rafId);
       removeInput();
+      window.removeEventListener('keydown', onFirstKey);
     };
   }, []);
 
