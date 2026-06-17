@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
 const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
 
@@ -10,6 +12,7 @@ type MatchRow = {
   mode: string;
   matchComment: string;
   playedAt: string;
+  onlineMatchId?: string | null;
 };
 
 async function fetchRecentResults(): Promise<MatchRow[] | null> {
@@ -55,37 +58,56 @@ export default async function RecentResults() {
           </p>
         ) : (
           <ul className="space-y-3">
-            {results.map((r) => (
-              <li
-                key={r.id}
-                className="rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-white">
-                    {r.homeTeamName}
-                  </span>
-                  <span
-                    className="text-base font-black font-mono"
-                    style={{ color: '#d6a94a' }}
-                  >
-                    {r.homeScore}&thinsp;:&thinsp;{r.awayScore}
-                  </span>
-                  <span className="text-sm font-bold text-white">
-                    {r.awayTeamName}
-                  </span>
-                </div>
+            {results.map((r) => {
+              const detailHref = r.onlineMatchId ? `/zapasy/${r.onlineMatchId}` : null;
+              const inner = (
+                <>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-sm font-bold text-white">
+                      {r.homeTeamName}
+                    </span>
+                    <span
+                      className="text-base font-black font-mono whitespace-nowrap"
+                      style={{ color: '#d6a94a' }}
+                    >
+                      {r.homeScore}&thinsp;:&thinsp;{r.awayScore}
+                    </span>
+                    <span className="text-sm font-bold text-white">
+                      {r.awayTeamName}
+                    </span>
+                  </div>
 
-                <div className="flex flex-col sm:items-end gap-0.5">
-                  <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                    {r.mode} &middot; {relativeTime(r.playedAt)}
-                  </span>
-                  <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.28)' }}>
-                    {r.matchComment}
-                  </span>
-                </div>
-              </li>
-            ))}
+                  <div className="flex flex-col sm:items-end gap-0.5">
+                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      {r.mode} &middot; {relativeTime(r.playedAt)}
+                      {detailHref && <span style={{ color: 'rgba(214,169,74,0.6)' }}> · detail →</span>}
+                    </span>
+                    <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                      {r.matchComment}
+                    </span>
+                  </div>
+                </>
+              );
+
+              const rowClass = 'rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1';
+              const rowStyle = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' };
+
+              return detailHref ? (
+                <li key={r.id}>
+                  <Link
+                    href={detailHref}
+                    className={`${rowClass} transition hover:border-amber-600/40`}
+                    style={rowStyle}
+                  >
+                    {inner}
+                  </Link>
+                </li>
+              ) : (
+                <li key={r.id} className={rowClass} style={rowStyle}>
+                  {inner}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
