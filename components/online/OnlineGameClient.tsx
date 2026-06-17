@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useOnlineGame } from './useOnlineGame';
 import OnlineGameCanvas from './OnlineGameCanvas';
 import MobileTouchControls from '@/components/game/MobileTouchControls';
+import MobileOrientationOverlay from '@/components/game/MobileOrientationOverlay';
 import type { TouchInput } from '@/game/types';
 
 interface KeyState {
@@ -204,29 +205,7 @@ export default function OnlineGameClient({
   // playing
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-2 py-4" style={bg}>
-      {isMobile && isPortrait && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 50,
-            background: '#041f14',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 16,
-            padding: 32,
-            textAlign: 'center',
-          }}
-        >
-          <span style={{ fontSize: 52, lineHeight: 1 }}>↻</span>
-          <p className="text-xl font-bold text-white">Otoč telefon na šířku.</p>
-          <p className="text-sm" style={subtleText}>
-            Okresní fotbal se na výšku nevejde.
-          </p>
-        </div>
-      )}
+      <MobileOrientationOverlay show={isMobile && isPortrait} />
       <div
         className="w-full"
         style={{

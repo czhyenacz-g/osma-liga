@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import GameCanvas from './GameCanvas';
 import MobileTouchControls from './MobileTouchControls';
+import MobileOrientationOverlay from './MobileOrientationOverlay';
 import { MATCH_DURATION } from '@/game/constants';
 import type { TouchInput } from '@/game/types';
 
@@ -27,21 +28,6 @@ const OVERLAY_STYLE: React.CSSProperties = {
   borderRadius: 6,
   border: '1px solid rgba(255,255,255,0.1)',
   gap: 20,
-  ...NO_SELECT,
-};
-
-const PORTRAIT_OVERLAY: React.CSSProperties = {
-  position: 'fixed',
-  inset: 0,
-  zIndex: 50,
-  background: '#041f14',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 16,
-  padding: 32,
-  textAlign: 'center',
   ...NO_SELECT,
 };
 
@@ -169,15 +155,7 @@ export default function MatchPageClient() {
 
   return (
     <>
-      {isMobile && isPortrait && (
-        <div style={PORTRAIT_OVERLAY}>
-          <span style={{ fontSize: 52, lineHeight: 1 }}>↻</span>
-          <p className="text-xl font-bold text-white">Otoč telefon na šířku.</p>
-          <p className="text-sm" style={{ color: 'rgba(209,250,229,0.5)' }}>
-            Okresní fotbal se na výšku nevejde.
-          </p>
-        </div>
-      )}
+      <MobileOrientationOverlay show={isMobile && isPortrait} />
 
       <div ref={gameWrapperRef} style={{ width: '100%', maxWidth: 960 }}>
         {gamePhase === 'idle' && (
