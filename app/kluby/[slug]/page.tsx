@@ -41,7 +41,7 @@ export default async function ClubDetailPage({ params }: Props) {
           backgroundPosition: "top center",
         }}
       >
-        <LeagueHeader />
+        <LeagueHeader compact />
       </div>
 
       <main className="bg-white min-h-screen">
