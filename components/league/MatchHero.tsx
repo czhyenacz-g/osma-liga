@@ -72,10 +72,10 @@ export default function MatchHero() {
 
                 {/* Skóre */}
                 <div>
-                  <div className="font-black leading-none text-white" style={{ fontSize: "clamp(36px, 9vw, 76px)", letterSpacing: "-0.03em" }}>
+                  <div className="font-black leading-none text-white whitespace-nowrap" style={{ fontSize: "clamp(36px, 9vw, 76px)", letterSpacing: "-0.03em" }}>
                     12 <span style={{ color: "#d6a94a" }}>:</span> 10
                   </div>
-                  <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/40">
+                  <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/40 whitespace-nowrap">
                     Konečný výsledek
                   </div>
                 </div>
