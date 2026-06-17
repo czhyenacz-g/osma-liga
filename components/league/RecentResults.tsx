@@ -1,5 +1,13 @@
 import Link from 'next/link';
 
+function formatMatchMode(mode: string | null | undefined): string {
+  switch (mode) {
+    case 'multiplayer':  return 'Online zápas';
+    case 'singleplayer': return 'Trénink proti botovi';
+    default:             return 'Zápas Osmé ligy';
+  }
+}
+
 const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
 const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
 
@@ -62,8 +70,8 @@ export default async function RecentResults() {
               const detailHref = r.onlineMatchId ? `/zapasy/${r.onlineMatchId}` : null;
               const inner = (
                 <>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-sm font-bold text-white">
+                  <div className="flex items-center gap-2 flex-wrap min-w-0">
+                    <span className="text-sm font-bold text-white break-words min-w-0">
                       {r.homeTeamName}
                     </span>
                     <span
@@ -72,19 +80,25 @@ export default async function RecentResults() {
                     >
                       {r.homeScore}&thinsp;:&thinsp;{r.awayScore}
                     </span>
-                    <span className="text-sm font-bold text-white">
+                    <span className="text-sm font-bold text-white break-words min-w-0">
                       {r.awayTeamName}
                     </span>
                   </div>
 
-                  <div className="flex flex-col sm:items-end gap-0.5">
+                  <div className="flex flex-col sm:items-end gap-0.5 shrink-0">
                     <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                      {r.mode} &middot; {relativeTime(r.playedAt)}
-                      {detailHref && <span style={{ color: 'rgba(214,169,74,0.6)' }}> · detail →</span>}
+                      {formatMatchMode(r.mode)} &middot; {relativeTime(r.playedAt)}
                     </span>
-                    <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.28)' }}>
-                      {r.matchComment}
-                    </span>
+                    {r.matchComment && (
+                      <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                        {r.matchComment}
+                      </span>
+                    )}
+                    {detailHref && (
+                      <span className="text-[11px] font-semibold" style={{ color: 'rgba(214,169,74,0.65)' }}>
+                        Detail zápasu →
+                      </span>
+                    )}
                   </div>
                 </>
               );
