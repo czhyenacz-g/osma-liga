@@ -44,5 +44,10 @@ export function createInitialState(): GameState {
     goalMessage: '',
     goalTimer: 0,
     activePlayerId: 'n1',
+    lastTouchTeam: null,
+    lastTouchPlayerId: null,
+    isOwnGoal: false,
+    cornerTimer: 0,
+    cornerKickCount: 0,
   };
 }

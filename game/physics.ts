@@ -113,6 +113,9 @@ export function resolvePlayerBallCollisions(state: GameState): void {
       // Gentle impulse in push direction
       ball.vel.x += dir.x * BUMP_FORCE;
       ball.vel.y += dir.y * BUMP_FORCE;
+      // Track last touch for own goal detection
+      state.lastTouchTeam = p.team;
+      state.lastTouchPlayerId = p.id;
     }
   }
 }

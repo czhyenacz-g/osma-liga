@@ -47,6 +47,7 @@ export default function GameCanvas({ onMatchEnd, onRestart }: Props) {
     let rafId: number;
     let lastTime = performance.now();
     let prevPhase = gameState.phase;
+    let prevCornerKickCount = gameState.cornerKickCount;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -56,10 +57,15 @@ export default function GameCanvas({ onMatchEnd, onRestart }: Props) {
       const wasRestart = input.restart;
       gameState = updateGame(gameState, input, dt);
 
-      // Whistle on restart (R key) or when goal phase resolves to playing
-      if (wasRestart || (prevPhase === 'goal' && gameState.phase === 'playing')) {
+      // Whistle on restart, goal reset, or systemic corner kick
+      if (
+        wasRestart ||
+        (prevPhase === 'goal' && gameState.phase === 'playing') ||
+        gameState.cornerKickCount > prevCornerKickCount
+      ) {
         playWhistle();
       }
+      prevCornerKickCount = gameState.cornerKickCount;
 
       // Notify parent when match ends for the first time
       if (prevPhase !== 'ended' && gameState.phase === 'ended') {

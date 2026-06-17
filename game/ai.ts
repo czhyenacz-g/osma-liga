@@ -122,6 +122,8 @@ export function updateAI(state: GameState, dt: number): void {
 
         ball.vel.x += kickDir.x * BOT_KICK_FORCE;
         ball.vel.y += kickDir.y * BOT_KICK_FORCE;
+        state.lastTouchTeam = 'away';
+        state.lastTouchPlayerId = p.id;
       }
 
       // ── Ball unstuck nudge ────────────────────────────────────────────────

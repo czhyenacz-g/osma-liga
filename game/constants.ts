@@ -37,3 +37,9 @@ export const BOT_KICK_COOLDOWN = 0.85;
 // Match
 export const MATCH_DURATION = 90;
 export const GOAL_PAUSE = 2.5;
+
+// Corner zone — ball must be near BOTH horizontal and vertical edge
+export const CORNER_ZONE_MARGIN = 72;
+export const CORNER_WARNING_DELAY = 3;   // seconds before countdown shows
+export const CORNER_CLEAR_DELAY = 8;     // seconds before systemic clearance kick
+export const CORNER_CLEAR_SPEED = 360;

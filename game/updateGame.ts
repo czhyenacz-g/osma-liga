@@ -9,8 +9,9 @@ import {
 } from './physics';
 import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
-  FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CY,
+  FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, RETURN_SPEED, GOAL_PAUSE,
+  CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
 } from './constants';
 
 const GOAL_MESSAGES = [
@@ -21,8 +22,22 @@ const GOAL_MESSAGES = [
   'Okresní fotbal v plné kráse.',
 ];
 
-function randomMessage(): string {
-  return GOAL_MESSAGES[Math.floor(Math.random() * GOAL_MESSAGES.length)];
+const HOME_OWN_GOAL_MESSAGES = [
+  'Vlastní gól. To se zapíše, ale nikdo se k tomu nehlásí.',
+  'Obrana si to vyřešila sama. Bohužel.',
+  'Brankář čekal střelu soupeře. Chyba.',
+  'Tohle byla přihrávka do historie.',
+  'Náhoda FC překonala vlastního brankáře.',
+];
+
+const AWAY_OWN_GOAL_MESSAGES = [
+  'Vlastní gól. Okresní fotbal v plné kráse.',
+  'Obrana FK Pařezov si to vyřešila sama.',
+  'Brankář čekal střelu. Dostalo se to jinak.',
+];
+
+function pickMessage(pool: string[]): string {
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function resetPositions(state: GameState): void {
@@ -34,6 +49,10 @@ function resetPositions(state: GameState): void {
   }
   state.ball.pos = { ...fresh.ball.pos };
   state.ball.vel = { x: 0, y: 0 };
+  state.cornerTimer = 0;
+  state.lastTouchTeam = null;
+  state.lastTouchPlayerId = null;
+  state.isOwnGoal = false;
 }
 
 export function updateGame(state: GameState, input: InputState, dt: number): GameState {
@@ -112,10 +131,8 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
   if (input.kick && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
     let kickDir: Vec2;
     if (mvLen > 0.1) {
-      // Kick in movement direction
       kickDir = { x: mvx / PLAYER_SPEED, y: mvy / PLAYER_SPEED };
     } else {
-      // Default: kick toward away goal (right)
       kickDir = normalize({
         x: FIELD_R - state.ball.pos.x,
         y: FIELD_CY - state.ball.pos.y,
@@ -124,6 +141,8 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     state.ball.vel.x += kickDir.x * KICK_FORCE;
     state.ball.vel.y += kickDir.y * KICK_FORCE;
     active.kickCooldown = KICK_COOLDOWN;
+    state.lastTouchTeam = 'home';
+    state.lastTouchPlayerId = active.id;
   }
 
   // ── Passive home players return to base ───────────────────────────────────
@@ -157,13 +176,51 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
   resolvePlayerBallCollisions(state);
   updateBallPhysics(state, dt);
 
+  // ── Corner zone clearance ─────────────────────────────────────────────────
+
+  const nearLeft  = state.ball.pos.x - FIELD_L < CORNER_ZONE_MARGIN;
+  const nearRight = FIELD_R - state.ball.pos.x < CORNER_ZONE_MARGIN;
+  const nearTop   = state.ball.pos.y - FIELD_T < CORNER_ZONE_MARGIN;
+  const nearBot   = FIELD_B - state.ball.pos.y < CORNER_ZONE_MARGIN;
+  const inCorner  = (nearLeft || nearRight) && (nearTop || nearBot);
+
+  if (inCorner) {
+    state.cornerTimer += dt;
+    if (state.cornerTimer >= CORNER_CLEAR_DELAY) {
+      const dir = normalize({
+        x: FIELD_CX - state.ball.pos.x,
+        y: FIELD_CY - state.ball.pos.y,
+      });
+      state.ball.vel.x = dir.x * CORNER_CLEAR_SPEED + (Math.random() - 0.5) * 40;
+      state.ball.vel.y = dir.y * CORNER_CLEAR_SPEED + (Math.random() - 0.5) * 40;
+      state.cornerTimer = 0;
+      state.cornerKickCount += 1;
+    }
+  } else {
+    state.cornerTimer = 0;
+  }
+
   // ── Goal check ────────────────────────────────────────────────────────────
 
   const scored = checkGoal(state);
   if (scored) {
+    // Own goal: ball scored into team's OWN net by their last touch
+    const isOwnGoal =
+      (scored === 'away' && state.lastTouchTeam === 'home') ||
+      (scored === 'home' && state.lastTouchTeam === 'away');
+
     state.score[scored] += 1;
     state.phase = 'goal';
-    state.goalMessage = randomMessage();
+    state.isOwnGoal = isOwnGoal;
+
+    if (isOwnGoal && scored === 'away') {
+      state.goalMessage = pickMessage(HOME_OWN_GOAL_MESSAGES);
+    } else if (isOwnGoal && scored === 'home') {
+      state.goalMessage = pickMessage(AWAY_OWN_GOAL_MESSAGES);
+    } else {
+      state.goalMessage = pickMessage(GOAL_MESSAGES);
+    }
+
     state.goalTimer = GOAL_PAUSE;
   }
 

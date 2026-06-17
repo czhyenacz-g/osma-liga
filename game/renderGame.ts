@@ -4,6 +4,7 @@ import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   GOAL_T, GOAL_B, GOAL_DEPTH,
   PLAYER_RADIUS, BALL_RADIUS,
+  CORNER_WARNING_DELAY, CORNER_CLEAR_DELAY,
 } from './constants';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -100,16 +101,27 @@ function drawActivePlayerIndicator(ctx: CanvasRenderingContext2D, player: Player
   ctx.lineWidth = 2.5;
   ctx.stroke();
 
-  // Small downward-pointing triangle above player head
-  const tipY  = player.pos.y - PLAYER_RADIUS - 6;
-  const baseY = tipY + 7;
-  ctx.beginPath();
-  ctx.moveTo(player.pos.x,     tipY);   // tip
-  ctx.lineTo(player.pos.x - 5, baseY);  // left base
-  ctx.lineTo(player.pos.x + 5, baseY);  // right base
-  ctx.closePath();
-  ctx.fillStyle = `rgba(251,191,36,${0.65 + pulse * 0.35})`;
-  ctx.fill();
+  // Arrow: only when moving, points in velocity direction
+  const speed = Math.sqrt(player.vel.x ** 2 + player.vel.y ** 2);
+  if (speed > 20) {
+    const nx = player.vel.x / speed;
+    const ny = player.vel.y / speed;
+    const ARROW_DIST = PLAYER_RADIUS + 10;
+    const tipX  = player.pos.x + nx * ARROW_DIST;
+    const tipY  = player.pos.y + ny * ARROW_DIST;
+    const baseX = player.pos.x + nx * (ARROW_DIST - 8);
+    const baseY = player.pos.y + ny * (ARROW_DIST - 8);
+    const px = -ny;   // perpendicular
+    const py =  nx;
+
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(baseX + px * 5, baseY + py * 5);
+    ctx.lineTo(baseX - px * 5, baseY - py * 5);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(251,191,36,${0.65 + pulse * 0.35})`;
+    ctx.fill();
+  }
 }
 
 // ── End overlay ───────────────────────────────────────────────────────────────
@@ -312,6 +324,22 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState): voi
   ctx.fillStyle = state.timeLeft < 15 ? '#f87171' : 'rgba(255,255,255,0.5)';
   ctx.fillText(formatTime(state.timeLeft), CANVAS_W / 2, hudMid + 9);
 
+  // ── Corner countdown warning ──────────────────────────────────────────────
+
+  if (state.phase === 'playing' && state.cornerTimer > CORNER_WARNING_DELAY) {
+    const countdown = Math.ceil(CORNER_CLEAR_DELAY - state.cornerTimer);
+    const blink = 0.7 + 0.3 * Math.sin(performance.now() / 200);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = `rgba(214,169,74,${blink})`;
+    ctx.fillText(
+      `Hrozí rohový kop: ${Math.max(1, countdown)}`,
+      CANVAS_W / 2,
+      FIELD_B + 14,
+    );
+  }
+
   // ── Goal overlay ──────────────────────────────────────────────────────────
 
   if (state.phase === 'goal') {
@@ -323,7 +351,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState): voi
 
     ctx.font = 'bold 68px sans-serif';
     ctx.fillStyle = '#fbbf24';
-    ctx.fillText('GÓL!', CANVAS_W / 2, CANVAS_H / 2 - 38);
+    ctx.fillText(state.isOwnGoal ? 'VLASTNÍ GÓL!' : 'GÓL!', CANVAS_W / 2, CANVAS_H / 2 - 38);
 
     ctx.font = '22px sans-serif';
     ctx.fillStyle = 'white';

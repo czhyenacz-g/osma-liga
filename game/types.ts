@@ -30,6 +30,13 @@ export interface GameState {
   goalMessage: string;
   goalTimer: number;
   activePlayerId: string;
+  // Last touch tracking — used for own goal detection
+  lastTouchTeam: Team | null;
+  lastTouchPlayerId: string | null;
+  isOwnGoal: boolean;
+  // Corner zone timer
+  cornerTimer: number;
+  cornerKickCount: number;
 }
 
 export interface InputState {
