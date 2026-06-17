@@ -15,7 +15,7 @@ import {
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
-  BALL_CONTROL_RADIUS, BALL_CONTROL_DAMPING, BALL_CONTROL_FORCE, BALL_CONTROL_OFFSET,
+  BALL_CONTROL_RADIUS, BALL_CONTROL_DAMPING, BALL_CONTROL_FORCE, BALL_CONTROL_INPUT_FORCE, BALL_CONTROL_OFFSET,
 } from './constants';
 
 const GOAL_MESSAGES = [
@@ -146,15 +146,19 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS,
   );
 
-  // ── Soft ball control (active player only, no kick) ───────────────────────
-  // Gently slows the ball and nudges it toward a controlled position in front
-  // of the player. Deactivated when kick is held so it doesn't dampen shots.
+  // ── Ball control (active player only, no kick) ───────────────────────────
+  // Brakes the ball and pulls it toward a point in front of the player.
+  // When the player holds a direction, BALL_CONTROL_INPUT_FORCE is used so
+  // the ball swings around to the correct side within ~1 s. Without input the
+  // weaker BALL_CONTROL_FORCE is used as a gentle settle toward goal direction.
+  // Deactivated on kick so the control impulse never dampens shots.
 
   if (!input.kick && activeDist < BALL_CONTROL_RADIUS) {
     state.ball.vel.x *= BALL_CONTROL_DAMPING;
     state.ball.vel.y *= BALL_CONTROL_DAMPING;
 
-    const targetDir = mvLen > 0.1
+    const hasInput = mvLen > 0.1;
+    const targetDir = hasInput
       ? { x: mvx / PLAYER_SPEED, y: mvy / PLAYER_SPEED }
       : normalize({ x: FIELD_R - active.pos.x, y: FIELD_CY - active.pos.y });
 
@@ -166,9 +170,10 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     const tx = targetPoint.x - state.ball.pos.x;
     const ty = targetPoint.y - state.ball.pos.y;
     const tLen = Math.sqrt(tx * tx + ty * ty);
-    if (tLen > 1) {
-      state.ball.vel.x += (tx / tLen) * BALL_CONTROL_FORCE * dt;
-      state.ball.vel.y += (ty / tLen) * BALL_CONTROL_FORCE * dt;
+    if (tLen > 4) {
+      const force = hasInput ? BALL_CONTROL_INPUT_FORCE : BALL_CONTROL_FORCE;
+      state.ball.vel.x += (tx / tLen) * force * dt;
+      state.ball.vel.y += (ty / tLen) * force * dt;
     }
   }
 

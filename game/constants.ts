@@ -46,9 +46,10 @@ export const TEAMMATE_SEPARATION_STRENGTH = 0.5;
 
 // Ball control (soft trap for active home player)
 export const BALL_CONTROL_RADIUS = 44;
-export const BALL_CONTROL_DAMPING = 0.90;
-export const BALL_CONTROL_FORCE = 110;
-export const BALL_CONTROL_OFFSET = 26;
+export const BALL_CONTROL_DAMPING = 0.86;
+export const BALL_CONTROL_FORCE = 130;        // without input direction
+export const BALL_CONTROL_INPUT_FORCE = 210;  // with input direction — pulls ball in front faster
+export const BALL_CONTROL_OFFSET = 34;
 
 // Match
 export const MATCH_DURATION = 90;
