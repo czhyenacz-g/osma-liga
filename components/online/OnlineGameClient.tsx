@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useOnlineGame } from './useOnlineGame';
 import OnlineGameCanvas from './OnlineGameCanvas';
+import MobileTouchControls from '@/components/game/MobileTouchControls';
+import type { TouchInput } from '@/game/types';
 
 interface KeyState {
   up: boolean;
@@ -49,6 +51,24 @@ export default function OnlineGameClient({
     kick: false,
   });
 
+  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false });
+
+  // Reset touch on blur / tab switch / orientation change
+  useEffect(() => {
+    const reset = () => {
+      const t = touchRef.current;
+      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false;
+    };
+    window.addEventListener('blur', reset);
+    document.addEventListener('visibilitychange', reset);
+    window.addEventListener('orientationchange', reset);
+    return () => {
+      window.removeEventListener('blur', reset);
+      document.removeEventListener('visibilitychange', reset);
+      window.removeEventListener('orientationchange', reset);
+    };
+  }, []);
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (['ArrowUp', 'w', 'W'].includes(e.key)) keysRef.current.up = true;
@@ -72,9 +92,17 @@ export default function OnlineGameClient({
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
 
-    // Send input to server at ~30Hz
+    // Send input to server at ~30Hz (merge keyboard + touch)
     const interval = setInterval(() => {
-      sendInput({ ...keysRef.current });
+      const k = keysRef.current;
+      const t = touchRef.current;
+      sendInput({
+        up: k.up || t.up,
+        down: k.down || t.down,
+        left: k.left || t.left,
+        right: k.right || t.right,
+        kick: k.kick || t.kick,
+      });
     }, 33);
 
     return () => {
@@ -153,13 +181,22 @@ export default function OnlineGameClient({
           )}
           <p className="text-sm" style={subtleText}>Náhoda FC vs FK Pařezov</p>
         </div>
-        <Link
-          href="/hra/online"
-          className="text-sm font-semibold transition hover:opacity-80"
-          style={{ color: '#d6a94a' }}
-        >
-          ← Zpět do lobby
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/satna"
+            className="rounded-xl px-6 py-2.5 text-sm font-bold transition hover:opacity-90"
+            style={{ background: '#d6a94a', color: '#041f14' }}
+          >
+            Zpět do šatny
+          </Link>
+          <Link
+            href="/hra/online"
+            className="rounded-xl px-6 py-2.5 text-sm font-bold transition hover:opacity-80"
+            style={{ background: 'rgba(209,250,229,0.12)', border: '1px solid rgba(209,250,229,0.25)', color: 'white' }}
+          >
+            Nový zápas
+          </Link>
+        </div>
       </main>
     );
   }
@@ -211,9 +248,12 @@ export default function OnlineGameClient({
           </div>
         )}
       </div>
-      <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
-        WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop
-      </p>
+      {!isMobile && (
+        <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
+          WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop
+        </p>
+      )}
+      {isMobile && !isPortrait && <MobileTouchControls touchRef={touchRef} />}
     </main>
   );
 }
