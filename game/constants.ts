@@ -37,7 +37,7 @@ export const BOT_KICK_COOLDOWN = 0.85;
 // Ball control (soft trap for active home player)
 export const BALL_CONTROL_RADIUS = 44;
 export const BALL_CONTROL_DAMPING = 0.90;
-export const BALL_CONTROL_FORCE = 90;
+export const BALL_CONTROL_FORCE = 110;
 export const BALL_CONTROL_OFFSET = 26;
 
 // Match
