@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CLUBS } from "@/data/clubs";
 
 export default function ClubGrid() {
@@ -12,8 +13,9 @@ export default function ClubGrid() {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {CLUBS.map((club) => (
-            <div
+            <Link
               key={club.id}
+              href={`/kluby/${club.slug}`}
               className="flex flex-col items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-4 text-center hover:border-green-300 hover:bg-green-50 transition"
             >
               <Image
@@ -25,8 +27,18 @@ export default function ClubGrid() {
               />
               <div className="text-xs font-bold text-gray-800 leading-snug">{club.name}</div>
               <div className="text-[10px] text-gray-500 leading-snug">{club.note}</div>
-            </div>
+            </Link>
           ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link
+            href="/kluby"
+            className="inline-block text-sm font-semibold transition hover:opacity-80"
+            style={{ color: "#2d6a4f" }}
+          >
+            Zobrazit všechny kluby →
+          </Link>
         </div>
       </div>
     </section>

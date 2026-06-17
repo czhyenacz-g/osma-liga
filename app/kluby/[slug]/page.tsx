@@ -1,0 +1,166 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { CLUBS, getClubBySlug } from "@/data/clubs";
+import LeagueHeader from "@/components/league/LeagueHeader";
+import SiteFooter from "@/components/league/SiteFooter";
+
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+export function generateStaticParams() {
+  return CLUBS.map((club) => ({ slug: club.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const club = getClubBySlug(slug);
+  if (!club) return {};
+  const description = `${club.description} ${club.seasonComment}`.slice(0, 160);
+  return {
+    title: `${club.name} | Kluby Osmé ligy`,
+    description,
+  };
+}
+
+export default async function ClubDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const club = getClubBySlug(slug);
+  if (!club) notFound();
+
+  const isNahoda = club.slug === "nahoda-fc";
+
+  return (
+    <>
+      <div
+        style={{
+          backgroundImage: "url(/top_background.webp)",
+          backgroundSize: "cover",
+          backgroundPosition: "top center",
+        }}
+      >
+        <LeagueHeader />
+      </div>
+
+      <main className="bg-white min-h-screen">
+        <div className="mx-auto max-w-3xl px-4 py-12">
+          {/* Breadcrumb */}
+          <div className="mb-6 text-xs text-gray-400 flex gap-2 items-center">
+            <Link href="/" className="hover:text-gray-600 transition">Úvod</Link>
+            <span>›</span>
+            <Link href="/kluby" className="hover:text-gray-600 transition">Kluby</Link>
+            <span>›</span>
+            <span className="text-gray-600">{club.name}</span>
+          </div>
+
+          {/* Hlavička klubu */}
+          <div className="flex items-center gap-6 mb-8">
+            <Image
+              src={club.banner}
+              alt={club.name}
+              width={96}
+              height={96}
+              className="object-contain shrink-0 drop-shadow-md"
+            />
+            <div>
+              <h1 className="text-2xl font-black text-gray-900 leading-tight mb-1">
+                {club.name}
+              </h1>
+              <p className="text-sm text-gray-500">{club.location}</p>
+              <p
+                className="text-xs font-semibold mt-2 italic"
+                style={{ color: "#2d6a4f" }}
+              >
+                &bdquo;{club.motto}&ldquo;
+              </p>
+            </div>
+          </div>
+
+          {/* Karta — základní info */}
+          <div
+            className="rounded-xl border border-gray-200 bg-gray-50 p-6 mb-6 grid grid-cols-2 gap-4 text-sm"
+          >
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                Barvy
+              </p>
+              <p className="text-gray-800">{club.colors}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                Hřiště
+              </p>
+              <p className="text-gray-800">{club.location}</p>
+            </div>
+          </div>
+
+          {/* Medailonek */}
+          <div className="mb-6">
+            <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
+              O klubu
+            </h2>
+            <p className="text-sm leading-relaxed text-gray-700">{club.description}</p>
+          </div>
+
+          {/* Sezóna */}
+          <div
+            className="rounded-xl px-6 py-5 mb-8"
+            style={{
+              background: "linear-gradient(135deg, #063f24 0%, #052e1a 100%)",
+              border: "1px solid rgba(216,173,69,0.22)",
+            }}
+          >
+            <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: "#d8ad45" }}>
+              Aktuální sezona
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(209,250,229,0.85)" }}>
+              {club.seasonComment}
+            </p>
+          </div>
+
+          {/* Trenérský koutek — pouze Náhoda FC */}
+          {isNahoda && (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5 mb-8">
+              <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
+                Trenérský koutek
+              </h2>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Fotka trenéra se připravuje. Zatím se tým řídí heslem:{" "}
+                <span className="font-semibold text-gray-800">VAR nemáme, hraj dál.</span>
+              </p>
+            </div>
+          )}
+
+          {/* CTA */}
+          <div className="flex flex-wrap gap-3 mt-2">
+            <Link
+              href="/hra"
+              className="inline-block rounded-lg px-5 py-2.5 text-sm font-bold transition hover:opacity-90"
+              style={{ background: "#063f24", color: "#fff" }}
+            >
+              Hrát za Náhoda FC
+            </Link>
+            <Link
+              href="/hra/online"
+              className="inline-block rounded-lg px-5 py-2.5 text-sm font-bold transition hover:opacity-90"
+              style={{ background: "rgba(216,173,69,0.15)", color: "#d8ad45", border: "1px solid rgba(216,173,69,0.35)" }}
+            >
+              Online zápas
+            </Link>
+            <Link
+              href="/kluby"
+              className="inline-block rounded-lg px-5 py-2.5 text-sm font-semibold transition hover:opacity-80"
+              style={{ color: "#6b7280" }}
+            >
+              ← Všechny kluby
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      <SiteFooter />
+    </>
+  );
+}
