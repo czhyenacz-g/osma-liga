@@ -29,13 +29,22 @@ export default function HraPage() {
         WASD / šipky &mdash; pohyb &nbsp;&middot;&nbsp; Space &mdash; kopnout &nbsp;&middot;&nbsp; R &mdash; restart
       </p>
 
-      <Link
-        href="/"
-        className="text-xs transition hover:opacity-80"
-        style={{ color: 'rgba(209,250,229,0.38)' }}
-      >
-        &#8592; Zpět na web Osmé ligy
-      </Link>
+      <div className="flex flex-col items-center gap-2">
+        <Link
+          href="/hra/online"
+          className="text-xs transition hover:opacity-80"
+          style={{ color: 'rgba(214,169,74,0.65)' }}
+        >
+          &#8594; Online lobby <span style={{ color: 'rgba(214,169,74,0.4)' }}>(beta)</span>
+        </Link>
+        <Link
+          href="/"
+          className="text-xs transition hover:opacity-80"
+          style={{ color: 'rgba(209,250,229,0.38)' }}
+        >
+          &#8592; Zpět na web Osmé ligy
+        </Link>
+      </div>
     </main>
   );
 }

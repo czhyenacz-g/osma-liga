@@ -123,9 +123,26 @@ curl http://127.0.0.1:3001/health
 
 ---
 
+## Online lobby
+
+Online lobby používá Hub API (`/api/osma-liga/online-games`).
+API key zůstává server-side v Next.js routes.
+Client volá `/api/online-games` (lokální Next.js proxy).
+
+Stránky:
+- `/hra/online` — seznam aktivních her, vytvoření nové hry
+- `/hra/online/[code]` — šatna pro konkrétní hru
+
+Proxy routes:
+- `app/api/online-games/route.ts` — GET list, POST create
+- `app/api/online-games/[code]/route.ts` — GET detail
+- `app/api/online-games/[code]/join/route.ts` — POST join
+
+---
+
 ## Plánované kroky
 
 - [ ] Automatické denní pg_dump zálohy s rotací (cron + rclone do B2)
 - [ ] Alerting na healthcheck (UptimeRobot nebo podobné)
 - [ ] Migrace na Prisma migrate místo db push
-- [ ] Online lobby a WebSocket multiplayer (budoucí modul)
+- [ ] WebSocket gameplay (přenos pohybu v reálném čase)
