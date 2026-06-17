@@ -14,6 +14,7 @@ import {
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
+  BALL_CONTROL_RADIUS, BALL_CONTROL_DAMPING, BALL_CONTROL_FORCE, BALL_CONTROL_OFFSET,
 } from './constants';
 
 const GOAL_MESSAGES = [
@@ -128,6 +129,32 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS,
     FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS,
   );
+
+  // ── Soft ball control (active player only, no kick) ───────────────────────
+  // Gently slows the ball and nudges it toward a controlled position in front
+  // of the player. Deactivated when kick is held so it doesn't dampen shots.
+
+  if (!input.kick && activeDist < BALL_CONTROL_RADIUS) {
+    state.ball.vel.x *= BALL_CONTROL_DAMPING;
+    state.ball.vel.y *= BALL_CONTROL_DAMPING;
+
+    const targetDir = mvLen > 0.1
+      ? { x: mvx / PLAYER_SPEED, y: mvy / PLAYER_SPEED }
+      : normalize({ x: FIELD_R - active.pos.x, y: FIELD_CY - active.pos.y });
+
+    const targetPoint = {
+      x: active.pos.x + targetDir.x * BALL_CONTROL_OFFSET,
+      y: active.pos.y + targetDir.y * BALL_CONTROL_OFFSET,
+    };
+
+    const tx = targetPoint.x - state.ball.pos.x;
+    const ty = targetPoint.y - state.ball.pos.y;
+    const tLen = Math.sqrt(tx * tx + ty * ty);
+    if (tLen > 1) {
+      state.ball.vel.x += (tx / tLen) * BALL_CONTROL_FORCE * dt;
+      state.ball.vel.y += (ty / tLen) * BALL_CONTROL_FORCE * dt;
+    }
+  }
 
   // ── Space kick ────────────────────────────────────────────────────────────
 
