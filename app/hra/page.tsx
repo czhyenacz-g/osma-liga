@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import GameCanvas from '@/components/game/GameCanvas';
+import MatchPageClient from '@/components/game/MatchPageClient';
 
 export const metadata: Metadata = {
   title: 'Zápas — Osmá liga',
@@ -23,9 +23,7 @@ export default function HraPage() {
         </p>
       </div>
 
-      <div style={{ width: '100%', maxWidth: 960 }}>
-        <GameCanvas />
-      </div>
+      <MatchPageClient />
 
       <p className="text-xs text-center" style={{ color: 'rgba(209,250,229,0.38)' }}>
         WASD / šipky &mdash; pohyb &nbsp;&middot;&nbsp; Space &mdash; kopnout &nbsp;&middot;&nbsp; R &mdash; restart

@@ -3,6 +3,7 @@ import MatchHero from "@/components/league/MatchHero";
 import ClubGrid from "@/components/league/ClubGrid";
 import NewsSection from "@/components/league/NewsSection";
 import LeagueTable from "@/components/league/LeagueTable";
+import RecentResults from "@/components/league/RecentResults";
 import SiteFooter from "@/components/league/SiteFooter";
 
 export default function HomePage() {
@@ -21,6 +22,7 @@ export default function HomePage() {
       </div>
 
       <main>
+        <RecentResults />
         <NewsSection />
         <LeagueTable />
         <ClubGrid />

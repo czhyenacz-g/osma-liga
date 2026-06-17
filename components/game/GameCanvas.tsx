@@ -9,7 +9,12 @@ import { renderGame } from '@/game/renderGame';
 import { playWhistle, resumeAudio } from '@/game/audio';
 import type { GameState, InputState } from '@/game/types';
 
-export default function GameCanvas() {
+interface Props {
+  onMatchEnd?: (score: { home: number; away: number }) => void;
+  onRestart?: () => void;
+}
+
+export default function GameCanvas({ onMatchEnd, onRestart }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -55,6 +60,17 @@ export default function GameCanvas() {
       if (wasRestart || (prevPhase === 'goal' && gameState.phase === 'playing')) {
         playWhistle();
       }
+
+      // Notify parent when match ends for the first time
+      if (prevPhase !== 'ended' && gameState.phase === 'ended') {
+        onMatchEnd?.({ home: gameState.score.home, away: gameState.score.away });
+      }
+
+      // Notify parent on restart so save UI can reset
+      if (wasRestart) {
+        onRestart?.();
+      }
+
       prevPhase = gameState.phase;
 
       renderGame(ctx, gameState);
@@ -70,7 +86,7 @@ export default function GameCanvas() {
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
     };
-  }, []);
+  }, [onMatchEnd, onRestart]);
 
   return (
     <canvas

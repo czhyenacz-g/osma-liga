@@ -3,5 +3,28 @@ services:
     build: .
     ports:
       - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       - NODE_ENV=production
+      - DATABASE_URL=postgresql://osmaliga:secret@postgres:5432/osmaliga
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: osmaliga
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: osmaliga
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U osmaliga -d osmaliga"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
