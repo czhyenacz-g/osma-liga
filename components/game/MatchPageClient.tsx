@@ -9,6 +9,12 @@ import type { TouchInput } from '@/game/types';
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 type GamePhase = 'idle' | 'countdown' | 'playing';
 
+const NO_SELECT: React.CSSProperties = {
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  WebkitTouchCallout: 'none',
+};
+
 const OVERLAY_STYLE: React.CSSProperties = {
   width: '100%',
   aspectRatio: '16 / 9',
@@ -20,6 +26,7 @@ const OVERLAY_STYLE: React.CSSProperties = {
   borderRadius: 6,
   border: '1px solid rgba(255,255,255,0.1)',
   gap: 20,
+  ...NO_SELECT,
 };
 
 const PORTRAIT_OVERLAY: React.CSSProperties = {
@@ -34,7 +41,28 @@ const PORTRAIT_OVERLAY: React.CSSProperties = {
   gap: 16,
   padding: 32,
   textAlign: 'center',
+  ...NO_SELECT,
 };
+
+async function requestGameFullscreen(element: HTMLElement | null): Promise<boolean> {
+  if (!element) return false;
+  const anyEl = element as HTMLElement & {
+    webkitRequestFullscreen?: () => Promise<void> | void;
+  };
+  try {
+    if (element.requestFullscreen) {
+      await element.requestFullscreen();
+      return true;
+    }
+    if (anyEl.webkitRequestFullscreen) {
+      await anyEl.webkitRequestFullscreen();
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
 
 export default function MatchPageClient() {
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
@@ -43,8 +71,11 @@ export default function MatchPageClient() {
   const [countdownNum, setCountdownNum] = useState(3);
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [fsStatus, setFsStatus] = useState<'idle' | 'unavailable'>('idle');
   const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false });
+  const gameWrapperRef = useRef<HTMLDivElement>(null);
 
+  // Orientation / mobile detection
   useEffect(() => {
     const check = () => {
       setIsPortrait(window.innerHeight > window.innerWidth);
@@ -61,6 +92,23 @@ export default function MatchPageClient() {
     };
   }, []);
 
+  // Reset touch state on blur / tab switch / orientation change
+  useEffect(() => {
+    const reset = () => {
+      const t = touchRef.current;
+      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false;
+    };
+    window.addEventListener('blur', reset);
+    document.addEventListener('visibilitychange', reset);
+    window.addEventListener('orientationchange', reset);
+    return () => {
+      window.removeEventListener('blur', reset);
+      document.removeEventListener('visibilitychange', reset);
+      window.removeEventListener('orientationchange', reset);
+    };
+  }, []);
+
+  // Countdown logic
   useEffect(() => {
     if (gamePhase !== 'countdown') return;
     if (countdownNum > 0) {
@@ -90,6 +138,11 @@ export default function MatchPageClient() {
     setSaveState('idle');
     setGamePhase('idle');
   }, []);
+
+  const handleFullscreen = async () => {
+    const ok = await requestGameFullscreen(gameWrapperRef.current);
+    if (!ok) setFsStatus('unavailable');
+  };
 
   const save = async () => {
     if (!matchScore) return;
@@ -125,7 +178,7 @@ export default function MatchPageClient() {
         </div>
       )}
 
-      <div style={{ width: '100%', maxWidth: 960 }}>
+      <div ref={gameWrapperRef} style={{ width: '100%', maxWidth: 960 }}>
         {gamePhase === 'idle' && (
           <div style={OVERLAY_STYLE}>
             <p className="text-2xl font-black text-white">Připraven?</p>
@@ -139,6 +192,23 @@ export default function MatchPageClient() {
             >
               Spustit zápas
             </button>
+
+            {isMobile && (
+              <div className="flex flex-col items-center gap-1.5">
+                <button
+                  onClick={handleFullscreen}
+                  className="text-xs transition hover:opacity-80"
+                  style={{ color: 'rgba(209,250,229,0.38)' }}
+                >
+                  ⛶ Celá obrazovka
+                </button>
+                {fsStatus === 'unavailable' && (
+                  <p className="text-[10px]" style={{ color: 'rgba(209,250,229,0.3)' }}>
+                    Celá obrazovka není v tomto prohlížeči dostupná.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -160,10 +230,11 @@ export default function MatchPageClient() {
           <div
             style={{
               touchAction: 'none',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
               overscrollBehavior: 'contain',
+              ...NO_SELECT,
             }}
+            onTouchStart={(e) => { e.preventDefault(); }}
+            onTouchMove={(e) => { e.preventDefault(); }}
           >
             <GameCanvas
               onMatchEnd={handleMatchEnd}

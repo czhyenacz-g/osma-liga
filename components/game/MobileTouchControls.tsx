@@ -5,6 +5,12 @@ import type { TouchInput } from '@/game/types';
 const BTN = 48;
 const GAP = 4;
 
+const NO_SELECT: React.CSSProperties = {
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  WebkitTouchCallout: 'none',
+};
+
 const BASE_BTN: React.CSSProperties = {
   width: BTN,
   height: BTN,
@@ -16,20 +22,20 @@ const BASE_BTN: React.CSSProperties = {
   borderRadius: 8,
   color: 'white',
   fontSize: 18,
-  userSelect: 'none',
-  WebkitUserSelect: 'none',
   touchAction: 'none',
   cursor: 'default',
-  WebkitTouchCallout: 'none',
+  ...NO_SELECT,
 };
 
 function Btn({
   label,
+  ariaLabel,
   onStart,
   onEnd,
   style,
 }: {
   label: string;
+  ariaLabel: string;
   onStart: () => void;
   onEnd: () => void;
   style?: React.CSSProperties;
@@ -37,17 +43,21 @@ function Btn({
   return (
     <button
       type="button"
+      draggable={false}
+      aria-label={ariaLabel}
       style={{ ...BASE_BTN, ...style }}
       onPointerDown={(e) => {
         e.preventDefault();
-        (e.currentTarget as Element).setPointerCapture(e.pointerId);
+        e.stopPropagation();
+        e.currentTarget.setPointerCapture(e.pointerId);
         onStart();
       }}
-      onPointerUp={(e) => { e.preventDefault(); onEnd(); }}
-      onPointerCancel={() => onEnd()}
-      onPointerLeave={() => onEnd()}
+      onPointerUp={(e) => { e.preventDefault(); e.stopPropagation(); onEnd(); }}
+      onPointerCancel={(e) => { e.stopPropagation(); onEnd(); }}
+      onPointerLeave={(e) => { e.stopPropagation(); onEnd(); }}
+      onTouchStart={(e) => { e.preventDefault(); }}
     >
-      {label}
+      <span aria-hidden="true" style={NO_SELECT}>{label}</span>
     </button>
   );
 }
@@ -72,17 +82,28 @@ export default function MobileTouchControls({
           gridTemplateColumns: `${BTN}px ${BTN}px ${BTN}px`,
           gridTemplateRows: `${BTN}px ${BTN}px ${BTN}px`,
           gap: GAP,
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
           touchAction: 'none',
+          ...NO_SELECT,
         }}
+        onTouchStart={(e) => e.preventDefault()}
+        onTouchMove={(e) => e.preventDefault()}
       >
         {/* Řádek 1 */}
         <div />
-        <Btn label="▲" onStart={() => { t.up = true; }} onEnd={() => { t.up = false; }} />
+        <Btn
+          label="▲"
+          ariaLabel="Nahoru"
+          onStart={() => { t.up = true; }}
+          onEnd={() => { t.up = false; }}
+        />
         <div />
         {/* Řádek 2 */}
-        <Btn label="◀" onStart={() => { t.left = true; }} onEnd={() => { t.left = false; }} />
+        <Btn
+          label="◀"
+          ariaLabel="Vlevo"
+          onStart={() => { t.left = true; }}
+          onEnd={() => { t.left = false; }}
+        />
         <div
           style={{
             width: BTN,
@@ -91,16 +112,28 @@ export default function MobileTouchControls({
             borderRadius: 8,
           }}
         />
-        <Btn label="▶" onStart={() => { t.right = true; }} onEnd={() => { t.right = false; }} />
+        <Btn
+          label="▶"
+          ariaLabel="Vpravo"
+          onStart={() => { t.right = true; }}
+          onEnd={() => { t.right = false; }}
+        />
         {/* Řádek 3 */}
         <div />
-        <Btn label="▼" onStart={() => { t.down = true; }} onEnd={() => { t.down = false; }} />
+        <Btn
+          label="▼"
+          ariaLabel="Dolů"
+          onStart={() => { t.down = true; }}
+          onEnd={() => { t.down = false; }}
+        />
         <div />
       </div>
 
       {/* KOP — pravý dolní roh */}
       <button
         type="button"
+        draggable={false}
+        aria-label="Kop"
         style={{
           position: 'fixed',
           bottom: 16,
@@ -119,23 +152,23 @@ export default function MobileTouchControls({
           alignItems: 'center',
           justifyContent: 'center',
           gap: 1,
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
           touchAction: 'none',
           cursor: 'default',
-          WebkitTouchCallout: 'none',
+          ...NO_SELECT,
         }}
         onPointerDown={(e) => {
           e.preventDefault();
-          (e.currentTarget as Element).setPointerCapture(e.pointerId);
+          e.stopPropagation();
+          e.currentTarget.setPointerCapture(e.pointerId);
           t.kick = true;
         }}
-        onPointerUp={(e) => { e.preventDefault(); t.kick = false; }}
-        onPointerCancel={() => { t.kick = false; }}
-        onPointerLeave={() => { t.kick = false; }}
+        onPointerUp={(e) => { e.preventDefault(); e.stopPropagation(); t.kick = false; }}
+        onPointerCancel={(e) => { e.stopPropagation(); t.kick = false; }}
+        onPointerLeave={(e) => { e.stopPropagation(); t.kick = false; }}
+        onTouchStart={(e) => { e.preventDefault(); }}
       >
-        <span>KOP</span>
-        <span style={{ fontSize: 9, opacity: 0.65 }}>střela</span>
+        <span aria-hidden="true" style={NO_SELECT}>KOP</span>
+        <span aria-hidden="true" style={{ fontSize: 9, opacity: 0.65, ...NO_SELECT }}>střela</span>
       </button>
     </>
   );
