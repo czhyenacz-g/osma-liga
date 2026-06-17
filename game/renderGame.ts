@@ -205,7 +205,7 @@ function drawEndOverlay(
   // ── Controls ──
   ctx.font = '11px monospace';
   ctx.fillStyle = 'rgba(255,255,255,0.28)';
-  ctx.fillText('R — restart  ·  Esc — web soutěže', cx, py + 272);
+  ctx.fillText('R — odveta  ·  Esc — šatna', cx, py + 272);
 }
 
 // ── Main render function ──────────────────────────────────────────────────────

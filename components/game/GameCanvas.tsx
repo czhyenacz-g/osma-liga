@@ -35,10 +35,10 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Pro
     const onFirstKey = () => { resumeAudio(); };
     window.addEventListener('keydown', onFirstKey, { once: true });
 
-    // Esc navigates back to homepage when match is ended
+    // Esc navigates to šatna when match is ended
     const onEsc = (e: KeyboardEvent) => {
       if (e.code === 'Escape' && gameState.phase === 'ended') {
-        window.location.href = '/';
+        window.location.href = '/satna';
       }
     };
     window.addEventListener('keydown', onEsc);

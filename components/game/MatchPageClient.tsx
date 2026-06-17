@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import GameCanvas from './GameCanvas';
 import MobileTouchControls from './MobileTouchControls';
 import { MATCH_DURATION } from '@/game/constants';
@@ -229,6 +230,7 @@ export default function MatchPageClient() {
         {gamePhase === 'playing' && (
           <div
             style={{
+              position: 'relative',
               touchAction: 'none',
               overscrollBehavior: 'contain',
               ...NO_SELECT,
@@ -241,11 +243,91 @@ export default function MatchPageClient() {
               onRestart={handleRestart}
               touchInputRef={touchRef}
             />
+
+            {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
+            {matchScore !== null && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  paddingBottom: '11%',
+                  gap: 8,
+                }}
+              >
+                {/* × v pravém horním rohu canvas panelu */}
+                <Link
+                  href="/satna"
+                  style={{
+                    position: 'absolute',
+                    top: '21%',
+                    right: '23%',
+                    width: 28,
+                    height: 28,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.45)',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    lineHeight: 1,
+                  }}
+                  aria-label="Zavřít a přejít do šatny"
+                >
+                  ×
+                </Link>
+
+                {/* Akční tlačítka */}
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <Link
+                    href="/satna"
+                    style={{
+                      background: '#d6a94a',
+                      color: '#041f14',
+                      padding: '11px 22px',
+                      borderRadius: 10,
+                      fontWeight: 'bold',
+                      fontSize: 13,
+                      textDecoration: 'none',
+                      touchAction: 'manipulation',
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                    }}
+                  >
+                    Zpět do šatny
+                  </Link>
+                  <button
+                    onClick={handleRestart}
+                    style={{
+                      background: 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.22)',
+                      color: 'rgba(255,255,255,0.8)',
+                      padding: '11px 22px',
+                      borderRadius: 10,
+                      fontWeight: 'bold',
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      touchAction: 'manipulation',
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                    }}
+                  >
+                    Odveta
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {isMobile && gamePhase === 'playing' && (
+      {isMobile && gamePhase === 'playing' && matchScore === null && (
         <MobileTouchControls touchRef={touchRef} />
       )}
 
