@@ -72,39 +72,29 @@ curl -o /dev/null -w "%{http_code}" https://api.osmaliga.cz/api/osma-liga/match-
 
 ---
 
-## Zálohy (checklist — zatím manuální)
+## Zálohy
 
-> Automatické backupy nejsou zatím nastaveny. Před prvním produkčním nasazením ověř:
+Denní lokální zálohy jsou nastavené. Viz detailní dokumentaci:
+[`docs/operations/backups.md`](backups.md) v repozitáři `project-hub-api`.
 
-- [ ] Název Postgres kontejneru: `project-hub-postgres`
-- [ ] Název databáze: `project_hub`
-- [ ] DB user: `project_hub_user`
-- [ ] Heslo: uloženo v `/opt/project-hub-api/.env` jako `POSTGRES_PASSWORD`
-- [ ] Ověřit volné místo na disku: `df -h` na VPS
-- [ ] Zálohy ukládat **mimo stejný disk** (jiný server, S3, Backblaze B2, apod.)
+Souhrn:
 
-### Příklad backup příkazu
+| Položka | Hodnota |
+|---|---|
+| Skript | `/opt/project-hub-api/scripts/backup-project-hub-db.sh` |
+| Backup dir | `/opt/backups/project-hub/daily/` |
+| Logy | `/opt/backups/project-hub/logs/` |
+| Cron | `17 3 * * *` (každý den v 03:17) |
+| Rotace | 14 dní |
+| Off-server backup | záměrně odložen (hobby/demo projekt) |
 
-> Nejdřív ověř, že container a credentials odpovídají `.env` na serveru.
-
-```bash
-docker exec project-hub-postgres pg_dump \
-  -U project_hub_user project_hub \
-  > backup-project-hub-$(date +%F).sql
-```
-
-Pro produkci: komprimované a rotované zálohy, ukládané mimo VPS:
-
-```bash
-docker exec project-hub-postgres pg_dump -U project_hub_user project_hub \
-  | gzip > backup-project-hub-$(date +%F).sql.gz
-# pak: scp nebo rclone na remote storage
-```
+Lokální záloha chrání hlavně před chybnou migrací nebo nechtěným smazáním dat.
+**Nechrání před ztrátou celého VPS.** Off-server backup (Hetzner Storage Box, B2) je doporučený krok před produkčním provozem.
 
 ### Kritické — nikdy nepoužívat bez vědomého rozhodnutí
 
 ```bash
-# TOTO PŘÍKAZ MAŽE VŠECHNA DATA — nespouštět bez úmyslu
+# TENTO PŘÍKAZ MAŽE DOCKER VOLUMES VČETNĚ DAT — nespouštět bez úmyslu
 docker compose down -v
 ```
 
