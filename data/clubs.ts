@@ -16,7 +16,7 @@ export const CLUBS: Club[] = [
     id: "nahoda_fc",
     slug: "nahoda-fc",
     name: "Náhoda FC",
-    banner: "/nahoda_banner.webp",
+    banner: "/banners/nahoda_banner.webp",
     note: "Klub, který nikdy neměl postoupit. Bohužel postoupil.",
     location: "Hřiště za hasičárnou",
     colors: "zelená, krémová, zlatá",
