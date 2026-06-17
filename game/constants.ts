@@ -40,6 +40,8 @@ export const GOAL_PAUSE = 2.5;
 
 // Corner zone — ball must be near BOTH horizontal and vertical edge
 export const CORNER_ZONE_MARGIN = 72;
-export const CORNER_WARNING_DELAY = 3;   // seconds before countdown shows
-export const CORNER_CLEAR_DELAY = 8;     // seconds before systemic clearance kick
+export const CORNER_WARNING_DELAY = 3;         // seconds before countdown shows
+export const CORNER_CLEAR_DELAY = 8;           // seconds before systemic clearance kick
 export const CORNER_CLEAR_SPEED = 360;
+export const CORNER_CLEAR_REPOSITION = 96;     // px ball is moved toward center before velocity kick
+export const CORNER_CLEAR_COOLDOWN = 1.5;      // seconds corner timer is suppressed after clear

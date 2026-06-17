@@ -49,5 +49,6 @@ export function createInitialState(): GameState {
     isOwnGoal: false,
     cornerTimer: 0,
     cornerKickCount: 0,
+    cornerClearCooldown: 0,
   };
 }

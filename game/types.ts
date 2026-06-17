@@ -37,6 +37,7 @@ export interface GameState {
   // Corner zone timer
   cornerTimer: number;
   cornerKickCount: number;
+  cornerClearCooldown: number;
 }
 
 export interface InputState {

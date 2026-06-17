@@ -12,6 +12,8 @@ import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, RETURN_SPEED, GOAL_PAUSE,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
+  CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
+  BALL_RADIUS,
 } from './constants';
 
 const GOAL_MESSAGES = [
@@ -50,6 +52,7 @@ function resetPositions(state: GameState): void {
   state.ball.pos = { ...fresh.ball.pos };
   state.ball.vel = { x: 0, y: 0 };
   state.cornerTimer = 0;
+  state.cornerClearCooldown = 0;
   state.lastTouchTeam = null;
   state.lastTouchPlayerId = null;
   state.isOwnGoal = false;
@@ -178,25 +181,40 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
 
   // ── Corner zone clearance ─────────────────────────────────────────────────
 
+  // Decrement cooldown after a clear (suppresses immediate re-trigger)
+  if (state.cornerClearCooldown > 0) {
+    state.cornerClearCooldown = Math.max(0, state.cornerClearCooldown - dt);
+  }
+
   const nearLeft  = state.ball.pos.x - FIELD_L < CORNER_ZONE_MARGIN;
   const nearRight = FIELD_R - state.ball.pos.x < CORNER_ZONE_MARGIN;
   const nearTop   = state.ball.pos.y - FIELD_T < CORNER_ZONE_MARGIN;
   const nearBot   = FIELD_B - state.ball.pos.y < CORNER_ZONE_MARGIN;
   const inCorner  = (nearLeft || nearRight) && (nearTop || nearBot);
 
-  if (inCorner) {
+  if (inCorner && state.cornerClearCooldown <= 0) {
     state.cornerTimer += dt;
     if (state.cornerTimer >= CORNER_CLEAR_DELAY) {
       const dir = normalize({
         x: FIELD_CX - state.ball.pos.x,
         y: FIELD_CY - state.ball.pos.y,
       });
+      // Move ball toward center before applying velocity so it escapes the corner
+      state.ball.pos = clampPos(
+        {
+          x: state.ball.pos.x + dir.x * CORNER_CLEAR_REPOSITION,
+          y: state.ball.pos.y + dir.y * CORNER_CLEAR_REPOSITION,
+        },
+        FIELD_L + BALL_RADIUS, FIELD_R - BALL_RADIUS,
+        FIELD_T + BALL_RADIUS, FIELD_B - BALL_RADIUS,
+      );
       state.ball.vel.x = dir.x * CORNER_CLEAR_SPEED + (Math.random() - 0.5) * 40;
       state.ball.vel.y = dir.y * CORNER_CLEAR_SPEED + (Math.random() - 0.5) * 40;
       state.cornerTimer = 0;
+      state.cornerClearCooldown = CORNER_CLEAR_COOLDOWN;
       state.cornerKickCount += 1;
     }
-  } else {
+  } else if (!inCorner) {
     state.cornerTimer = 0;
   }
 
