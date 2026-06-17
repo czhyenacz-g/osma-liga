@@ -1,14 +1,79 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import GameCanvas from './GameCanvas';
 import { MATCH_DURATION } from '@/game/constants';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+type GamePhase = 'idle' | 'countdown' | 'playing';
+
+const OVERLAY_STYLE: React.CSSProperties = {
+  width: '100%',
+  aspectRatio: '16 / 9',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: '#030e08',
+  borderRadius: 6,
+  border: '1px solid rgba(255,255,255,0.1)',
+  gap: 20,
+};
+
+const PORTRAIT_OVERLAY: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 50,
+  background: '#041f14',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 16,
+  padding: 32,
+  textAlign: 'center',
+};
 
 export default function MatchPageClient() {
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
   const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [gamePhase, setGamePhase] = useState<GamePhase>('idle');
+  const [countdownNum, setCountdownNum] = useState(3);
+  const [isPortrait, setIsPortrait] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+      setIsMobile(
+        window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768,
+      );
+    };
+    check();
+    window.addEventListener('resize', check);
+    window.addEventListener('orientationchange', check);
+    return () => {
+      window.removeEventListener('resize', check);
+      window.removeEventListener('orientationchange', check);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (gamePhase !== 'countdown') return;
+    if (countdownNum > 0) {
+      const t = setTimeout(() => setCountdownNum((n) => n - 1), 1000);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setGamePhase('playing'), 700);
+    return () => clearTimeout(t);
+  }, [gamePhase, countdownNum]);
+
+  const startCountdown = () => {
+    setCountdownNum(3);
+    setGamePhase('countdown');
+    setMatchScore(null);
+    setSaveState('idle');
+  };
 
   const handleMatchEnd = useCallback((score: { home: number; away: number }) => {
     setMatchScore(score);
@@ -18,6 +83,7 @@ export default function MatchPageClient() {
   const handleRestart = useCallback(() => {
     setMatchScore(null);
     setSaveState('idle');
+    setGamePhase('idle');
   }, []);
 
   const save = async () => {
@@ -40,18 +106,67 @@ export default function MatchPageClient() {
     }
   };
 
+  const countdownText = countdownNum > 0 ? String(countdownNum) : 'HRAJ!';
+
   return (
     <>
+      {isMobile && isPortrait && (
+        <div style={PORTRAIT_OVERLAY}>
+          <span style={{ fontSize: 52, lineHeight: 1 }}>↻</span>
+          <p className="text-xl font-bold text-white">Otoč telefon na šířku.</p>
+          <p className="text-sm" style={{ color: 'rgba(209,250,229,0.5)' }}>
+            Okresní fotbal se na výšku nevejde.
+          </p>
+        </div>
+      )}
+
       <div style={{ width: '100%', maxWidth: 960 }}>
-        <GameCanvas onMatchEnd={handleMatchEnd} onRestart={handleRestart} />
+        {gamePhase === 'idle' && (
+          <div style={OVERLAY_STYLE}>
+            <p className="text-2xl font-black text-white">Připraven?</p>
+            <p className="text-sm" style={{ color: 'rgba(209,250,229,0.5)' }}>
+              Nastoupit na hřiště.
+            </p>
+            <button
+              onClick={startCountdown}
+              className="rounded-xl px-8 py-3 text-sm font-bold transition hover:opacity-90 active:scale-95"
+              style={{ background: '#d6a94a', color: '#041f14' }}
+            >
+              Spustit zápas
+            </button>
+          </div>
+        )}
+
+        {gamePhase === 'countdown' && (
+          <div style={OVERLAY_STYLE}>
+            <p
+              className="font-black leading-none"
+              style={{
+                fontSize: countdownNum === 0 ? 80 : 140,
+                color: countdownNum === 0 ? '#d6a94a' : 'white',
+              }}
+            >
+              {countdownText}
+            </p>
+          </div>
+        )}
+
+        {gamePhase === 'playing' && (
+          <div
+            style={{
+              touchAction: 'none',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              overscrollBehavior: 'contain',
+            }}
+          >
+            <GameCanvas onMatchEnd={handleMatchEnd} onRestart={handleRestart} />
+          </div>
+        )}
       </div>
 
-      {/* Save UI — visible only after match ends */}
       {matchScore !== null && (
-        <div
-          className="flex items-center gap-3 text-sm"
-          style={{ minHeight: 36 }}
-        >
+        <div className="flex items-center gap-3 text-sm" style={{ minHeight: 36 }}>
           {saveState === 'idle' && (
             <button
               onClick={save}

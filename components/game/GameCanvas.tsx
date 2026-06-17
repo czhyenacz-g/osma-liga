@@ -106,6 +106,9 @@ export default function GameCanvas({ onMatchEnd, onRestart }: Props) {
         maxWidth: CANVAS_W,
         borderRadius: '6px',
         outline: '1px solid rgba(255,255,255,0.1)',
+        touchAction: 'none',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
       }}
     />
   );
