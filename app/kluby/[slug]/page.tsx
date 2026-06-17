@@ -136,7 +136,7 @@ export default async function ClubDetailPage({ params }: Props) {
           {/* CTA */}
           <div className="flex flex-wrap gap-3 mt-2">
             <Link
-              href="/hra"
+              href="/satna"
               className="inline-block rounded-lg px-5 py-2.5 text-sm font-bold transition hover:opacity-90"
               style={{ background: "#063f24", color: "#fff" }}
             >
