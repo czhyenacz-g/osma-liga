@@ -14,8 +14,54 @@ export default function SiteFooter() {
       id="partneri"
       style={{ borderTop: "1px solid rgba(216,173,69,0.22)", background: "linear-gradient(to bottom, #063f24 0%, #052e1a 60%, #041f14 100%)" }}
     >
+      {/* Partner / spolupráce box */}
+      <div className="mx-auto max-w-[1240px] px-6 pt-12 pb-8">
+        <div
+          className="max-w-2xl rounded-xl px-7 py-7"
+          style={{
+            background: "rgba(6,63,36,0.55)",
+            border: "1px solid rgba(216,173,69,0.28)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.22)",
+          }}
+        >
+          <p
+            className="text-xs font-black uppercase tracking-[0.18em] mb-4"
+            style={{ color: "#d8ad45" }}
+          >
+            Spolupráce a skutečné kluby
+          </p>
+          <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
+            Máte značku, hospodu, obchod, službu nebo projekt, který patří k fotbalu, vesnici nebo
+            okresnímu životu? Na Osmé lize může být prostor i pro vaši reklamu.
+          </p>
+          <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
+            A pokud jste skutečný tým z nižší soutěže a na těchto stránkách se zatím nevidíte,
+            ozvěte se. Rádi vás časem přidáme mezi kluby, které drží okresní fotbal při životě.
+          </p>
+          <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(209,250,229,0.82)" }}>
+            Za drobný poplatek vám můžeme připravit i jednoduchou stránku klubu přímo na Osmé lize —
+            nebo samostatnou malou klubovou prezentaci, aby se o vašem týmu, zápasech a lidech kolem
+            hřiště vědělo víc.
+          </p>
+          <p className="text-sm mb-1" style={{ color: "rgba(209,250,229,0.82)" }}>
+            Napište na{" "}
+            <a
+              href="mailto:info@osmaliga.cz"
+              className="font-semibold transition hover:opacity-80"
+              style={{ color: "#d8ad45" }}
+            >
+              info@osmaliga.cz
+            </a>
+            .
+          </p>
+          <p className="text-xs mt-4 italic" style={{ color: "rgba(209,250,229,0.4)" }}>
+            Hrdinové okresu si zaslouží být vidět.
+          </p>
+        </div>
+      </div>
+
       {/* Hlavní obsah */}
-      <div className="mx-auto max-w-[1240px] px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+      <div className="mx-auto max-w-[1240px] px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
 
         {/* Levý sloupec — brand */}
         <div className="flex flex-col gap-4">
@@ -82,6 +128,13 @@ export default function SiteFooter() {
               <br />
               <span className="text-xs" style={{ color: "rgba(209,250,229,0.4)" }}>trenér Náhoda FC</span>
             </p>
+            <a
+              href="mailto:info@osmaliga.cz"
+              className="text-sm transition hover:opacity-80 mt-1 inline-block"
+              style={{ color: "#d8ad45" }}
+            >
+              info@osmaliga.cz
+            </a>
           </div>
         </div>
 
