@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import GameCanvas from './GameCanvas';
+import MobileTouchControls from './MobileTouchControls';
 import { MATCH_DURATION } from '@/game/constants';
+import type { TouchInput } from '@/game/types';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 type GamePhase = 'idle' | 'countdown' | 'playing';
@@ -41,6 +43,7 @@ export default function MatchPageClient() {
   const [countdownNum, setCountdownNum] = useState(3);
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false });
 
   useEffect(() => {
     const check = () => {
@@ -81,6 +84,8 @@ export default function MatchPageClient() {
   }, []);
 
   const handleRestart = useCallback(() => {
+    const t = touchRef.current;
+    t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false;
     setMatchScore(null);
     setSaveState('idle');
     setGamePhase('idle');
@@ -160,10 +165,18 @@ export default function MatchPageClient() {
               overscrollBehavior: 'contain',
             }}
           >
-            <GameCanvas onMatchEnd={handleMatchEnd} onRestart={handleRestart} />
+            <GameCanvas
+              onMatchEnd={handleMatchEnd}
+              onRestart={handleRestart}
+              touchInputRef={touchRef}
+            />
           </div>
         )}
       </div>
+
+      {isMobile && gamePhase === 'playing' && (
+        <MobileTouchControls touchRef={touchRef} />
+      )}
 
       {matchScore !== null && (
         <div className="flex items-center gap-3 text-sm" style={{ minHeight: 36 }}>

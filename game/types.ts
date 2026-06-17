@@ -48,3 +48,11 @@ export interface InputState {
   kick: boolean;
   restart: boolean;
 }
+
+export interface TouchInput {
+  up: boolean;
+  down: boolean;
+  left: boolean;
+  right: boolean;
+  kick: boolean;
+}

@@ -1,20 +1,22 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import type { MutableRefObject } from 'react';
 import { CANVAS_W, CANVAS_H } from '@/game/constants';
 import { createInitialState } from '@/game/createInitialState';
 import { createInputState, attachInputListeners } from '@/game/input';
 import { updateGame } from '@/game/updateGame';
 import { renderGame } from '@/game/renderGame';
 import { playWhistle, resumeAudio } from '@/game/audio';
-import type { GameState, InputState } from '@/game/types';
+import type { GameState, InputState, TouchInput } from '@/game/types';
 
 interface Props {
   onMatchEnd?: (score: { home: number; away: number }) => void;
   onRestart?: () => void;
+  touchInputRef?: MutableRefObject<TouchInput>;
 }
 
-export default function GameCanvas({ onMatchEnd, onRestart }: Props) {
+export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -54,8 +56,20 @@ export default function GameCanvas({ onMatchEnd, onRestart }: Props) {
       const dt = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
 
-      const wasRestart = input.restart;
-      gameState = updateGame(gameState, input, dt);
+      const touch = touchInputRef?.current;
+      const merged: InputState = touch
+        ? {
+            up: input.up || touch.up,
+            down: input.down || touch.down,
+            left: input.left || touch.left,
+            right: input.right || touch.right,
+            kick: input.kick || touch.kick,
+            restart: input.restart,
+          }
+        : input;
+
+      const wasRestart = merged.restart;
+      gameState = updateGame(gameState, merged, dt);
 
       // Whistle on restart, goal reset, or systemic corner kick
       if (
@@ -92,7 +106,7 @@ export default function GameCanvas({ onMatchEnd, onRestart }: Props) {
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
     };
-  }, [onMatchEnd, onRestart]);
+  }, [onMatchEnd, onRestart, touchInputRef]);
 
   return (
     <canvas
