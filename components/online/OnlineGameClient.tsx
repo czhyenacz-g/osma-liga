@@ -53,10 +53,10 @@ export default function OnlineGameClient({
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
 
-    // Send input to server at 20Hz
+    // Send input to server at ~30Hz
     const interval = setInterval(() => {
       sendInput({ ...keysRef.current });
-    }, 50);
+    }, 33);
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
