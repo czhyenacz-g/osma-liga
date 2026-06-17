@@ -37,6 +37,13 @@ export const BOT_KICK_COOLDOWN = 0.85;
 // Inactive teammate support movement speed
 export const SUPPORT_PLAYER_SPEED = 120;
 
+// Active player stability: new candidate must be this many px closer before switching
+export const ACTIVE_PLAYER_SWITCH_MARGIN = 18;
+
+// Teammate separation — soft push to prevent overlapping
+export const TEAMMATE_SEPARATION_RADIUS = 42;
+export const TEAMMATE_SEPARATION_STRENGTH = 0.5;
+
 // Ball control (soft trap for active home player)
 export const BALL_CONTROL_RADIUS = 44;
 export const BALL_CONTROL_DAMPING = 0.90;

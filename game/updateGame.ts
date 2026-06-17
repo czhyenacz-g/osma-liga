@@ -11,6 +11,7 @@ import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, GOAL_PAUSE, SUPPORT_PLAYER_SPEED,
+  ACTIVE_PLAYER_SWITCH_MARGIN, TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
@@ -84,20 +85,35 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     return state;
   }
 
-  // ── Active player: home player closest to ball ────────────────────────────
+  // ── Active player selection with hysteresis ──────────────────────────────
+  // The current active player stays active until a different player is clearly
+  // closer by ACTIVE_PLAYER_SWITCH_MARGIN, preventing jitter when two players
+  // are at similar distances from the ball.
 
   const homePlayers = state.players.filter(p => p.team === 'home');
 
-  let active = homePlayers[0];
-  let activeDist = Infinity;
+  let nearest = homePlayers[0];
+  let nearestDist = Infinity;
   for (const p of homePlayers) {
     const d = dist(p.pos, state.ball.pos);
-    if (d < activeDist) {
-      activeDist = d;
-      active = p;
+    if (d < nearestDist) {
+      nearestDist = d;
+      nearest = p;
     }
   }
+
+  const currentActive = homePlayers.find(p => p.id === state.activePlayerId);
+  let active: typeof nearest;
+  if (!currentActive) {
+    active = nearest;
+  } else {
+    const currentDist = dist(currentActive.pos, state.ball.pos);
+    active = (nearest.id !== currentActive.id && nearestDist + ACTIVE_PLAYER_SWITCH_MARGIN < currentDist)
+      ? nearest
+      : currentActive;
+  }
   state.activePlayerId = active.id;
+  const activeDist = dist(active.pos, state.ball.pos);
 
   // Decrement kick cooldowns
   for (const p of homePlayers) {
@@ -241,6 +257,34 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
       FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS,
       FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS,
     );
+  }
+
+  // ── Teammate separation ───────────────────────────────────────────────────
+  // Soft push to prevent home players from fully overlapping. Active player
+  // receives only 25 % of the push so player control feels stable.
+
+  for (let i = 0; i < homePlayers.length - 1; i++) {
+    for (let j = i + 1; j < homePlayers.length; j++) {
+      const a = homePlayers[i];
+      const b = homePlayers[j];
+      const dx = b.pos.x - a.pos.x;
+      const dy = b.pos.y - a.pos.y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < TEAMMATE_SEPARATION_RADIUS) {
+        const nx = d > 0.1 ? dx / d : 1;
+        const ny = d > 0.1 ? dy / d : 0;
+        const totalPush = (TEAMMATE_SEPARATION_RADIUS - d) * TEAMMATE_SEPARATION_STRENGTH;
+        const aIsActive = a.id === active.id;
+        const aFrac = aIsActive ? 0.25 : (b.id === active.id ? 0.75 : 0.5);
+        const bFrac = 1.0 - aFrac;
+        a.pos.x -= nx * totalPush * aFrac;
+        a.pos.y -= ny * totalPush * aFrac;
+        b.pos.x += nx * totalPush * bFrac;
+        b.pos.y += ny * totalPush * bFrac;
+        a.pos = clampPos(a.pos, FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS, FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS);
+        b.pos = clampPos(b.pos, FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS, FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS);
+      }
+    }
   }
 
   // ── Bot AI ────────────────────────────────────────────────────────────────
