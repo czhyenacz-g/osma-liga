@@ -129,11 +129,11 @@ export default function OnlineLobbyPage() {
 
             <div className="flex flex-col gap-2">
               <p className="text-xs" style={{ color: 'rgba(209,250,229,0.45)' }}>Odkaz pro soupeře</p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 min-w-0">
                 <input
                   readOnly
                   value={inviteUrl}
-                  className="flex-1 text-xs px-3 py-2 rounded-lg bg-transparent border text-white"
+                  className="flex-1 min-w-0 text-xs px-3 py-2 rounded-lg bg-transparent border text-white truncate"
                   style={{ borderColor: 'rgba(255,255,255,0.12)' }}
                 />
                 <button

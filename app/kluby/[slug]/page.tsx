@@ -47,7 +47,7 @@ export default async function ClubDetailPage({ params }: Props) {
       <main className="bg-white min-h-screen">
         <div className="mx-auto max-w-3xl px-4 py-12">
           {/* Breadcrumb */}
-          <div className="mb-6 text-xs text-gray-400 flex gap-2 items-center">
+          <div className="mb-6 text-xs text-gray-400 flex flex-wrap gap-2 items-center">
             <Link href="/" className="hover:text-gray-600 transition">Úvod</Link>
             <span>›</span>
             <Link href="/kluby" className="hover:text-gray-600 transition">Kluby</Link>
@@ -56,7 +56,7 @@ export default async function ClubDetailPage({ params }: Props) {
           </div>
 
           {/* Hlavička klubu */}
-          <div className="flex items-center gap-6 mb-8">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-8">
             <Image
               src={club.banner}
               alt={club.name}

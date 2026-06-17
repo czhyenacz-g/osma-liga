@@ -28,7 +28,7 @@ export default function SatnaJoinForm() {
           onChange={(e) => { setCode(e.target.value); setError(''); }}
           placeholder="např. AB3XY7"
           maxLength={12}
-          className="flex-1 px-4 py-2.5 rounded-lg text-sm font-mono font-bold uppercase bg-transparent border text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/60"
+          className="flex-1 px-4 py-2.5 rounded-lg text-base font-mono font-bold uppercase bg-transparent border text-white placeholder:text-white/25 focus:outline-none focus:border-amber-400/60"
           style={{ borderColor: 'rgba(255,255,255,0.15)' }}
         />
         <button

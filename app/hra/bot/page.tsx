@@ -25,8 +25,11 @@ export default function HraBotPage() {
 
       <MatchPageClient />
 
-      <p className="text-xs text-center" style={{ color: 'rgba(209,250,229,0.38)' }}>
+      <p className="hidden sm:block text-xs text-center" style={{ color: 'rgba(209,250,229,0.38)' }}>
         WASD / šipky &mdash; pohyb &nbsp;&middot;&nbsp; Space &mdash; kopnout &nbsp;&middot;&nbsp; R &mdash; restart
+      </p>
+      <p className="sm:hidden text-xs text-center max-w-xs" style={{ color: 'rgba(209,250,229,0.38)' }}>
+        Hra vyžaduje klávesnici. Na mobilu doporučujeme hrát na větší obrazovce.
       </p>
 
       <div className="flex flex-col items-center gap-2">

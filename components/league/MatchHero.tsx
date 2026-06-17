@@ -47,7 +47,7 @@ export default function MatchHero() {
       {/* Tmavý overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/75" />
 
-      <div className="relative mx-auto max-w-[1240px] px-6 py-12 lg:py-16">
+      <div className="relative mx-auto max-w-[1240px] px-4 sm:px-6 py-10 lg:py-16">
         <div className="flex flex-col lg:flex-row lg:items-start lg:gap-16 xl:gap-24">
 
           {/* ── LEVÁ ČÁST: poslední utkání ── */}
@@ -63,7 +63,7 @@ export default function MatchHero() {
               </div>
 
               {/* Scoreboard */}
-              <div className="grid items-center text-center" style={{ gridTemplateColumns: "150px 1fr 150px" }}>
+              <div className="grid items-center text-center" style={{ gridTemplateColumns: "minmax(72px, 140px) 1fr minmax(72px, 140px)" }}>
                 {/* Domácí */}
                 <div className="flex flex-col items-center gap-1.5">
                   <Image src="/nahoda_banner.webp" alt="Náhoda FC" width={72} height={72} className="object-contain drop-shadow-lg" />
@@ -72,7 +72,7 @@ export default function MatchHero() {
 
                 {/* Skóre */}
                 <div>
-                  <div className="font-black leading-none text-white" style={{ fontSize: "clamp(52px, 7vw, 76px)", letterSpacing: "-0.03em" }}>
+                  <div className="font-black leading-none text-white" style={{ fontSize: "clamp(36px, 9vw, 76px)", letterSpacing: "-0.03em" }}>
                     12 <span style={{ color: "#d6a94a" }}>:</span> 10
                   </div>
                   <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/40">

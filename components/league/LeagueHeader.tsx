@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const NAV = [
-  { label: "Úvod",     href: "#uvod",      active: true  },
+  { label: "Šatna",    href: "/satna",     active: false },
   { label: "Výsledky", href: "#vysledky",  active: false },
   { label: "Kluby",    href: "#kluby",     active: false },
   { label: "Nábor",    href: "#aktuality", active: false },
@@ -21,8 +21,8 @@ export default function LeagueHeader() {
       />
 
       <div
-        className="relative mx-auto flex max-w-[1240px] items-center gap-6 px-6"
-        style={{ minHeight: "120px" }}
+        className="relative mx-auto flex flex-wrap max-w-[1240px] items-center gap-x-4 sm:gap-x-6 px-4 sm:px-6 py-3 sm:py-0"
+        style={{ minHeight: "100px" }}
       >
         {/* Logo */}
         <div className="shrink-0">
@@ -37,10 +37,10 @@ export default function LeagueHeader() {
         </div>
 
         {/* Brand text */}
-        <div className="shrink-0">
+        <div className="shrink-0 min-w-0">
           <div
             className="font-extrabold leading-none text-white"
-            style={{ fontSize: "clamp(26px, 3vw, 40px)", letterSpacing: "-0.01em" }}
+            style={{ fontSize: "clamp(22px, 3vw, 40px)", letterSpacing: "-0.01em" }}
           >
             Osmá liga
           </div>
@@ -93,15 +93,17 @@ export default function LeagueHeader() {
           />
         </div>
 
-        {/* Navigace — mobil */}
-        <nav className="md:hidden flex items-center gap-0.5 ml-auto flex-wrap justify-end">
-          {NAV.slice(0, 3).map((item) => (
+        {/* Navigace — mobil (řádek pod brandem) */}
+        <nav className="md:hidden w-full flex items-center gap-4 justify-center pb-2">
+          {([
+            { label: "Šatna",    href: "/satna"    },
+            { label: "Kluby",    href: "#kluby"    },
+            { label: "Partneři", href: "#partneri" },
+          ] as const).map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider hover:text-[#f0c75e] transition ${
-                item.active ? "text-white" : "text-white/60"
-              }`}
+              className="px-1 py-1 text-[11px] font-bold uppercase tracking-wider text-white/70 hover:text-[#f0c75e] transition"
             >
               {item.label}
             </a>
