@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/prisma';
+const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
+const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
 
 type MatchRow = {
   id: string;
@@ -8,33 +9,24 @@ type MatchRow = {
   awayScore: number;
   mode: string;
   matchComment: string;
-  playedAt: Date;
+  playedAt: string;
 };
 
 async function fetchRecentResults(): Promise<MatchRow[] | null> {
   try {
-    return await prisma.matchResult.findMany({
-      orderBy: { playedAt: 'desc' },
-      take: 5,
-      select: {
-        id: true,
-        homeTeamName: true,
-        awayTeamName: true,
-        homeScore: true,
-        awayScore: true,
-        mode: true,
-        matchComment: true,
-        playedAt: true,
-      },
+    const res = await fetch(`${HUB_URL}/api/osma-liga/match-results?limit=5`, {
+      headers: { 'X-Project-Hub-Key': HUB_KEY },
+      next: { revalidate: 30 },
     });
+    if (!res.ok) return null;
+    return res.json() as Promise<MatchRow[]>;
   } catch {
-    // DB not reachable — render empty state silently
     return null;
   }
 }
 
-function relativeTime(date: Date): string {
-  const diff = Date.now() - new Date(date).getTime();
+function relativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
   const mins  = Math.floor(diff / 60_000);
   const hours = Math.floor(diff / 3_600_000);
   const days  = Math.floor(diff / 86_400_000);

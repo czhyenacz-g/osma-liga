@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
-function matchComment(homeScore: number, awayScore: number): string {
-  if (homeScore > awayScore) return 'Postupujeme. Nikdo neví proč.';
-  if (awayScore > homeScore) return 'Dneska nás zařízl trávník.';
-  return 'Bod je bod. Hlavně že se nikdo neptá.';
-}
+const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
+const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
 
 function isValidScore(v: unknown): v is number {
   return Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 99;
@@ -33,20 +29,25 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const result = await prisma.matchResult.create({
-      data: {
-        homeTeamSlug: 'nahoda-fc',
-        homeTeamName: 'Náhoda FC',
-        awayTeamSlug: 'fk-parezov',
-        awayTeamName: 'FK Pařezov',
+    const res = await fetch(`${HUB_URL}/api/osma-liga/match-results`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Project-Hub-Key': HUB_KEY,
+      },
+      body: JSON.stringify({
         homeScore,
         awayScore,
-        mode: 'singleplayer',
-        durationSeconds: Math.round(durationSeconds),
-        matchComment: matchComment(homeScore, awayScore),
-        playedAt: new Date(),
-      },
+        durationSeconds: Math.round(durationSeconds as number),
+      }),
     });
+
+    if (!res.ok) {
+      console.error('[match-results] hub API error:', res.status);
+      return NextResponse.json({ error: 'Chyba serveru.' }, { status: 500 });
+    }
+
+    const result = await res.json() as unknown;
     return NextResponse.json(result, { status: 201 });
   } catch (err) {
     console.error('[match-results] POST error:', err);
@@ -59,20 +60,16 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '5', 10), 20);
 
   try {
-    const results = await prisma.matchResult.findMany({
-      orderBy: { playedAt: 'desc' },
-      take: limit,
-      select: {
-        id: true,
-        homeTeamName: true,
-        awayTeamName: true,
-        homeScore: true,
-        awayScore: true,
-        mode: true,
-        matchComment: true,
-        playedAt: true,
-      },
+    const res = await fetch(`${HUB_URL}/api/osma-liga/match-results?limit=${limit}`, {
+      headers: { 'X-Project-Hub-Key': HUB_KEY },
+      next: { revalidate: 30 },
     });
+
+    if (!res.ok) {
+      return NextResponse.json({ error: 'Chyba serveru.' }, { status: 500 });
+    }
+
+    const results = await res.json() as unknown;
     return NextResponse.json(results);
   } catch (err) {
     console.error('[match-results] GET error:', err);
