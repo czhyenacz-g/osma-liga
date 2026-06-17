@@ -8,8 +8,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE, lastModified: now, changeFrequency: "daily", priority: 1 },
-    { url: `${BASE}/hra`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${BASE}/hra/online`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE}/satna`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE}/hra/bot`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE}/hra/multiplayer`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE}/hra/online`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
     { url: `${BASE}/kluby`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
   ];
 

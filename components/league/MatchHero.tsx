@@ -105,7 +105,7 @@ export default function MatchHero() {
               {/* CTA */}
               <div className="flex flex-col sm:flex-row gap-3 pt-1">
                 <Link
-                  href="/hra"
+                  href="/satna"
                   className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold transition hover:opacity-90"
                   style={{ background: "#d6a94a", color: "#052e1a" }}
                 >
