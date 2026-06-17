@@ -10,7 +10,7 @@ import {
 import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
-  PLAYER_RADIUS, RETURN_SPEED, GOAL_PAUSE,
+  PLAYER_RADIUS, GOAL_PAUSE, SUPPORT_PLAYER_SPEED,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
@@ -175,23 +175,69 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     state.lastTouchPlayerId = active.id;
   }
 
-  // ── Passive home players return to base ───────────────────────────────────
+  // ── Support positioning for inactive home players ─────────────────────────
+  // Inactive players take simple roles instead of returning to base:
+  // defender (lower index) stays back as safety; runner (higher index) offers
+  // forward near the ball. Roles assigned by stable array index to avoid
+  // chaotic swapping every frame.
 
-  for (const p of homePlayers) {
-    if (p === active) continue;
-    const d = dist(p.pos, p.basePos);
-    if (d > 5) {
-      const dir = normalize({ x: p.basePos.x - p.pos.x, y: p.basePos.y - p.pos.y });
-      p.vel.x = dir.x * RETURN_SPEED;
-      p.vel.y = dir.y * RETURN_SPEED;
+  const nonActive = homePlayers.filter(p => p !== active);
+  const FIELD_W = FIELD_R - FIELD_L;
+  const sc = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
+  const defender = nonActive[0];
+  const runner   = nonActive[1];
+
+  if (defender) {
+    const defTarget = {
+      x: FIELD_L + FIELD_W * 0.25,
+      y: sc(state.ball.pos.y, FIELD_T + 50, FIELD_B - 50),
+    };
+    const ddx = defTarget.x - defender.pos.x;
+    const ddy = defTarget.y - defender.pos.y;
+    const dd  = Math.sqrt(ddx * ddx + ddy * ddy);
+    if (dd > 5) {
+      defender.vel.x = (ddx / dd) * SUPPORT_PLAYER_SPEED;
+      defender.vel.y = (ddy / dd) * SUPPORT_PLAYER_SPEED;
     } else {
-      p.vel.x = 0;
-      p.vel.y = 0;
+      defender.vel.x = 0;
+      defender.vel.y = 0;
     }
-    p.pos.x += p.vel.x * dt;
-    p.pos.y += p.vel.y * dt;
-    p.pos = clampPos(
-      p.pos,
+    defender.pos.x += defender.vel.x * dt;
+    defender.pos.y += defender.vel.y * dt;
+    defender.pos = clampPos(
+      defender.pos,
+      FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS,
+      FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS,
+    );
+  }
+
+  if (runner) {
+    const vertOffset = state.ball.pos.y < FIELD_CY ? 80 : -80;
+    const runX = sc(state.ball.pos.x + 120, FIELD_L + FIELD_W * 0.45, FIELD_R - 60);
+    let   runY = sc(state.ball.pos.y + vertOffset, FIELD_T + 50, FIELD_B - 50);
+
+    // Nudge away from active player if too close
+    const rdx = runX - active.pos.x;
+    const rdy = runY - active.pos.y;
+    if (Math.sqrt(rdx * rdx + rdy * rdy) < 70) {
+      runY = sc(runY + (vertOffset > 0 ? -40 : 40), FIELD_T + 50, FIELD_B - 50);
+    }
+
+    const rrx = runX - runner.pos.x;
+    const rry = runY - runner.pos.y;
+    const rr  = Math.sqrt(rrx * rrx + rry * rry);
+    if (rr > 5) {
+      runner.vel.x = (rrx / rr) * SUPPORT_PLAYER_SPEED;
+      runner.vel.y = (rry / rr) * SUPPORT_PLAYER_SPEED;
+    } else {
+      runner.vel.x = 0;
+      runner.vel.y = 0;
+    }
+    runner.pos.x += runner.vel.x * dt;
+    runner.pos.y += runner.vel.y * dt;
+    runner.pos = clampPos(
+      runner.pos,
       FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS,
       FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS,
     );

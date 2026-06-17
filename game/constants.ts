@@ -34,6 +34,9 @@ export const BOT_KICK_FORCE = 460;
 export const BOT_KICK_RANGE = PLAYER_RADIUS + 22;
 export const BOT_KICK_COOLDOWN = 0.85;
 
+// Inactive teammate support movement speed
+export const SUPPORT_PLAYER_SPEED = 120;
+
 // Ball control (soft trap for active home player)
 export const BALL_CONTROL_RADIUS = 44;
 export const BALL_CONTROL_DAMPING = 0.90;
