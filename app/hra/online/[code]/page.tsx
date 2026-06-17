@@ -3,6 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { use } from 'react';
+import dynamic from 'next/dynamic';
+
+// Lazy-load game client — only mounted when we have a token and game is ready
+const OnlineGameClient = dynamic(
+  () => import('../../../../components/online/OnlineGameClient'),
+  { ssr: false },
+);
 
 type GameRoom = {
   code: string;
@@ -37,13 +44,13 @@ export default function OnlineRoomPage({
   const [joinError, setJoinError] = useState<string | null>(null);
   const [myToken, setMyToken] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
+  const [enterGame, setEnterGame] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = sessionStorage.getItem(`osma-lobby-token-${upperCode}`);
       if (token) {
         setMyToken(token);
-        // pokud máme token a místnost je waiting, jsme host
         setIsHost(true);
       }
     }
@@ -59,13 +66,12 @@ export default function OnlineRoomPage({
       if (res.ok) {
         const data = await res.json() as GameRoom;
         setRoom(data);
-        // pokud room přešel na full a my jsme host, aktualizujeme
         if (data.status === 'full' && myToken) {
           setIsHost(true);
         }
       }
     } catch {
-      // tiché selhání
+      // silent
     } finally {
       setLoading(false);
     }
@@ -108,6 +114,12 @@ export default function OnlineRoomPage({
     }
   }
 
+  // If we have a token and both players are ready, show the game client
+  const isFull = room?.status === 'full';
+  if (enterGame && myToken && isFull) {
+    return <OnlineGameClient gameCode={upperCode} playerToken={myToken} />;
+  }
+
   if (loading) {
     return (
       <main
@@ -146,7 +158,6 @@ export default function OnlineRoomPage({
   if (!room) return null;
 
   const hasToken = !!myToken;
-  const isFull = room.status === 'full';
 
   return (
     <main
@@ -181,17 +192,35 @@ export default function OnlineRoomPage({
           </div>
         </div>
 
-        {/* Různé stavy */}
+        {/* Stavy */}
         {isFull && hasToken && isHost && (
-          <p className="text-sm font-semibold" style={{ color: '#86efac' }}>
-            Soupeř dorazil. Rozhodčí se tváří, že ví, co dělá.
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-semibold" style={{ color: '#86efac' }}>
+              Soupeř dorazil. Jdeme hrát?
+            </p>
+            <button
+              onClick={() => setEnterGame(true)}
+              className="w-full py-3 rounded-lg font-bold text-sm transition hover:opacity-90"
+              style={{ background: '#d6a94a', color: '#041f14' }}
+            >
+              Vstoupit do zápasu
+            </button>
+          </div>
         )}
 
         {isFull && hasToken && !isHost && (
-          <p className="text-sm font-semibold" style={{ color: '#86efac' }}>
-            Jsi v šatně jako host. Zápas brzy začne.
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-semibold" style={{ color: '#86efac' }}>
+              Jsi v šatně jako host. Jdeme?
+            </p>
+            <button
+              onClick={() => setEnterGame(true)}
+              className="w-full py-3 rounded-lg font-bold text-sm transition hover:opacity-90"
+              style={{ background: '#d6a94a', color: '#041f14' }}
+            >
+              Vstoupit do zápasu
+            </button>
+          </div>
         )}
 
         {!isFull && hasToken && isHost && (
