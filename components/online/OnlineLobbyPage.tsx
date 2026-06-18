@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CLUBS } from '@/data/clubs';
 import GameNavLink from '@/components/ui/GameNavLink';
@@ -23,13 +24,19 @@ type CreatedGame = {
 };
 
 export default function OnlineLobbyPage() {
+  const searchParams = useSearchParams();
+  const clubParam = searchParams.get('club');
+  const initialClub = (clubParam && CLUBS.some((c) => c.slug === clubParam))
+    ? clubParam
+    : (CLUBS[0]?.slug ?? 'nahoda-fc');
+
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState<CreatedGame | null>(null);
   const [copied, setCopied] = useState(false);
   const [games, setGames] = useState<GameRoom[]>([]);
   const [loadingGames, setLoadingGames] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedClubId, setSelectedClubId] = useState<string>(CLUBS[0]?.slug ?? 'nahoda-fc');
+  const [selectedClubId, setSelectedClubId] = useState<string>(initialClub);
 
   const fetchGames = useCallback(async () => {
     try {

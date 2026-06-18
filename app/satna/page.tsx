@@ -15,8 +15,13 @@ const cardBase: React.CSSProperties = {
   borderRadius: 16,
 };
 
-export default async function SatnaPage() {
+export default async function SatnaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ club?: string }>;
+}) {
   const session = await getSession();
+  const { club: clubSlug } = await searchParams;
 
   return (
     <main
@@ -31,6 +36,11 @@ export default async function SatnaPage() {
         <p className="text-sm leading-relaxed" style={{ color: 'rgba(209,250,229,0.55)' }}>
           Než vyběhneš na hřiště, vyber si, jak dneska utrpíš slávu.
         </p>
+        {clubSlug && (
+          <p className="text-xs mt-2 font-semibold" style={{ color: '#d6a94a' }}>
+            Vybraný klub: {clubSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+          </p>
+        )}
       </div>
 
       {/* Karty */}
@@ -104,7 +114,7 @@ export default async function SatnaPage() {
             </p>
           </div>
           <Link
-            href="/hra/multiplayer"
+            href={clubSlug ? `/hra/multiplayer?club=${clubSlug}` : '/hra/multiplayer'}
             className="inline-block text-center rounded-lg py-2.5 text-sm font-bold transition hover:opacity-90"
             style={{ background: 'rgba(214,169,74,0.14)', color: '#d6a94a', border: '1px solid rgba(214,169,74,0.35)' }}
           >

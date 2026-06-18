@@ -137,18 +137,11 @@ export default async function ClubDetailPage({ params }: Props) {
           {/* CTA */}
           <div className="flex flex-wrap gap-3 mt-2">
             <Link
-              href="/satna"
+              href={`/satna?club=${club.slug}`}
               className="inline-block rounded-lg px-5 py-2.5 text-sm font-bold transition hover:opacity-90"
               style={{ background: "#063f24", color: "#fff" }}
             >
-              Hrát za Náhoda FC
-            </Link>
-            <Link
-              href="/hra/online"
-              className="inline-block rounded-lg px-5 py-2.5 text-sm font-bold transition hover:opacity-90"
-              style={{ background: "rgba(216,173,69,0.15)", color: "#d8ad45", border: "1px solid rgba(216,173,69,0.35)" }}
-            >
-              Online zápas
+              Hrát za {club.name}
             </Link>
             <Link
               href="/kluby"
