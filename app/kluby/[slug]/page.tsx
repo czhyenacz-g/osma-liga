@@ -30,7 +30,7 @@ export default async function ClubDetailPage({ params }: Props) {
   const { slug } = await params;
   const [club, clubData] = await Promise.all([getClub(slug), getClubStats(slug)]);
   if (!club) notFound();
-  const { stats, topPlayers } = clubData;
+  const { period, stats, topPlayers } = clubData;
 
   const isNahoda = club.slug === "nahoda-fc";
 
@@ -137,11 +137,16 @@ export default async function ClubDetailPage({ params }: Props) {
 
           {/* Statistiky klubu */}
           <div className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5 mb-8">
-            <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
-              Statistiky klubu
-            </h2>
+            <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
+              <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">
+                Statistiky za posledních 30 dní
+              </h2>
+              <span className="text-[10px] text-gray-300">
+                {new Date(period.since).toLocaleDateString('cs-CZ')} – {new Date(period.until).toLocaleDateString('cs-CZ')}
+              </span>
+            </div>
             {stats.matches === 0 ? (
-              <p className="text-sm text-gray-500">Klub zatím nemá odehraný online zápas.</p>
+              <p className="text-sm text-gray-500">Klub zatím nemá odehraný online zápas za posledních 30 dní.</p>
             ) : (
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <StatRow label="Zápasy" value={String(stats.matches)} />
@@ -158,10 +163,10 @@ export default async function ClubDetailPage({ params }: Props) {
           {/* Nejlepší hráči */}
           <div className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5 mb-8">
             <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
-              Nejlepší hráči
+              Nejlepší hráči za posledních 30 dní
             </h2>
             {topPlayers.length === 0 ? (
-              <p className="text-sm text-gray-500">Klub zatím nemá žádného přihlášeného hráče v online zápasech.</p>
+              <p className="text-sm text-gray-500">Klub zatím nemá žádného přihlášeného hráče v online zápasech za posledních 30 dní.</p>
             ) : (
               <ol className="flex flex-col gap-3">
                 {topPlayers.map((player, i) => {

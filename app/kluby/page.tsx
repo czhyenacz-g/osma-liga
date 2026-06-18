@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function KlubyPage() {
-  const [clubs, standings] = await Promise.all([getClubs(), getClubStandings()]);
+  const [clubs, { period, standings }] = await Promise.all([getClubs(), getClubStandings()]);
 
   return (
     <>
@@ -45,8 +45,16 @@ export default async function KlubyPage() {
           <div className="mb-12">
             <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
               <h2 className="text-base font-black text-gray-900 uppercase tracking-wide">Tabulka klubů</h2>
-              <p className="text-xs text-gray-400">Výhra 3 body · Remíza 1 bod · Prohra 0 bodů</p>
+              <p className="text-xs text-gray-400">
+                {standings.every((e) => e.stats.points === 0)
+                  ? 'Zatím se hraje o první body v posledních 30 dnech. Výbor čeká na zápis.'
+                  : 'Aktuální forma za posledních 30 dní · Výhra 3 body · Remíza 1 · Prohra 0'}
+              </p>
             </div>
+            <p className="text-[11px] text-gray-400 mb-3 italic">
+              Okresní sláva se musí pravidelně obhajovat.{' '}
+              <span className="not-italic text-gray-300">Od {new Date(period.since).toLocaleDateString('cs-CZ')} do {new Date(period.until).toLocaleDateString('cs-CZ')}</span>
+            </p>
 
             <div className="overflow-x-auto rounded-xl border border-gray-200">
               <table className="w-full text-sm" style={{ minWidth: 520 }}>

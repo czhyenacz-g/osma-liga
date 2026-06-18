@@ -51,6 +51,13 @@ export async function getClub(slug: string): Promise<Club | undefined> {
   return getStaticClubBySlug(slug);
 }
 
+export type ClubStatsPeriod = {
+  type: 'rolling_30_days';
+  days: number;
+  since: string;
+  until: string;
+};
+
 export type ClubStats = {
   matches: number;
   wins: number;
@@ -77,31 +84,58 @@ export type ClubTopPlayer = {
 };
 
 type ClubStatsResponse = {
+  period?: ClubStatsPeriod;
   stats: ClubStats;
   topPlayers: ClubTopPlayer[];
 };
 
 const EMPTY_STATS: ClubStats = { matches: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0 };
 
+function localFallbackPeriod(): ClubStatsPeriod {
+  const until = new Date();
+  const since = new Date(until);
+  since.setDate(since.getDate() - 30);
+  return { type: 'rolling_30_days', days: 30, since: since.toISOString(), until: until.toISOString() };
+}
+
 export type StandingEntry = {
   club: { id: string; slug: string; name: string; shortName: string | null; bannerPath: string | null; logoPath: string | null };
   stats: ClubStats;
 };
 
-export async function getClubStandings(): Promise<StandingEntry[]> {
-  const data = await fetchFromApi<{ standings: StandingEntry[] }>('/api/osma-liga/clubs/standings');
-  if (data && Array.isArray(data.standings)) return data.standings;
+export type StandingsResult = {
+  period: ClubStatsPeriod;
+  standings: StandingEntry[];
+};
+
+export async function getClubStandings(): Promise<StandingsResult> {
+  const data = await fetchFromApi<{ period?: ClubStatsPeriod; standings: StandingEntry[] }>('/api/osma-liga/clubs/standings');
+  if (data && Array.isArray(data.standings)) {
+    return {
+      period: data.period ?? localFallbackPeriod(),
+      standings: data.standings,
+    };
+  }
   // Fallback: all static clubs with zero stats
-  return STATIC_CLUBS.map((c) => ({
-    club: { id: c.id, slug: c.slug, name: c.name, shortName: null, bannerPath: c.banner, logoPath: null },
-    stats: { ...EMPTY_STATS },
-  }));
+  return {
+    period: localFallbackPeriod(),
+    standings: STATIC_CLUBS.map((c) => ({
+      club: { id: c.id, slug: c.slug, name: c.name, shortName: null, bannerPath: c.banner, logoPath: null },
+      stats: { ...EMPTY_STATS },
+    })),
+  };
 }
 
-export async function getClubStats(slug: string): Promise<{ stats: ClubStats; topPlayers: ClubTopPlayer[] }> {
+export type ClubStatsResult = {
+  period: ClubStatsPeriod;
+  stats: ClubStats;
+  topPlayers: ClubTopPlayer[];
+};
+
+export async function getClubStats(slug: string): Promise<ClubStatsResult> {
   const data = await fetchFromApi<ClubStatsResponse>(`/api/osma-liga/clubs/${slug}/stats`);
   if (data && typeof data === 'object' && data.stats) {
-    return { stats: data.stats, topPlayers: data.topPlayers ?? [] };
+    return { period: data.period ?? localFallbackPeriod(), stats: data.stats, topPlayers: data.topPlayers ?? [] };
   }
-  return { stats: EMPTY_STATS, topPlayers: [] };
+  return { period: localFallbackPeriod(), stats: EMPTY_STATS, topPlayers: [] };
 }

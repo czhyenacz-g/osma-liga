@@ -63,6 +63,23 @@ Migrace: `20260618000003_add_club_points_to_online_matches`
   - každý řádek je odkaz na detail klubu
   - kluby bez zápasů zobrazeny s nulami
 
+### Rolling 30-day window
+
+Veřejné klubové statistiky (tabulka i detail klubu) pracují s plovoucím 30denním oknem:
+
+- `GET /api/osma-liga/clubs/standings` — filtruje zápasy `finishedAt >= now - 30 days`
+- `GET /api/osma-liga/clubs/:slug/stats` — stejný filtr
+- Oba endpointy vrací `period: { type, days, since, until }` v odpovědi
+- Zápasy se v DB nemažou — `finishedAt` zůstává historický záznam
+- Detail zápasu `/zapasy/[id]` je historický a 30denní okno ho neovlivňuje
+- Pokud API nevrátí `period`, fallback ho dopočítá lokálně v `lib/clubs.ts`
+- Denní odečítání bodů se neimplementuje — body přirozeně klesají odpadnutím starých zápasů z okna
+
+UI:
+- `/kluby` ukazuje „Aktuální forma za posledních 30 dní" s datem intervalu
+- Detail klubu nadpis bloku statistik: „Statistiky za posledních 30 dní" s datem
+- „Nejlepší hráči za posledních 30 dní" — top hráči také v rolling window
+
 ## Co zatím NENÍ implementováno
 
 - Sezóny — nejsou v plánu pro MVP
