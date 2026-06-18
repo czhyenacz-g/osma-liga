@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
+import { getRequestCountry } from '@/lib/geo/getRequestCountry';
+import { isEuCountry } from '@/lib/geo/euCountries';
 
 const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
 const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
@@ -29,6 +31,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/online-games — create game
 export async function POST(req: NextRequest) {
+  if (!isEuCountry(getRequestCountry(req))) {
+    return NextResponse.json({ error: 'Region not supported' }, { status: 403 });
+  }
   const session = await getSession();
   let clubId: string | null = null;
   try {
