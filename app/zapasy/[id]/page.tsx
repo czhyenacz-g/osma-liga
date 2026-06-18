@@ -19,8 +19,7 @@ type MatchUser = {
   id: string;
   username: string;
   globalName: string | null;
-  avatar: string | null;
-  discordId: string;
+  avatarUrl: string | null;
 };
 
 type OnlineMatch = {
@@ -283,10 +282,7 @@ function PlayerChip({
   align?: 'left' | 'right';
 }) {
   const name = user ? (user.globalName ?? user.username) : null;
-  const avatarUrl =
-    user?.avatar && user.discordId
-      ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=32`
-      : null;
+  const avatarUrl = user?.avatarUrl ?? null;
 
   return (
     <div
