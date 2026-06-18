@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import SatnaJoinForm from '@/components/game/SatnaJoinForm';
+import { getSession } from '@/lib/auth/session';
 
 export const metadata: Metadata = {
   title: 'Šatna | Osmá liga',
@@ -13,7 +14,9 @@ const cardBase: React.CSSProperties = {
   borderRadius: 16,
 };
 
-export default function SatnaPage() {
+export default async function SatnaPage() {
+  const session = await getSession();
+
   return (
     <main
       className="min-h-screen flex flex-col items-center justify-center gap-8 px-4 py-12"
@@ -27,8 +30,46 @@ export default function SatnaPage() {
         </p>
       </div>
 
-      {/* Tři karty */}
+      {/* Karty */}
       <div className="w-full max-w-md flex flex-col gap-4">
+
+        {/* 0. Auth */}
+        {session ? (
+          <div className="p-6 flex flex-col gap-2" style={cardBase}>
+            <p className="text-xs font-black uppercase tracking-widest" style={{ color: '#d6a94a' }}>
+              Hráč
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(209,250,229,0.7)' }}>
+              Vítej, <span className="font-bold text-white">{session.globalName ?? session.username}</span>. Jsi připraven na hru?
+            </p>
+            <form method="POST" action="/api/auth/logout" className="mt-1">
+              <button type="submit" className="text-xs transition hover:opacity-80" style={{ color: 'rgba(209,250,229,0.35)' }}>
+                Odhlásit se
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="p-6 flex flex-col gap-4" style={cardBase}>
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: '#d6a94a' }}>
+                Přihlášení
+              </p>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(209,250,229,0.7)' }}>
+                Bez přihlášení přes Discord se ti statistiky zápasů nebudou ukládat na účet.
+              </p>
+            </div>
+            <a
+              href="/api/auth/login"
+              className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition hover:opacity-90"
+              style={{ background: '#5865F2', color: 'white' }}
+            >
+              <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor" aria-hidden="true">
+                <path d="M60.1 4.9A58.6 58.6 0 0 0 45.5.5a40.4 40.4 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.2 0A39.4 39.4 0 0 0 25.7.5 58.4 58.4 0 0 0 11.1 4.9C1.6 19.4-.9 33.4.3 47.2a58.8 58.8 0 0 0 17.9 9.1 43.4 43.4 0 0 0 3.8-6.2 38.4 38.4 0 0 1-6-2.9l1.5-1.1a42 42 0 0 0 36 0l1.5 1.1a38.6 38.6 0 0 1-6 2.9 43.3 43.3 0 0 0 3.8 6.2 58.6 58.6 0 0 0 17.9-9.1c1.5-15.4-2.4-29.3-10.5-41.2ZM23.8 37.9a6.7 6.7 0 0 1-6.3-7 6.7 6.7 0 0 1 6.3-7 6.7 6.7 0 0 1 6.3 7 6.7 6.7 0 0 1-6.3 7Zm23.3 0a6.7 6.7 0 0 1-6.3-7 6.7 6.7 0 0 1 6.3-7 6.7 6.7 0 0 1 6.3 7 6.7 6.7 0 0 1-6.3 7Z" />
+              </svg>
+              Přihlásit přes Discord
+            </a>
+          </div>
+        )}
 
         {/* 1. Bot */}
         <div className="p-6 flex flex-col gap-4" style={cardBase}>
