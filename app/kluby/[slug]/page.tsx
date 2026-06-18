@@ -28,8 +28,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ClubDetailPage({ params }: Props) {
   const { slug } = await params;
-  const [club, stats] = await Promise.all([getClub(slug), getClubStats(slug)]);
+  const [club, clubData] = await Promise.all([getClub(slug), getClubStats(slug)]);
   if (!club) notFound();
+  const { stats, topPlayers } = clubData;
 
   const isNahoda = club.slug === "nahoda-fc";
 
@@ -154,6 +155,41 @@ export default async function ClubDetailPage({ params }: Props) {
             )}
           </div>
 
+          {/* Nejlepší hráči */}
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5 mb-8">
+            <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
+              Nejlepší hráči
+            </h2>
+            {topPlayers.length === 0 ? (
+              <p className="text-sm text-gray-500">Klub zatím nemá žádného přihlášeného hráče v online zápasech.</p>
+            ) : (
+              <ol className="flex flex-col gap-3">
+                {topPlayers.map((player, i) => {
+                  const name = player.globalName ?? player.username;
+                  return (
+                    <li key={player.userId} className="flex items-center gap-3">
+                      <span className="text-xs font-black text-gray-300 w-4 shrink-0">{i + 1}.</span>
+                      {player.avatarUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={player.avatarUrl} alt="" width={28} height={28} className="rounded-full shrink-0" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-gray-200 shrink-0 flex items-center justify-center">
+                          <span className="text-[10px] font-bold text-gray-400">{name[0]?.toUpperCase()}</span>
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <span className="text-sm font-bold text-gray-800 truncate">{name}</span>
+                        <span className="text-xs text-gray-500">
+                          {formatPoints(player.points)} · {formatMatches(player.matches)} · {player.wins} {player.wins === 1 ? 'výhra' : player.wins >= 2 && player.wins <= 4 ? 'výhry' : 'výher'}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+          </div>
+
           {/* CTA */}
           <div className="flex flex-wrap gap-3 mt-2">
             <Link
@@ -177,6 +213,18 @@ export default async function ClubDetailPage({ params }: Props) {
       <SiteFooter />
     </>
   );
+}
+
+function formatPoints(points: number): string {
+  if (points === 1) return '1 bod';
+  if (points >= 2 && points <= 4) return `${points} body`;
+  return `${points} bodů`;
+}
+
+function formatMatches(matches: number): string {
+  if (matches === 1) return '1 zápas';
+  if (matches >= 2 && matches <= 4) return `${matches} zápasy`;
+  return `${matches} zápasů`;
 }
 
 function StatRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {

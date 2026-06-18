@@ -62,10 +62,31 @@ export type ClubStats = {
   points: number;
 };
 
+export type ClubTopPlayer = {
+  userId: string;
+  username: string;
+  globalName?: string | null;
+  avatarUrl?: string | null;
+  points: number;
+  matches: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+};
+
+type ClubStatsResponse = {
+  stats: ClubStats;
+  topPlayers: ClubTopPlayer[];
+};
+
 const EMPTY_STATS: ClubStats = { matches: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0 };
 
-export async function getClubStats(slug: string): Promise<ClubStats> {
-  const data = await fetchFromApi<{ stats: ClubStats }>(`/api/osma-liga/clubs/${slug}/stats`);
-  if (data && typeof data === 'object' && data.stats) return data.stats;
-  return EMPTY_STATS;
+export async function getClubStats(slug: string): Promise<{ stats: ClubStats; topPlayers: ClubTopPlayer[] }> {
+  const data = await fetchFromApi<ClubStatsResponse>(`/api/osma-liga/clubs/${slug}/stats`);
+  if (data && typeof data === 'object' && data.stats) {
+    return { stats: data.stats, topPlayers: data.topPlayers ?? [] };
+  }
+  return { stats: EMPTY_STATS, topPlayers: [] };
 }
