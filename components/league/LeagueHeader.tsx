@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import AuthStatus from "@/components/auth/AuthStatus";
 
 const NAV = [
   { label: "Šatna",    href: "/satna",     active: false },
@@ -94,22 +95,31 @@ export default function LeagueHeader({ compact = false }: { compact?: boolean })
               />
             </div>
 
+            {/* Auth status — desktop */}
+            <div className="hidden lg:flex items-center gap-3 shrink-0 ml-2">
+              <div className="h-14 w-px bg-white/10" />
+              <AuthStatus />
+            </div>
+
             {/* Navigace — mobil (řádek pod brandem) */}
-            <nav className="md:hidden w-full flex items-center gap-4 justify-center pb-2">
-              {([
-                { label: "Šatna",    href: "/satna"    },
-                { label: "Kluby",    href: "#kluby"    },
-                { label: "Partneři", href: "#partneri" },
-              ] as const).map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="px-1 py-1 text-[11px] font-bold uppercase tracking-wider text-white/70 hover:text-[#f0c75e] transition"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
+            <div className="md:hidden w-full flex items-center justify-between pb-2">
+              <nav className="flex items-center gap-4">
+                {([
+                  { label: "Šatna",    href: "/satna"    },
+                  { label: "Kluby",    href: "#kluby"    },
+                  { label: "Partneři", href: "#partneri" },
+                ] as const).map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="px-1 py-1 text-[11px] font-bold uppercase tracking-wider text-white/70 hover:text-[#f0c75e] transition"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+              <AuthStatus />
+            </div>
           </>
         )}
       </div>
