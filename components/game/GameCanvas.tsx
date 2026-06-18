@@ -8,7 +8,7 @@ import { createInputState, attachInputListeners } from '@/game/input';
 import { updateGame } from '@/game/updateGame';
 import { renderGame } from '@/game/renderGame';
 import { resumeAudio } from '@/game/audio';
-import { playKickoffWhistle, playGoalRestartWhistle } from '@/lib/audio/whistleEngine';
+import { playKickoffWhistle, playGoalSound } from '@/lib/audio/whistleEngine';
 import type { GameState, InputState, TouchInput } from '@/game/types';
 
 interface Props {
@@ -44,13 +44,9 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Pro
     };
     window.addEventListener('keydown', onEsc);
 
-    // Attempt start whistle — succeeds only if audio is already unlocked
-    playKickoffWhistle();
-
     let rafId: number;
     let lastTime = performance.now();
     let prevPhase = gameState.phase;
-    let prevCornerKickCount = gameState.cornerKickCount;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -72,17 +68,12 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Pro
       const wasRestart = merged.restart;
       gameState = updateGame(gameState, merged, dt);
 
-      // Kickoff whistle on manual restart; goal-restart whistle after goal or corner kick
+      // Kickoff on manual restart; goal sound on entering goal phase
       if (wasRestart) {
         playKickoffWhistle();
-      } else if (
-        (prevPhase === 'goal' && gameState.phase === 'playing') ||
-        gameState.cornerKickCount > prevCornerKickCount
-      ) {
-        playGoalRestartWhistle();
+      } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
+        playGoalSound();
       }
-      prevCornerKickCount = gameState.cornerKickCount;
-
       // Notify parent when match ends for the first time
       if (prevPhase !== 'ended' && gameState.phase === 'ended') {
         onMatchEnd?.({ home: gameState.score.home, away: gameState.score.away });

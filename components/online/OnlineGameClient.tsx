@@ -5,7 +5,7 @@ import { useOnlineGame } from './useOnlineGame';
 import OnlineGameCanvas from './OnlineGameCanvas';
 import MobileTouchControls from '@/components/game/MobileTouchControls';
 import MobileOrientationOverlay from '@/components/game/MobileOrientationOverlay';
-import { playGoalRestartWhistle } from '@/lib/audio/whistleEngine';
+import { playGoalSound } from '@/lib/audio/whistleEngine';
 import type { TouchInput } from '@/game/types';
 
 interface KeyState {
@@ -34,7 +34,7 @@ export default function OnlineGameClient({
   useEffect(() => {
     const msg = snapshot?.goalMessage ?? '';
     if (msg && msg !== prevGoalMsgRef.current) {
-      playGoalRestartWhistle();
+      playGoalSound();
     }
     prevGoalMsgRef.current = msg;
   }, [snapshot?.goalMessage]);

@@ -60,14 +60,26 @@ Pokud klíč neexistuje, funkce pouze zaloguje `console.warn` a tiše pokračuje
 Herní kód nepoužívá `playSound` přímo — volá pojmenované wrappery z `lib/audio/whistleEngine.ts`:
 
 ```ts
-import { playKickoffWhistle, playFullTimeWhistle, playGoalRestartWhistle } from '@/lib/audio/whistleEngine';
+import { playKickoffWhistle, playFullTimeWhistle, playGoalSound } from '@/lib/audio/whistleEngine';
 
-playKickoffWhistle();      // → 01-tone
-playFullTimeWhistle();     // → 21-tone
-playGoalRestartWhistle();  // → náhodný 15-tone .. 19-tone
+playKickoffWhistle();  // → 01-tone  — začátek zápasu / manuální restart
+playFullTimeWhistle(); // → 21-tone  — konec zápasu
+playGoalSound();       // → 18-tone  — padl gól
 ```
 
 Wrappery jsou fire-and-forget (vrací `void`).
+
+### Sound mapping pravidla
+
+| Sound key | Wrapper | Kdy |
+|-----------|---------|-----|
+| `01-tone` | `playKickoffWhistle()` | "HRAJ!" overlay, manuální restart po zápase |
+| `18-tone` | `playGoalSound()` | vstup do gólové fáze (bot), `goalMessage` ze serveru (online) |
+| `21-tone` | `playFullTimeWhistle()` | konec zápasu (bot i online) |
+
+Restart po gólu zpět do hry je zatím bez zvuku.
+
+> `playGoalRestartWhistle()` je zachovaný jako legacy alias pro `playGoalSound()` — nový kód ho nepoužívá.
 
 ## Kde jsou wrappery napojeny
 

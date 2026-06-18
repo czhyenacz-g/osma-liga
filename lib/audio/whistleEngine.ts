@@ -146,9 +146,13 @@ export function playFullTimeWhistle(): void {
   void playSound('21-tone').catch(() => {});
 }
 
-const GOAL_RESTART_KEYS = ['15-tone', '16-tone', '17-tone', '18-tone', '19-tone'] as const;
+// Goal sound — plays at the moment a goal is scored
+export function playGoalSound(): void {
+  void playSound('18-tone').catch(() => {});
+}
 
+// Legacy wrapper — kept for backward compatibility.
+// Prefer playGoalSound() for goal events or a future playRestartSound() for restarts.
 export function playGoalRestartWhistle(): void {
-  const key = GOAL_RESTART_KEYS[Math.floor(Math.random() * GOAL_RESTART_KEYS.length)];
-  void playSound(key).catch(() => {});
+  playGoalSound();
 }
