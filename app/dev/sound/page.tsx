@@ -3,81 +3,136 @@
 import { useState } from 'react';
 import { whistleSounds, type WhistleSound } from '@/data/whistleSounds';
 
-// ── Web Audio tone engine ────────────────────────────────────────────────────
+// ── Web Audio whistle engine ─────────────────────────────────────────────────
 
-type Note = { freq: number; dur: number; gap?: number; vol?: number; descend?: boolean };
+type Whistle = {
+  freq: number;      // base frequency Hz (2600–3800)
+  dur: number;       // total duration seconds
+  gap?: number;      // pause after this note (default 0.05)
+  vol?: number;      // peak volume 0–1 (default 0.42)
+  vibrato?: number;  // vibrato depth Hz (default 30); set 0 to disable
+  noise?: boolean;   // add breathed noise burst via highpass
+  descend?: boolean; // frequency drops ~18% over duration
+};
 
-function playNotes(notes: Note[]) {
-  const AudioCtx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-  const ctx = new AudioCtx();
+function playPattern(pattern: Whistle[]) {
+  const AudioCtxClass = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  const ctx = new AudioCtxClass();
   let t = ctx.currentTime + 0.04;
 
-  for (const note of notes) {
-    const osc = ctx.createOscillator();
+  for (const w of pattern) {
+    const vol    = w.vol    ?? 0.42;
+    const vDepth = w.vibrato ?? 30;
+    const attack = 0.015;
+    const holdEnd = t + w.dur * 0.72;
+    const end = t + w.dur;
+
+    // Main oscillator
+    const osc  = ctx.createOscillator();
     const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(w.freq, t);
+    if (w.descend) {
+      osc.frequency.exponentialRampToValueAtTime(w.freq * 0.82, end);
+    }
+
+    // Vibrato LFO
+    if (vDepth > 0) {
+      const lfo      = ctx.createOscillator();
+      const lfoGain  = ctx.createGain();
+      lfo.frequency.value  = 11;
+      lfoGain.gain.value   = vDepth;
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfo.start(t);
+      lfo.stop(end + 0.05);
+    }
+
+    // ADSR envelope
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(vol, t + attack);
+    gain.gain.setValueAtTime(vol, holdEnd);
+    gain.gain.exponentialRampToValueAtTime(0.0001, end);
+
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(note.freq, t);
-    if (note.descend) {
-      osc.frequency.exponentialRampToValueAtTime(note.freq * 0.72, t + note.dur);
-    }
-    const vol = note.vol ?? 0.32;
-    gain.gain.setValueAtTime(vol, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + note.dur);
     osc.start(t);
-    osc.stop(t + note.dur + 0.02);
-    t += note.dur + (note.gap ?? 0.05);
+    osc.stop(end + 0.05);
+
+    // Optional noise burst (wet/tired/atmospheric whistles)
+    if (w.noise) {
+      const bufSize   = Math.ceil(ctx.sampleRate * (w.dur + 0.05));
+      const buf       = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data      = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+      const noise     = ctx.createBufferSource();
+      noise.buffer    = buf;
+      const hpf       = ctx.createBiquadFilter();
+      hpf.type        = 'highpass';
+      hpf.frequency.value = 2200;
+      const nGain     = ctx.createGain();
+      nGain.gain.setValueAtTime(0.0001, t);
+      nGain.gain.exponentialRampToValueAtTime(0.03, t + attack);
+      nGain.gain.setValueAtTime(0.03, holdEnd);
+      nGain.gain.exponentialRampToValueAtTime(0.0001, end);
+      noise.connect(hpf);
+      hpf.connect(nGain);
+      nGain.connect(ctx.destination);
+      noise.start(t);
+      noise.stop(end + 0.05);
+    }
+
+    t += w.dur + (w.gap ?? 0.05);
   }
 }
 
-const S = 880;  // standard pitch
-const H = 1100; // high
-const L = 780;  // low
+const S = 3000;  // standard
+const H = 3500;  // high
+const L = 2750;  // low
 
-const TONE_MAP: Record<string, Note[]> = {
-  kickoff:               [{ freq: S,  dur: 0.18 }],
-  restart:               [{ freq: H,  dur: 0.09 }],
-  common_foul:           [{ freq: S,  dur: 0.20, vol: 0.38 }],
-  hard_foul:             [{ freq: S,  dur: 0.55, vol: 0.42 }],
-  yellow_card:           [{ freq: S,  dur: 0.22, vol: 0.40 }],
-  red_card:              [{ freq: L,  dur: 0.80, vol: 0.48 }],
-  strict_referee:        [{ freq: 820,dur: 0.28, vol: 0.45 }],
-  advantage:             [{ freq: H,  dur: 0.09, gap: 0.10 }, { freq: H, dur: 0.09 }],
-  did_not_see:           [{ freq: S,  dur: 0.14, gap: 0.05, vol: 0.22 }, { freq: L, dur: 0.09, vol: 0.18 }],
-  what_was_that:         [{ freq: S,  dur: 0.15, gap: 0.38 }, { freq: H, dur: 0.07, vol: 0.20 }],
+const TONE_MAP: Record<string, Whistle[]> = {
+  kickoff:               [{ freq: S,    dur: 0.18, noise: true }],
+  restart:               [{ freq: H,    dur: 0.09 }],
+  common_foul:           [{ freq: S,    dur: 0.20, vol: 0.44 }],
+  hard_foul:             [{ freq: S,    dur: 0.55, vol: 0.50, noise: true }],
+  yellow_card:           [{ freq: S,    dur: 0.22, vol: 0.44 }],
+  red_card:              [{ freq: L,    dur: 0.80, vol: 0.54, noise: true }],
+  strict_referee:        [{ freq: 2850, dur: 0.28, vol: 0.50, vibrato: 15 }],
+  advantage:             [{ freq: H, dur: 0.09, gap: 0.10 }, { freq: H, dur: 0.09 }],
+  did_not_see:           [{ freq: S, dur: 0.14, gap: 0.05, vol: 0.24 }, { freq: L, dur: 0.09, vol: 0.20 }],
+  what_was_that:         [{ freq: S, dur: 0.15, gap: 0.38 }, { freq: H, dur: 0.07, vol: 0.22 }],
   panic:                 [
-    { freq: H, dur: 0.07, gap: 0.08 },
-    { freq: H, dur: 0.07, gap: 0.08 },
-    { freq: H, dur: 0.07, gap: 0.08 },
-    { freq: S, dur: 0.28, vol: 0.40 },
+    { freq: H,    dur: 0.07, gap: 0.08 },
+    { freq: H,    dur: 0.07, gap: 0.08 },
+    { freq: H,    dur: 0.07, gap: 0.08 },
+    { freq: S,    dur: 0.28, vol: 0.46 },
   ],
-  dive_accepted:         [{ freq: S, dur: 0.16, gap: 0.28 }, { freq: L, dur: 0.14, vol: 0.25 }],
-  dive_spotted:          [{ freq: S, dur: 0.22, vol: 0.44 }],
-  time_wasting:          [{ freq: S, dur: 0.85, vol: 0.30 }],
-  village_whistle:       [{ freq: 840, dur: 0.18, vol: 0.28 }],
-  wet_whistle:           [{ freq: 620, dur: 0.10, gap: 0.04, vol: 0.15 }, { freq: 860, dur: 0.18, vol: 0.26 }],
-  sad_whistle:           [{ freq: S, dur: 0.45, vol: 0.26, descend: true }],
-  happy_whistle:         [{ freq: 1200, dur: 0.11, vol: 0.30 }],
-  distant_whistle:       [{ freq: S, dur: 0.18, vol: 0.12 }],
-  tired_referee:         [{ freq: 600, dur: 0.18, gap: 0.08, vol: 0.14 }, { freq: 840, dur: 0.22, vol: 0.24 }],
-  full_time_double_long: [{ freq: S, dur: 0.35, gap: 0.45 }, { freq: S, dur: 0.35 }],
+  dive_accepted:         [{ freq: S, dur: 0.16, gap: 0.28 }, { freq: L, dur: 0.14, vol: 0.28 }],
+  dive_spotted:          [{ freq: S,    dur: 0.22, vol: 0.48 }],
+  time_wasting:          [{ freq: S,    dur: 0.85, vol: 0.32 }],
+  village_whistle:       [{ freq: 2820, dur: 0.18, vol: 0.30, vibrato: 55, noise: true }],
+  wet_whistle:           [{ freq: 2650, dur: 0.10, gap: 0.04, vol: 0.18, noise: true }, { freq: 2900, dur: 0.18, vol: 0.28, noise: true }],
+  sad_whistle:           [{ freq: S,    dur: 0.45, vol: 0.28, descend: true, vibrato: 18 }],
+  happy_whistle:         [{ freq: 3750, dur: 0.11, vol: 0.34 }],
+  distant_whistle:       [{ freq: S,    dur: 0.18, vol: 0.12, vibrato: 8 }],
+  tired_referee:         [{ freq: 2620, dur: 0.18, gap: 0.08, vol: 0.16, noise: true }, { freq: 2850, dur: 0.22, vol: 0.26 }],
+  full_time_double_long:    [{ freq: S, dur: 0.35, gap: 0.45 }, { freq: S, dur: 0.35 }],
   full_time_triple_classic: [
     { freq: S, dur: 0.22, gap: 0.18 },
     { freq: S, dur: 0.22, gap: 0.18 },
-    { freq: S, dur: 0.65, vol: 0.40 },
+    { freq: S, dur: 0.65, vol: 0.46, noise: true },
   ],
-  full_time_tired:       [{ freq: 820, dur: 0.28, gap: 0.50, vol: 0.22 }, { freq: 820, dur: 0.22, vol: 0.20 }],
-  full_time_chaos:       [
+  full_time_tired:          [{ freq: 2820, dur: 0.28, gap: 0.50, vol: 0.24, noise: true }, { freq: 2820, dur: 0.22, vol: 0.22 }],
+  full_time_chaos:          [
     { freq: S, dur: 0.14, gap: 0.08 },
     { freq: S, dur: 0.14, gap: 0.28 },
-    { freq: L, dur: 0.75, vol: 0.42 },
+    { freq: L, dur: 0.75, vol: 0.48, noise: true },
   ],
 };
 
 function playWhistle(id: string) {
-  const notes = TONE_MAP[id];
-  if (notes) playNotes(notes);
+  const pattern = TONE_MAP[id];
+  if (pattern) playPattern(pattern);
 }
 
 // ── UI ────────────────────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth/session';
 
 const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
 const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/online-games — create game
 export async function POST() {
+  const session = await getSession();
   try {
     const res = await fetch(`${HUB_URL}/api/osma-liga/online-games`, {
       method: 'POST',
@@ -35,7 +37,11 @@ export async function POST() {
         'Content-Type': 'application/json',
         'X-Project-Hub-Key': HUB_KEY,
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({
+        userId:     session?.osmaUserId ?? null,
+        userName:   session?.globalName ?? session?.username ?? null,
+        userAvatar: session?.avatarUrl ?? null,
+      }),
     });
 
     if (!res.ok) {

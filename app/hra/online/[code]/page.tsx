@@ -37,6 +37,8 @@ export default function OnlineRoomPage({
   const { code } = use(params);
   const upperCode = code.toUpperCase();
 
+  type CurrentUser = { username: string; globalName: string | null; avatarUrl: string | null } | null;
+
   const [room, setRoom] = useState<GameRoom | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -45,6 +47,7 @@ export default function OnlineRoomPage({
   const [myToken, setMyToken] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [enterGame, setEnterGame] = useState(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -55,6 +58,13 @@ export default function OnlineRoomPage({
       }
     }
   }, [upperCode]);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((r) => r.json() as Promise<{ user: CurrentUser }>)
+      .then(({ user }) => setCurrentUser(user))
+      .catch(() => {});
+  }, []);
 
   const fetchRoom = useCallback(async () => {
     try {
@@ -175,6 +185,19 @@ export default function OnlineRoomPage({
         className="w-full max-w-sm rounded-xl p-6 flex flex-col gap-4 text-center"
         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(214,169,74,0.2)' }}
       >
+        {/* Identita */}
+        {currentUser ? (
+          <p className="text-xs" style={{ color: 'rgba(209,250,229,0.5)' }}>
+            Hraješ jako{' '}
+            <span className="font-semibold text-white">{currentUser.globalName ?? currentUser.username}</span>
+          </p>
+        ) : (
+          <p className="text-xs" style={{ color: 'rgba(209,250,229,0.35)' }}>
+            Hraješ anonymně &mdash;{' '}
+            <a href="/api/auth/login" style={{ color: '#d6a94a' }}>přihlásit přes Discord</a>
+          </p>
+        )}
+
         {/* Stav hráčů */}
         <div className="flex justify-center gap-6">
           <div className="flex flex-col items-center gap-1">
