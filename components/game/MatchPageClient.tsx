@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { playFullTimeWhistle } from '@/lib/audio/whistleEngine';
+import { playFullTimeWhistle, playKickoffWhistle, unlockAudio } from '@/lib/audio/whistleEngine';
 import GameCanvas from './GameCanvas';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
@@ -103,11 +103,14 @@ export default function MatchPageClient() {
       const t = setTimeout(() => setCountdownNum((n) => n - 1), 1000);
       return () => clearTimeout(t);
     }
+    // countdownNum === 0: "HRAJ!" is shown — play kickoff whistle immediately
+    playKickoffWhistle();
     const t = setTimeout(() => setGamePhase('playing'), 700);
     return () => clearTimeout(t);
   }, [gamePhase, countdownNum]);
 
   const startCountdown = () => {
+    void unlockAudio(); // pre-warm Tone.js AudioContext in user gesture handler
     setCountdownNum(3);
     setGamePhase('countdown');
     setMatchScore(null);
