@@ -15,8 +15,8 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function matchResultLabel(home: number, away: number): string {
-  if (home > away) return 'Vítěz: Náhoda FC';
+function matchResultLabel(home: number, away: number, homeTeamName: string): string {
+  if (home > away) return `Vítěz: ${homeTeamName}`;
   if (away > home) return 'Vítěz: FK Pařezov';
   return 'Remíza';
 }
@@ -129,6 +129,7 @@ function drawActivePlayerIndicator(ctx: CanvasRenderingContext2D, player: Player
 function drawEndOverlay(
   ctx: CanvasRenderingContext2D,
   score: { home: number; away: number },
+  homeTeamName: string,
 ): void {
   // Full dim backdrop
   ctx.fillStyle = 'rgba(0,0,0,0.58)';
@@ -177,7 +178,7 @@ function drawEndOverlay(
   ctx.font = 'bold 13px sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.textAlign = 'left';
-  ctx.fillText('Náhoda FC', px + 22, py + 124);
+  ctx.fillText(homeTeamName, px + 22, py + 124);
   ctx.textAlign = 'right';
   ctx.fillText('FK Pařezov', px + pw - 22, py + 124);
 
@@ -193,7 +194,7 @@ function drawEndOverlay(
   const isDraw = score.home === score.away;
   ctx.font = 'bold 15px sans-serif';
   ctx.fillStyle = isDraw ? 'rgba(255,255,255,0.6)' : '#d6a94a';
-  ctx.fillText(matchResultLabel(score.home, score.away), cx, py + 198);
+  ctx.fillText(matchResultLabel(score.home, score.away, homeTeamName), cx, py + 198);
 
   // Comment
   ctx.font = '13px sans-serif';
@@ -210,7 +211,7 @@ function drawEndOverlay(
 
 // ── Main render function ──────────────────────────────────────────────────────
 
-export function renderGame(ctx: CanvasRenderingContext2D, state: GameState): void {
+export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, homeTeamName = 'Náhoda FC'): void {
   // ── Background ────────────────────────────────────────────────────────────
 
   ctx.fillStyle = 'rgba(3,18,10,0.92)';
@@ -315,7 +316,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState): voi
   ctx.fillStyle = 'white';
   ctx.font = 'bold 16px monospace';
   ctx.fillText(
-    `Náhoda FC  ${state.score.home}  :  ${state.score.away}  FK Pařezov`,
+    `${homeTeamName}  ${state.score.home}  :  ${state.score.away}  FK Pařezov`,
     CANVAS_W / 2,
     hudMid - 7,
   );
@@ -369,6 +370,6 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState): voi
   // ── End overlay ───────────────────────────────────────────────────────────
 
   if (state.phase === 'ended') {
-    drawEndOverlay(ctx, state.score);
+    drawEndOverlay(ctx, state.score, homeTeamName);
   }
 }

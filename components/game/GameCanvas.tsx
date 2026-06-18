@@ -15,9 +15,10 @@ interface Props {
   onMatchEnd?: (score: { home: number; away: number }) => void;
   onRestart?: () => void;
   touchInputRef?: MutableRefObject<TouchInput>;
+  homeTeamName?: string;
 }
 
-export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Props) {
+export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef, homeTeamName }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Pro
 
       prevPhase = gameState.phase;
 
-      renderGame(ctx, gameState);
+      renderGame(ctx, gameState, homeTeamName);
 
       rafId = requestAnimationFrame(loop);
     };
@@ -101,7 +102,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Pro
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
     };
-  }, [onMatchEnd, onRestart, touchInputRef]);
+  }, [onMatchEnd, onRestart, touchInputRef, homeTeamName]);
 
   return (
     <canvas

@@ -95,7 +95,7 @@ export default async function SatnaPage({
             </p>
           </div>
           <Link
-            href="/hra/bot"
+            href={clubSlug ? `/hra/bot?club=${clubSlug}` : '/hra/bot'}
             className="inline-block text-center rounded-lg py-2.5 text-sm font-bold transition hover:opacity-90"
             style={{ background: '#d6a94a', color: '#041f14' }}
           >

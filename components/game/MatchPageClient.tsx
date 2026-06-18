@@ -8,6 +8,7 @@ import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
 import { MATCH_DURATION } from '@/game/constants';
 import type { TouchInput } from '@/game/types';
+import { CLUBS } from '@/data/clubs';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 type GamePhase = 'idle' | 'countdown' | 'playing';
@@ -52,7 +53,8 @@ async function requestGameFullscreen(element: HTMLElement | null): Promise<boole
   }
 }
 
-export default function MatchPageClient() {
+export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: string }) {
+  const homeTeamName = (homeClubSlug && CLUBS.find((c) => c.slug === homeClubSlug)?.name) || 'Náhoda FC';
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [gamePhase, setGamePhase] = useState<GamePhase>('idle');
@@ -225,6 +227,7 @@ export default function MatchPageClient() {
               onMatchEnd={handleMatchEnd}
               onRestart={handleRestart}
               touchInputRef={touchRef}
+              homeTeamName={homeTeamName}
             />
 
             {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
