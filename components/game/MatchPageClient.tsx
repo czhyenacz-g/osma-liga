@@ -283,9 +283,8 @@ export default function MatchPageClient() {
                   <button
                     onClick={handleRestart}
                     style={{
-                      background: 'rgba(209,250,229,0.15)',
-                      border: '1px solid rgba(209,250,229,0.35)',
-                      color: 'white',
+                      background: '#6dbf8a',
+                      color: '#041f14',
                       padding: '11px 22px',
                       borderRadius: 10,
                       fontWeight: 'bold',
