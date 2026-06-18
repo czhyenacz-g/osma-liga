@@ -8,7 +8,7 @@ import { createInputState, attachInputListeners } from '@/game/input';
 import { updateGame } from '@/game/updateGame';
 import { renderGame } from '@/game/renderGame';
 import { resumeAudio } from '@/game/audio';
-import { playKickoffWhistle, playGoalSound } from '@/lib/audio/whistleEngine';
+import { playKickoffWhistle, playGoalSound, playRestartSound } from '@/lib/audio/whistleEngine';
 import type { GameState, InputState, TouchInput } from '@/game/types';
 
 interface Props {
@@ -68,11 +68,13 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef }: Pro
       const wasRestart = merged.restart;
       gameState = updateGame(gameState, merged, dt);
 
-      // Kickoff on manual restart; goal sound on entering goal phase
+      // Kickoff on manual restart; goal sound on goal entry; pum on restart
       if (wasRestart) {
         playKickoffWhistle();
       } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
         playGoalSound();
+      } else if (prevPhase === 'goal' && gameState.phase === 'playing') {
+        playRestartSound();
       }
       // Notify parent when match ends for the first time
       if (prevPhase !== 'ended' && gameState.phase === 'ended') {

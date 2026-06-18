@@ -148,7 +148,28 @@ export function playFullTimeWhistle(): void {
 
 // Goal sound — plays at the moment a goal is scored
 export function playGoalSound(): void {
-  void playSound('18-tone').catch(() => {});
+  void playSound('02-tone').catch(() => {});
+}
+
+// Restart sound — digital "pum" played when play resumes after a goal.
+// Uses MembraneSynth (kick-drum style), not the whistle chain — no highpass filter.
+async function playRestartPum(): Promise<void> {
+  if (typeof window === 'undefined') return;
+  const Tone = await import('tone');
+  await Tone.start();
+  const synth = new Tone.MembraneSynth({
+    pitchDecay: 0.05,
+    octaves: 2.5,
+    envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.12 },
+  });
+  const vol = new Tone.Volume(-9);
+  synth.chain(vol, Tone.Destination);
+  synth.triggerAttackRelease('C3', 0.08, Tone.now() + 0.02);
+  setTimeout(() => { synth.dispose(); vol.dispose(); }, 600);
+}
+
+export function playRestartSound(): void {
+  void playRestartPum().catch(() => {});
 }
 
 // Legacy wrapper — kept for backward compatibility.
