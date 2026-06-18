@@ -91,9 +91,9 @@ const H = 3500;  // high
 const L = 2750;  // low
 
 const TONE_MAP: Record<string, Whistle[]> = {
-  kickoff:               [{ freq: S,    dur: 0.27, noise: true }],
-  restart:               [{ freq: H,    dur: 0.14 }],
-  common_foul:           [{ freq: S,    dur: 0.30, vol: 0.44 }],
+  kickoff:               [{ freq: S,    dur: 0.83, noise: true }],
+  restart:               [{ freq: H,    dur: 0.70 }],
+  common_foul:           [{ freq: S,    dur: 0.86, vol: 0.44 }],
   hard_foul:             [{ freq: S,    dur: 0.83, vol: 0.50, noise: true }],
   yellow_card:           [{ freq: S,    dur: 0.33, vol: 0.44 }],
   red_card:              [{ freq: L,    dur: 1.20, vol: 0.54, noise: true }],
@@ -149,9 +149,9 @@ const TJ_H = 3800;
 const TJ_L = 2600;
 
 const TONE_JS_MAP: Record<string, ToneNote[]> = {
-  kickoff:               [{ freq: TJ_S, duration: 0.27 }],
-  restart:               [{ freq: TJ_H, duration: 0.14 }],
-  common_foul:           [{ freq: TJ_S, duration: 0.30 }],
+  kickoff:               [{ freq: TJ_S, duration: 0.83 }],
+  restart:               [{ freq: TJ_H, duration: 0.70 }],
+  common_foul:           [{ freq: TJ_S, duration: 0.86 }],
   hard_foul:             [{ freq: TJ_S, duration: 0.83 }],
   yellow_card:           [{ freq: TJ_S, duration: 0.33 }],
   red_card:              [{ freq: TJ_L, duration: 1.20 }],

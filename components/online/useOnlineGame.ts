@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { playFullTimeWhistle } from '@/lib/audio/whistleEngine';
 
 export interface OnlinePlayer {
   id: string;
@@ -55,6 +56,7 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
 
     socket.on('game_finished', () => {
       setGameStatus('finished');
+      playFullTimeWhistle();
     });
 
     socket.on('error', ({ message }: { message: string }) => {

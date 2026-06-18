@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { playFullTimeWhistle } from '@/lib/audio/whistleEngine';
 import GameCanvas from './GameCanvas';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
@@ -116,6 +117,7 @@ export default function MatchPageClient() {
   const handleMatchEnd = useCallback((score: { home: number; away: number }) => {
     setMatchScore(score);
     setSaveState('idle');
+    playFullTimeWhistle();
   }, []);
 
   const handleRestart = useCallback(() => {
