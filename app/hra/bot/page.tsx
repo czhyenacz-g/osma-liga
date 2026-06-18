@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import MatchPageClient from '@/components/game/MatchPageClient';
+import GameNavLink from '@/components/ui/GameNavLink';
 
 export const metadata: Metadata = {
   title: 'Zápas proti botovi — Osmá liga',
@@ -12,6 +13,8 @@ export default function HraBotPage() {
       className="min-h-screen flex flex-col items-center justify-center gap-5 px-4 py-8"
       style={{ background: '#041f14' }}
     >
+      <GameNavLink />
+
       <div className="text-center">
         <h1 className="text-xl font-black text-white">
           Náhoda FC{' '}

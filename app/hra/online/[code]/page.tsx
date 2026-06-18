@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { use } from 'react';
 import dynamic from 'next/dynamic';
 import { CLUBS } from '@/data/clubs';
+import GameNavLink from '@/components/ui/GameNavLink';
 
 // Lazy-load game client — only mounted when we have a token and game is ready
 const OnlineGameClient = dynamic(
@@ -181,6 +182,8 @@ export default function OnlineRoomPage({
       className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 py-10"
       style={{ background: '#041f14' }}
     >
+      <GameNavLink />
+
       <div className="text-center">
         <p className="text-xs mb-1" style={{ color: 'rgba(209,250,229,0.4)' }}>Kód zápasu</p>
         <span className="text-5xl font-black tracking-widest" style={{ color: '#d6a94a' }}>

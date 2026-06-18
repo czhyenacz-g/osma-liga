@@ -3,14 +3,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { CLUBS } from '@/data/clubs';
+import GameNavLink from '@/components/ui/GameNavLink';
 
 type GameRoom = {
   code: string;
-  status: 'waiting' | 'full' | 'expired';
+  status: 'waiting' | 'full' | 'playing' | 'finished' | 'expired';
   players: number;
   maxPlayers: number;
   createdAt: string;
   expiresAt: string;
+  onlineMatchId?: string | null;
 };
 
 type CreatedGame = {
@@ -94,6 +96,8 @@ export default function OnlineLobbyPage() {
       className="min-h-screen flex flex-col items-center px-4 py-10 gap-8"
       style={{ background: '#041f14' }}
     >
+      <GameNavLink />
+
       <div className="text-center max-w-md">
         <h1 className="text-2xl font-black text-white mb-2">Online zápas</h1>
         <p className="text-sm" style={{ color: 'rgba(209,250,229,0.55)' }}>
@@ -203,8 +207,15 @@ export default function OnlineLobbyPage() {
                   <span className="font-mono font-bold text-sm text-white">{g.code}</span>
                   <span className="text-xs" style={{ color: 'rgba(209,250,229,0.4)' }}>
                     {g.players}/{g.maxPlayers} hráčů &middot;{' '}
-                    <span style={{ color: g.status === 'waiting' ? '#86efac' : '#fca5a5' }}>
-                      {g.status === 'waiting' ? 'čeká na hráče' : 'plno'}
+                    <span style={{
+                      color: g.status === 'waiting' ? '#86efac'
+                           : g.status === 'finished' ? 'rgba(209,250,229,0.35)'
+                           : '#fca5a5',
+                    }}>
+                      {g.status === 'waiting' ? 'čeká na hráče'
+                       : g.status === 'playing' ? 'probíhá'
+                       : g.status === 'finished' ? 'dohráno'
+                       : 'plno'}
                     </span>
                   </span>
                 </div>
@@ -215,6 +226,15 @@ export default function OnlineLobbyPage() {
                     style={{ background: 'rgba(214,169,74,0.15)', color: '#d6a94a', border: '1px solid rgba(214,169,74,0.25)' }}
                   >
                     Připojit se
+                  </Link>
+                )}
+                {g.status === 'finished' && g.onlineMatchId && (
+                  <Link
+                    href={`/zapasy/${g.onlineMatchId}`}
+                    className="text-xs px-3 py-1.5 rounded-lg font-semibold transition hover:opacity-80"
+                    style={{ background: 'rgba(209,250,229,0.06)', color: 'rgba(209,250,229,0.5)', border: '1px solid rgba(209,250,229,0.12)' }}
+                  >
+                    Detail →
                   </Link>
                 )}
               </div>

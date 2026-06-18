@@ -23,6 +23,8 @@ const LERP = 0.3;
 interface RenderPlayer extends OnlinePlayer {
   rx: number; // rendered (interpolated) x
   ry: number; // rendered (interpolated) y
+  pvx: number; // previous-frame velocity x (for arrow direction)
+  pvy: number; // previous-frame velocity y
 }
 
 interface RenderState {
@@ -39,6 +41,36 @@ function formatTime(s: number): string {
   const m = Math.floor(clamped / 60);
   const sec = Math.floor(clamped % 60);
   return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+function drawActiveIndicator(ctx: CanvasRenderingContext2D, rp: RenderPlayer): void {
+  const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 300);
+  // Pulsing outer ring — matches bot game
+  ctx.beginPath();
+  ctx.arc(rp.rx, rp.ry, PLAYER_RADIUS + 5 + pulse * 3, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(251,191,36,${0.5 + pulse * 0.45})`;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  // Arrow: based on accumulated velocity from position delta
+  const speed = Math.sqrt(rp.pvx ** 2 + rp.pvy ** 2);
+  if (speed > 0.5) {
+    const nx = rp.pvx / speed;
+    const ny = rp.pvy / speed;
+    const ARROW_DIST = PLAYER_RADIUS + 10;
+    const tipX  = rp.rx + nx * ARROW_DIST;
+    const tipY  = rp.ry + ny * ARROW_DIST;
+    const baseX = rp.rx + nx * (ARROW_DIST - 8);
+    const baseY = rp.ry + ny * (ARROW_DIST - 8);
+    const px = -ny;
+    const py =  nx;
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(baseX + px * 5, baseY + py * 5);
+    ctx.lineTo(baseX - px * 5, baseY - py * 5);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(251,191,36,${0.65 + pulse * 0.35})`;
+    ctx.fill();
+  }
 }
 
 function drawFrame(
@@ -94,6 +126,15 @@ function drawFrame(
   ctx.lineTo(FIELD_R, GOAL_B);
   ctx.stroke();
 
+  // Active indicator rings — drawn behind players
+  for (const rp of render.players) {
+    const isHome = rp.team === 'home';
+    const isMyTeam = (role === 'home' && isHome) || (role === 'guest' && !isHome);
+    if (isMyTeam && rp.active) {
+      drawActiveIndicator(ctx, rp);
+    }
+  }
+
   // Players (from interpolated render state)
   for (const rp of render.players) {
     const isHome = rp.team === 'home';
@@ -104,8 +145,8 @@ function drawFrame(
       ? rp.active ? '#22c55e' : '#15803d'
       : rp.active ? '#3b82f6' : '#1d4ed8';
     ctx.fill();
-    ctx.strokeStyle = isMyTeam && rp.active ? '#fbbf24' : 'rgba(255,255,255,0.65)';
-    ctx.lineWidth = isMyTeam && rp.active ? 2.5 : 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.fillStyle = 'white';
     ctx.font = 'bold 10px monospace';
@@ -172,7 +213,7 @@ export default function OnlineGameCanvas({
     if (!renderRef.current) {
       renderRef.current = {
         ball: { rx: snapshot.ball.x, ry: snapshot.ball.y },
-        players: snapshot.players.map((p) => ({ ...p, rx: p.x, ry: p.y })),
+        players: snapshot.players.map((p) => ({ ...p, rx: p.x, ry: p.y, pvx: 0, pvy: 0 })),
       };
     }
   }, [snapshot]);
@@ -192,32 +233,39 @@ export default function OnlineGameCanvas({
       if (!render) {
         render = {
           ball: { rx: target.ball.x, ry: target.ball.y },
-          players: target.players.map((p) => ({ ...p, rx: p.x, ry: p.y })),
+          players: target.players.map((p) => ({ ...p, rx: p.x, ry: p.y, pvx: 0, pvy: 0 })),
         };
         renderRef.current = render;
       }
 
+      const r = render;
+
       // Interpolate ball toward target
-      render.ball.rx = lerp(render.ball.rx, target.ball.x, LERP);
-      render.ball.ry = lerp(render.ball.ry, target.ball.y, LERP);
+      r.ball.rx = lerp(r.ball.rx, target.ball.x, LERP);
+      r.ball.ry = lerp(r.ball.ry, target.ball.y, LERP);
 
       // Interpolate players toward target; sync non-positional state directly
       for (let i = 0; i < target.players.length; i++) {
         const tp = target.players[i];
-        const rp = render.players[i];
+        const rp = r.players[i];
         if (!tp) continue;
         if (!rp) {
-          render.players[i] = { ...tp, rx: tp.x, ry: tp.y };
+          r.players[i] = { ...tp, rx: tp.x, ry: tp.y, pvx: 0, pvy: 0 };
           continue;
         }
+        const prevRx = rp.rx;
+        const prevRy = rp.ry;
         rp.rx = lerp(rp.rx, tp.x, LERP);
         rp.ry = lerp(rp.ry, tp.y, LERP);
+        // Smooth velocity from position delta for arrow direction
+        rp.pvx = lerp(rp.pvx, (rp.rx - prevRx) * 30, 0.25);
+        rp.pvy = lerp(rp.pvy, (rp.ry - prevRy) * 30, 0.25);
         rp.active = tp.active;
         rp.team = tp.team;
         rp.label = tp.label;
       }
 
-      drawFrame(ctx!, render, target, role);
+      drawFrame(ctx!, r, target, role);
       rafRef.current = requestAnimationFrame(frame);
     }
 

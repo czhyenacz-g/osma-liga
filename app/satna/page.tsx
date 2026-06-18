@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import SatnaJoinForm from '@/components/game/SatnaJoinForm';
 import { getSession } from '@/lib/auth/session';
+import GameNavLink from '@/components/ui/GameNavLink';
 
 export const metadata: Metadata = {
   title: 'Šatna | Osmá liga',
@@ -22,6 +23,8 @@ export default async function SatnaPage() {
       className="min-h-screen flex flex-col items-center justify-center gap-8 px-4 py-12"
       style={{ background: '#041f14' }}
     >
+      <GameNavLink />
+
       {/* Nadpis */}
       <div className="text-center max-w-md">
         <h1 className="text-3xl font-black text-white mb-2">Šatna</h1>
