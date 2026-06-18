@@ -40,6 +40,15 @@ const BANK: Record<string, SoundDefinition> = {
     notes: [{ freq: WA_H, dur: 0.70 }],
   },
 
+  // ── goal-tone — used by playGoalSound() ─────────────────────────────────
+  // Based on 02-tone but 1.5× longer and louder for better audibility.
+  'goal-tone': {
+    key: 'goal-tone', number: 2, baseId: 'restart', engine: 'tone',
+    name: 'Gólové písknutí',
+    notes: [{ freq: TJ_H, dur: 1.05 }],
+    volDb: -3,
+  },
+
   // ── #03 Běžný faul ────────────────────────────────────────────────────────
   '03-tone': {
     key: '03-tone', number: 3, baseId: 'common_foul', engine: 'tone',
