@@ -83,8 +83,8 @@ export default function LeagueHeader({ compact = false }: { compact?: boolean })
             {/* Oddělovač před sloganem */}
             <div className="hidden lg:block h-14 w-px bg-white/10 shrink-0" />
 
-            {/* SVG slogan */}
-            <div className="hidden lg:flex shrink-0 items-center">
+            {/* SVG slogan + auth status pod ním — desktop */}
+            <div className="hidden lg:flex shrink-0 flex-col items-center gap-1">
               <Image
                 src="/var-slogan.svg"
                 alt="VAR nemáme, hraj dál."
@@ -93,11 +93,6 @@ export default function LeagueHeader({ compact = false }: { compact?: boolean })
                 className="object-contain"
                 style={{ width: 200, height: "auto" }}
               />
-            </div>
-
-            {/* Auth status — desktop */}
-            <div className="hidden lg:flex items-center gap-3 shrink-0 ml-2">
-              <div className="h-14 w-px bg-white/10" />
               <AuthStatus />
             </div>
 
