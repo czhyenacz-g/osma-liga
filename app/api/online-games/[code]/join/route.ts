@@ -6,11 +6,18 @@ const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
 
 // POST /api/online-games/:code/join — join as guest
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ code: string }> },
 ) {
   const { code } = await params;
   const session = await getSession();
+  let clubId: string | null = null;
+  try {
+    const body = await req.json() as { clubId?: string | null };
+    clubId = typeof body.clubId === 'string' ? body.clubId : null;
+  } catch {
+    // no body — ok
+  }
 
   try {
     const res = await fetch(`${HUB_URL}/api/osma-liga/online-games/${code}/join`, {
@@ -23,6 +30,7 @@ export async function POST(
         userId:     session?.osmaUserId ?? null,
         userName:   session?.globalName ?? session?.username ?? null,
         userAvatar: session?.avatarUrl ?? null,
+        clubId,
       }),
     });
 

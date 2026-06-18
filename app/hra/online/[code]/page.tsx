@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { use } from 'react';
 import dynamic from 'next/dynamic';
+import { CLUBS } from '@/data/clubs';
 
 // Lazy-load game client — only mounted when we have a token and game is ready
 const OnlineGameClient = dynamic(
@@ -48,6 +49,8 @@ export default function OnlineRoomPage({
   const [isHost, setIsHost] = useState(false);
   const [enterGame, setEnterGame] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
+  // Default: second club for guest, first for host (will be overridden by actual role)
+  const [selectedClubId, setSelectedClubId] = useState<string>(CLUBS[1]?.slug ?? CLUBS[0]?.slug ?? 'tj-sokol-tupoljany');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -97,7 +100,11 @@ export default function OnlineRoomPage({
     setJoining(true);
     setJoinError(null);
     try {
-      const res = await fetch(`/api/online-games/${upperCode}/join`, { method: 'POST' });
+      const res = await fetch(`/api/online-games/${upperCode}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clubId: selectedClubId }),
+      });
       if (res.status === 409) {
         setJoinError('Zápas je already plný. Asi tě někdo předběhl.');
         return;
@@ -263,6 +270,23 @@ export default function OnlineRoomPage({
             <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
               Hostitel čeká na soupeře. Připoj se!
             </p>
+            <div className="flex flex-col gap-1 text-left">
+              <label className="text-xs" style={{ color: 'rgba(209,250,229,0.5)' }}>
+                Tvůj klub
+              </label>
+              <select
+                value={selectedClubId}
+                onChange={(e) => setSelectedClubId(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg text-sm font-semibold text-white bg-transparent border outline-none"
+                style={{ borderColor: 'rgba(214,169,74,0.3)', background: 'rgba(255,255,255,0.06)' }}
+              >
+                {CLUBS.map((c) => (
+                  <option key={c.slug} value={c.slug} style={{ background: '#041f14' }}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
               onClick={() => { void handleJoin(); }}
               disabled={joining}

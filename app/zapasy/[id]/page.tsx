@@ -22,6 +22,15 @@ type MatchUser = {
   avatarUrl: string | null;
 };
 
+type MatchClub = {
+  id: string;
+  slug: string;
+  name: string;
+  shortName: string | null;
+  banner: string | null;
+  logo: string | null;
+};
+
 type OnlineMatch = {
   id: string;
   gameCode: string;
@@ -36,6 +45,8 @@ type OnlineMatch = {
   finishReason: string;
   homeUser?: MatchUser | null;
   awayUser?: MatchUser | null;
+  homeClub?: MatchClub | null;
+  awayClub?: MatchClub | null;
   events: OnlineMatchEvent[];
 };
 
@@ -187,17 +198,15 @@ export default async function ZapasDetailPage({ params }: Props) {
         <Row label="Délka" value={formatDuration(match.durationSeconds)} />
       </div>
 
-      {/* Hráči */}
-      {(match.homeUser || match.awayUser) && (
-        <div className="w-full max-w-lg p-5 flex flex-col gap-3" style={cardStyle}>
-          <p className="text-xs font-black uppercase tracking-widest" style={gold}>Hráči</p>
-          <div className="flex items-center justify-between gap-3">
-            <PlayerChip user={match.homeUser ?? null} teamName={match.homeTeamName} />
-            <span className="text-sm shrink-0" style={{ color: 'rgba(209,250,229,0.2)' }}>vs</span>
-            <PlayerChip user={match.awayUser ?? null} teamName={match.awayTeamName} align="right" />
-          </div>
+      {/* Hráči a kluby */}
+      <div className="w-full max-w-lg p-5 flex flex-col gap-3" style={cardStyle}>
+        <p className="text-xs font-black uppercase tracking-widest" style={gold}>Hráči</p>
+        <div className="flex items-center justify-between gap-3">
+          <PlayerChip user={match.homeUser ?? null} teamName={match.homeTeamName} club={match.homeClub ?? null} />
+          <span className="text-sm shrink-0" style={{ color: 'rgba(209,250,229,0.2)' }}>vs</span>
+          <PlayerChip user={match.awayUser ?? null} teamName={match.awayTeamName} club={match.awayClub ?? null} align="right" />
         </div>
-      )}
+      </div>
 
       {/* Timeline */}
       <div className="w-full max-w-lg flex flex-col gap-3">
@@ -275,28 +284,35 @@ export default async function ZapasDetailPage({ params }: Props) {
 function PlayerChip({
   user,
   teamName,
+  club,
   align = 'left',
 }: {
   user: MatchUser | null;
   teamName: string;
+  club: MatchClub | null;
   align?: 'left' | 'right';
 }) {
   const name = user ? (user.globalName ?? user.username) : null;
   const avatarUrl = user?.avatarUrl ?? null;
+  const clubName = club?.name ?? null;
 
   return (
     <div
       className="flex flex-col gap-1 min-w-0"
       style={{ alignItems: align === 'right' ? 'flex-end' : 'flex-start' }}
     >
-      <span className="text-xs text-white/60 truncate max-w-[120px]">{teamName}</span>
+      {clubName ? (
+        <span className="text-xs font-bold text-white/80 truncate max-w-[130px]">{clubName}</span>
+      ) : (
+        <span className="text-xs text-white/30 truncate max-w-[130px]">{teamName}</span>
+      )}
       <div className="flex items-center gap-1.5" style={{ flexDirection: align === 'right' ? 'row-reverse' : 'row' }}>
         {avatarUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={avatarUrl} alt="" width={20} height={20} className="rounded-full shrink-0" />
         )}
-        <span className="text-xs font-semibold truncate max-w-[120px]" style={{ color: name ? 'white' : 'rgba(209,250,229,0.3)' }}>
-          {name ?? 'anonymní'}
+        <span className="text-xs truncate max-w-[120px]" style={{ color: name ? 'rgba(209,250,229,0.6)' : 'rgba(209,250,229,0.3)' }}>
+          hráč: {name ?? 'anonymní'}
         </span>
       </div>
     </div>

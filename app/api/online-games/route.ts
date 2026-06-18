@@ -28,8 +28,15 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/online-games — create game
-export async function POST() {
+export async function POST(req: NextRequest) {
   const session = await getSession();
+  let clubId: string | null = null;
+  try {
+    const body = await req.json() as { clubId?: string | null };
+    clubId = typeof body.clubId === 'string' ? body.clubId : null;
+  } catch {
+    // no body — ok
+  }
   try {
     const res = await fetch(`${HUB_URL}/api/osma-liga/online-games`, {
       method: 'POST',
@@ -41,6 +48,7 @@ export async function POST() {
         userId:     session?.osmaUserId ?? null,
         userName:   session?.globalName ?? session?.username ?? null,
         userAvatar: session?.avatarUrl ?? null,
+        clubId,
       }),
     });
 
