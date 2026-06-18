@@ -281,6 +281,7 @@ const BANK: Record<string, SoundDefinition> = {
     key: '21-tone', number: 21, baseId: 'full_time_double_long', engine: 'tone',
     name: 'Konec zápasu — dvojité dlouhé',
     notes: [{ freq: TJ_S, dur: 0.53, gap: 0.45 }, { freq: TJ_S, dur: 0.53 }],
+    volDb: -2,
   },
   '21-webaudio': {
     key: '21-webaudio', number: 21, baseId: 'full_time_double_long', engine: 'webaudio',

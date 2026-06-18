@@ -88,7 +88,7 @@ async function playTonePattern(notes: WhistleNote[], volumeDb = -7) {
 
   synth.chain(vibrato, filter, vol, Tone.Destination);
 
-  let now = Tone.now() + 0.04;
+  let now = Tone.now() + 0.10;
   let totalDur = 0;
 
   for (const note of notes) {
