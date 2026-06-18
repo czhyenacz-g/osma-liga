@@ -6,6 +6,7 @@ import { use } from 'react';
 import dynamic from 'next/dynamic';
 import { CLUBS } from '@/data/clubs';
 import GameNavLink from '@/components/ui/GameNavLink';
+import ClubSelect from '@/components/ui/ClubSelect';
 
 // Lazy-load game client — only mounted when we have a token and game is ready
 const OnlineGameClient = dynamic(
@@ -273,23 +274,7 @@ export default function OnlineRoomPage({
             <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
               Hostitel čeká na soupeře. Připoj se!
             </p>
-            <div className="flex flex-col gap-1 text-left">
-              <label className="text-xs" style={{ color: 'rgba(209,250,229,0.5)' }}>
-                Tvůj klub
-              </label>
-              <select
-                value={selectedClubId}
-                onChange={(e) => setSelectedClubId(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg text-sm font-semibold text-white bg-transparent border outline-none"
-                style={{ borderColor: 'rgba(214,169,74,0.3)', background: 'rgba(255,255,255,0.06)' }}
-              >
-                {CLUBS.map((c) => (
-                  <option key={c.slug} value={c.slug} style={{ background: '#041f14' }}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ClubSelect value={selectedClubId} onChange={setSelectedClubId} />
             <button
               onClick={() => { void handleJoin(); }}
               disabled={joining}

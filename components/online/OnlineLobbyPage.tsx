@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CLUBS } from '@/data/clubs';
 import GameNavLink from '@/components/ui/GameNavLink';
+import ClubSelect from '@/components/ui/ClubSelect';
 
 type GameRoom = {
   code: string;
@@ -120,23 +121,7 @@ export default function OnlineLobbyPage() {
       >
         {!created ? (
           <>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs" style={{ color: 'rgba(209,250,229,0.5)' }}>
-                Tvůj klub
-              </label>
-              <select
-                value={selectedClubId}
-                onChange={(e) => setSelectedClubId(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg text-sm font-semibold text-white bg-transparent border outline-none"
-                style={{ borderColor: 'rgba(214,169,74,0.3)', background: 'rgba(255,255,255,0.06)' }}
-              >
-                {CLUBS.map((c) => (
-                  <option key={c.slug} value={c.slug} style={{ background: '#041f14' }}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ClubSelect value={selectedClubId} onChange={setSelectedClubId} />
             <button
               onClick={() => { void handleCreate(); }}
               disabled={creating}
