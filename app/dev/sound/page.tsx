@@ -2,235 +2,11 @@
 
 import { useState } from 'react';
 import { whistleSounds, type WhistleSound } from '@/data/whistleSounds';
+import { playSound } from '@/lib/audio/playSound';
 
-// ── Web Audio whistle engine ─────────────────────────────────────────────────
-
-type Whistle = {
-  freq: number;      // base frequency Hz (2600–3800)
-  dur: number;       // total duration seconds
-  gap?: number;      // pause after this note (default 0.05)
-  vol?: number;      // peak volume 0–1 (default 0.42)
-  vibrato?: number;  // vibrato depth Hz (default 30); set 0 to disable
-  noise?: boolean;   // add breathed noise burst via highpass
-  descend?: boolean; // frequency drops ~18% over duration
-};
-
-function playPattern(pattern: Whistle[]) {
-  const AudioCtxClass = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-  const ctx = new AudioCtxClass();
-  let t = ctx.currentTime + 0.04;
-
-  for (const w of pattern) {
-    const vol    = w.vol    ?? 0.42;
-    const vDepth = w.vibrato ?? 30;
-    const attack = 0.015;
-    const holdEnd = t + w.dur * 0.72;
-    const end = t + w.dur;
-
-    // Main oscillator
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(w.freq, t);
-    if (w.descend) {
-      osc.frequency.exponentialRampToValueAtTime(w.freq * 0.82, end);
-    }
-
-    // Vibrato LFO
-    if (vDepth > 0) {
-      const lfo      = ctx.createOscillator();
-      const lfoGain  = ctx.createGain();
-      lfo.frequency.value  = 11;
-      lfoGain.gain.value   = vDepth;
-      lfo.connect(lfoGain);
-      lfoGain.connect(osc.frequency);
-      lfo.start(t);
-      lfo.stop(end + 0.05);
-    }
-
-    // ADSR envelope
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(vol, t + attack);
-    gain.gain.setValueAtTime(vol, holdEnd);
-    gain.gain.exponentialRampToValueAtTime(0.0001, end);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(t);
-    osc.stop(end + 0.05);
-
-    // Optional noise burst (wet/tired/atmospheric whistles)
-    if (w.noise) {
-      const bufSize   = Math.ceil(ctx.sampleRate * (w.dur + 0.05));
-      const buf       = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-      const data      = buf.getChannelData(0);
-      for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-      const noise     = ctx.createBufferSource();
-      noise.buffer    = buf;
-      const hpf       = ctx.createBiquadFilter();
-      hpf.type        = 'highpass';
-      hpf.frequency.value = 2200;
-      const nGain     = ctx.createGain();
-      nGain.gain.setValueAtTime(0.0001, t);
-      nGain.gain.exponentialRampToValueAtTime(0.03, t + attack);
-      nGain.gain.setValueAtTime(0.03, holdEnd);
-      nGain.gain.exponentialRampToValueAtTime(0.0001, end);
-      noise.connect(hpf);
-      hpf.connect(nGain);
-      nGain.connect(ctx.destination);
-      noise.start(t);
-      noise.stop(end + 0.05);
-    }
-
-    t += w.dur + (w.gap ?? 0.05);
-  }
+function padNum(n: number) {
+  return String(n).padStart(2, '0');
 }
-
-const S = 3000;  // standard
-const H = 3500;  // high
-const L = 2750;  // low
-
-const TONE_MAP: Record<string, Whistle[]> = {
-  kickoff:               [{ freq: S,    dur: 0.83, noise: true }],
-  restart:               [{ freq: H,    dur: 0.70 }],
-  common_foul:           [{ freq: S,    dur: 0.86, vol: 0.44 }],
-  hard_foul:             [{ freq: S,    dur: 0.83, vol: 0.50, noise: true }],
-  yellow_card:           [{ freq: S,    dur: 0.33, vol: 0.44 }],
-  red_card:              [{ freq: L,    dur: 1.20, vol: 0.54, noise: true }],
-  strict_referee:        [{ freq: 2850, dur: 0.42, vol: 0.50, vibrato: 15 }],
-  advantage:             [{ freq: H, dur: 0.14, gap: 0.10 }, { freq: H, dur: 0.14 }],
-  did_not_see:           [{ freq: S, dur: 0.21, gap: 0.05, vol: 0.24 }, { freq: L, dur: 0.14, vol: 0.20 }],
-  what_was_that:         [{ freq: S, dur: 0.23, gap: 0.38 }, { freq: H, dur: 0.11, vol: 0.22 }],
-  panic:                 [
-    { freq: H,    dur: 0.11, gap: 0.08 },
-    { freq: H,    dur: 0.11, gap: 0.08 },
-    { freq: H,    dur: 0.11, gap: 0.08 },
-    { freq: S,    dur: 0.42, vol: 0.46 },
-  ],
-  dive_accepted:         [{ freq: S, dur: 0.24, gap: 0.28 }, { freq: L, dur: 0.21, vol: 0.28 }],
-  dive_spotted:          [{ freq: S,    dur: 0.33, vol: 0.48 }],
-  time_wasting:          [{ freq: S,    dur: 1.28, vol: 0.32 }],
-  village_whistle:       [{ freq: 2820, dur: 0.27, vol: 0.30, vibrato: 55, noise: true }],
-  wet_whistle:           [{ freq: 2650, dur: 0.15, gap: 0.04, vol: 0.18, noise: true }, { freq: 2900, dur: 0.27, vol: 0.28, noise: true }],
-  sad_whistle:           [{ freq: S,    dur: 0.68, vol: 0.28, descend: true, vibrato: 18 }],
-  happy_whistle:         [{ freq: 3750, dur: 0.17, vol: 0.34 }],
-  distant_whistle:       [{ freq: S,    dur: 0.27, vol: 0.12, vibrato: 8 }],
-  tired_referee:         [{ freq: 2620, dur: 0.27, gap: 0.08, vol: 0.16, noise: true }, { freq: 2850, dur: 0.33, vol: 0.26 }],
-  full_time_double_long:    [{ freq: S, dur: 0.53, gap: 0.45 }, { freq: S, dur: 0.53 }],
-  full_time_triple_classic: [
-    { freq: S, dur: 0.33, gap: 0.18 },
-    { freq: S, dur: 0.33, gap: 0.18 },
-    { freq: S, dur: 0.98, vol: 0.46, noise: true },
-  ],
-  full_time_tired:          [{ freq: 2820, dur: 0.42, gap: 0.50, vol: 0.24, noise: true }, { freq: 2820, dur: 0.33, vol: 0.22 }],
-  full_time_chaos:          [
-    { freq: S, dur: 0.21, gap: 0.08 },
-    { freq: S, dur: 0.21, gap: 0.28 },
-    { freq: L, dur: 1.13, vol: 0.48, noise: true },
-  ],
-};
-
-function playWhistle(id: string) {
-  const pattern = TONE_MAP[id];
-  if (pattern) playPattern(pattern);
-}
-
-// ── Tone.js engine (lazy import) ─────────────────────────────────────────────
-
-type ToneNote = {
-  freq: number;      // Hz
-  duration: number;  // seconds
-  gap?: number;      // seconds after note (default 0.05)
-  descend?: boolean; // freq drops to ~75% over duration
-};
-
-const TJ_S = 3300;
-const TJ_H = 3800;
-const TJ_L = 2600;
-
-const TONE_JS_MAP: Record<string, ToneNote[]> = {
-  kickoff:               [{ freq: TJ_S, duration: 0.83 }],
-  restart:               [{ freq: TJ_H, duration: 0.70 }],
-  common_foul:           [{ freq: TJ_S, duration: 0.86 }],
-  hard_foul:             [{ freq: TJ_S, duration: 0.83 }],
-  yellow_card:           [{ freq: TJ_S, duration: 0.33 }],
-  red_card:              [{ freq: TJ_L, duration: 1.20 }],
-  strict_referee:        [{ freq: 3000, duration: 0.42 }],
-  advantage:             [{ freq: TJ_H, duration: 0.14, gap: 0.10 }, { freq: TJ_H, duration: 0.14 }],
-  did_not_see:           [{ freq: TJ_S, duration: 0.21, gap: 0.05 }, { freq: TJ_L, duration: 0.14 }],
-  what_was_that:         [{ freq: TJ_S, duration: 0.23, gap: 0.38 }, { freq: TJ_H, duration: 0.11 }],
-  panic:                 [
-    { freq: TJ_H, duration: 0.11, gap: 0.08 },
-    { freq: TJ_H, duration: 0.11, gap: 0.08 },
-    { freq: TJ_H, duration: 0.11, gap: 0.08 },
-    { freq: TJ_S, duration: 0.42 },
-  ],
-  dive_accepted:         [{ freq: TJ_S, duration: 0.24, gap: 0.28 }, { freq: TJ_L, duration: 0.21 }],
-  dive_spotted:          [{ freq: TJ_S, duration: 0.33 }],
-  time_wasting:          [{ freq: TJ_S, duration: 1.28 }],
-  village_whistle:       [{ freq: 2900, duration: 0.27 }],
-  wet_whistle:           [{ freq: 2700, duration: 0.15, gap: 0.04 }, { freq: 3000, duration: 0.27 }],
-  sad_whistle:           [{ freq: TJ_S, duration: 0.68, descend: true }],
-  happy_whistle:         [{ freq: TJ_H, duration: 0.17 }],
-  distant_whistle:       [{ freq: TJ_S, duration: 0.27 }],
-  tired_referee:         [{ freq: 2700, duration: 0.27, gap: 0.08 }, { freq: 3000, duration: 0.33 }],
-  full_time_double_long:    [{ freq: TJ_S, duration: 0.53, gap: 0.45 }, { freq: TJ_S, duration: 0.53 }],
-  full_time_triple_classic: [
-    { freq: TJ_S, duration: 0.33, gap: 0.18 },
-    { freq: TJ_S, duration: 0.33, gap: 0.18 },
-    { freq: TJ_S, duration: 0.98 },
-  ],
-  full_time_tired:          [{ freq: 2900, duration: 0.42, gap: 0.50 }, { freq: 2900, duration: 0.33 }],
-  full_time_chaos:          [
-    { freq: TJ_S, duration: 0.21, gap: 0.08 },
-    { freq: TJ_S, duration: 0.21, gap: 0.28 },
-    { freq: TJ_L, duration: 1.13 },
-  ],
-};
-
-async function playToneWhistle(id: string) {
-  const notes = TONE_JS_MAP[id];
-  if (!notes) return;
-
-  const Tone = await import('tone');
-  await Tone.start();
-
-  const vibrato = new Tone.Vibrato(10, 0.12);
-  const filter  = new Tone.Filter(2500, 'highpass');
-  const vol     = new Tone.Volume(-7);
-  const synth   = new Tone.Synth({
-    oscillator: { type: 'sine' },
-    envelope: { attack: 0.015, decay: 0.04, sustain: 0.85, release: 0.15 },
-  });
-
-  synth.chain(vibrato, filter, vol, Tone.Destination);
-
-  let now = Tone.now() + 0.04;
-  let totalDur = 0;
-
-  for (const note of notes) {
-    const gap = note.gap ?? 0.05;
-    if (note.descend) {
-      synth.triggerAttack(note.freq, now);
-      synth.frequency.setValueAtTime(note.freq, now);
-      synth.frequency.exponentialRampToValueAtTime(note.freq * 0.75, now + note.duration);
-      synth.triggerRelease(now + note.duration);
-    } else {
-      synth.triggerAttackRelease(note.freq, note.duration, now);
-    }
-    now += note.duration + gap;
-    totalDur += note.duration + gap;
-  }
-
-  setTimeout(() => {
-    synth.dispose();
-    vibrato.dispose();
-    filter.dispose();
-    vol.dispose();
-  }, (totalDur + 0.5) * 1000);
-}
-
-// ── UI ────────────────────────────────────────────────────────────────────────
 
 const CATEGORY_ORDER = [
   'Základní hra',
@@ -257,14 +33,15 @@ function WhistleCard({ s }: { s: WhistleSound }) {
   const [playingTone, setPlayingTone] = useState(false);
 
   const handlePlay = () => {
-    playWhistle(s.id);
     setPlaying(true);
-    setTimeout(() => setPlaying(false), 600);
+    void playSound(`${padNum(s.number)}-webaudio`).finally(() => {
+      setTimeout(() => setPlaying(false), 600);
+    });
   };
 
   const handlePlayTone = () => {
     setPlayingTone(true);
-    playToneWhistle(s.id).finally(() => {
+    void playSound(`${padNum(s.number)}-tone`).finally(() => {
       setTimeout(() => setPlayingTone(false), 600);
     });
   };
@@ -398,7 +175,7 @@ export default function DevSoundPage() {
             Pískací laboratoř okresního fotbalu.
           </p>
           <p style={{ fontSize: 12, color: 'rgba(209,250,229,0.3)', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, padding: '8px 12px', display: 'inline-block' }}>
-            Vývojová stránka — není v hlavní navigaci. Zvuky se zatím nenapojují do hry.
+            Vývojová stránka — testovací UI nad centrální sound bankou.
           </p>
         </div>
 

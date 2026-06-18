@@ -5,6 +5,7 @@ import { useOnlineGame } from './useOnlineGame';
 import OnlineGameCanvas from './OnlineGameCanvas';
 import MobileTouchControls from '@/components/game/MobileTouchControls';
 import MobileOrientationOverlay from '@/components/game/MobileOrientationOverlay';
+import { playGoalRestartWhistle } from '@/lib/audio/whistleEngine';
 import type { TouchInput } from '@/game/types';
 
 interface KeyState {
@@ -27,6 +28,16 @@ export default function OnlineGameClient({
 
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Play goal-restart whistle when goalMessage appears (tracks previous to fire only once per goal)
+  const prevGoalMsgRef = useRef('');
+  useEffect(() => {
+    const msg = snapshot?.goalMessage ?? '';
+    if (msg && msg !== prevGoalMsgRef.current) {
+      playGoalRestartWhistle();
+    }
+    prevGoalMsgRef.current = msg;
+  }, [snapshot?.goalMessage]);
 
   useEffect(() => {
     const check = () => {
