@@ -47,6 +47,8 @@ type OnlineMatch = {
   awayUser?: MatchUser | null;
   homeClub?: MatchClub | null;
   awayClub?: MatchClub | null;
+  homeClubPoints?: number | null;
+  awayClubPoints?: number | null;
   events: OnlineMatchEvent[];
 };
 
@@ -86,6 +88,11 @@ function formatDuration(seconds?: number | null): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return s > 0 ? `${m} min ${s} s` : `${m} min`;
+}
+
+function formatClubPoints(points: number): string {
+  if (points === 1) return '+1 bod pro klub';
+  return `+${points} body pro klub`;
 }
 
 function winnerLabel(side?: string | null, home?: string, away?: string): string | null {
@@ -202,9 +209,9 @@ export default async function ZapasDetailPage({ params }: Props) {
       <div className="w-full max-w-lg p-5 flex flex-col gap-3" style={cardStyle}>
         <p className="text-xs font-black uppercase tracking-widest" style={gold}>Hráči</p>
         <div className="flex items-center justify-between gap-3">
-          <PlayerChip user={match.homeUser ?? null} teamName={match.homeTeamName} club={match.homeClub ?? null} />
+          <PlayerChip user={match.homeUser ?? null} teamName={match.homeTeamName} club={match.homeClub ?? null} clubPoints={match.homeClubPoints ?? null} />
           <span className="text-sm shrink-0" style={{ color: 'rgba(209,250,229,0.2)' }}>vs</span>
-          <PlayerChip user={match.awayUser ?? null} teamName={match.awayTeamName} club={match.awayClub ?? null} align="right" />
+          <PlayerChip user={match.awayUser ?? null} teamName={match.awayTeamName} club={match.awayClub ?? null} clubPoints={match.awayClubPoints ?? null} align="right" />
         </div>
       </div>
 
@@ -285,11 +292,13 @@ function PlayerChip({
   user,
   teamName,
   club,
+  clubPoints,
   align = 'left',
 }: {
   user: MatchUser | null;
   teamName: string;
   club: MatchClub | null;
+  clubPoints: number | null;
   align?: 'left' | 'right';
 }) {
   const name = user ? (user.globalName ?? user.username) : null;
@@ -315,6 +324,11 @@ function PlayerChip({
           hráč: {name ?? 'anonymní'}
         </span>
       </div>
+      {clubPoints !== null && (
+        <span className="text-xs font-semibold" style={{ color: clubPoints > 0 ? '#6dbf8a' : 'rgba(209,250,229,0.35)' }}>
+          {formatClubPoints(clubPoints)}
+        </span>
+      )}
     </div>
   );
 }

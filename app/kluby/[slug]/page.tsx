@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getClubs, getClub } from "@/lib/clubs";
+import { getClubs, getClub, getClubStats } from "@/lib/clubs";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
 
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ClubDetailPage({ params }: Props) {
   const { slug } = await params;
-  const club = await getClub(slug);
+  const [club, stats] = await Promise.all([getClub(slug), getClubStats(slug)]);
   if (!club) notFound();
 
   const isNahoda = club.slug === "nahoda-fc";
@@ -134,6 +134,26 @@ export default async function ClubDetailPage({ params }: Props) {
             </div>
           )}
 
+          {/* Statistiky klubu */}
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5 mb-8">
+            <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
+              Statistiky klubu
+            </h2>
+            {stats.matches === 0 ? (
+              <p className="text-sm text-gray-500">Klub zatím nemá odehraný online zápas.</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                <StatRow label="Zápasy" value={String(stats.matches)} />
+                <StatRow label="Body" value={String(stats.points)} highlight />
+                <StatRow label="Výhry" value={String(stats.wins)} />
+                <StatRow label="Remízy" value={String(stats.draws)} />
+                <StatRow label="Prohry" value={String(stats.losses)} />
+                <StatRow label="Skóre" value={`${stats.goalsFor}:${stats.goalsAgainst}`} />
+                <StatRow label="Rozdíl skóre" value={stats.goalDifference >= 0 ? `+${stats.goalDifference}` : String(stats.goalDifference)} />
+              </div>
+            )}
+          </div>
+
           {/* CTA */}
           <div className="flex flex-wrap gap-3 mt-2">
             <Link
@@ -156,5 +176,16 @@ export default async function ClubDetailPage({ params }: Props) {
 
       <SiteFooter />
     </>
+  );
+}
+
+function StatRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className="flex justify-between items-baseline gap-2">
+      <span className="text-gray-500 text-xs">{label}</span>
+      <span className={`font-bold tabular-nums ${highlight ? 'text-gray-900 text-base' : 'text-gray-800 text-sm'}`}>
+        {value}
+      </span>
+    </div>
   );
 }

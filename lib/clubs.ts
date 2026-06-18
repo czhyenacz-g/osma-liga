@@ -50,3 +50,22 @@ export async function getClub(slug: string): Promise<Club | undefined> {
   }
   return getStaticClubBySlug(slug);
 }
+
+export type ClubStats = {
+  matches: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+};
+
+const EMPTY_STATS: ClubStats = { matches: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0 };
+
+export async function getClubStats(slug: string): Promise<ClubStats> {
+  const data = await fetchFromApi<{ stats: ClubStats }>(`/api/osma-liga/clubs/${slug}/stats`);
+  if (data && typeof data === 'object' && data.stats) return data.stats;
+  return EMPTY_STATS;
+}
