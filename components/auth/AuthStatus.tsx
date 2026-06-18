@@ -35,8 +35,8 @@ export default async function AuthStatus() {
   return (
     <a
       href="/api/auth/login"
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition hover:opacity-90 shrink-0"
-      style={{ background: '#5865F2', color: 'white' }}
+      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition hover:opacity-90 shrink-0"
+      style={{ background: '#d6a94a', color: '#041f14' }}
     >
       <DiscordIcon />
       Přihlásit
