@@ -1,0 +1,268 @@
+export type WhistleSound = {
+  id: string;
+  number: number;
+  section: 'basic' | 'match_end';
+  category: string;
+  name: string;
+  pattern: string;
+  usage: string;
+  description: string;
+};
+
+export const whistleSounds: WhistleSound[] = [
+  // ── Základní hra ─────────────────────────────────────────────────────────
+  {
+    id: 'kickoff',
+    number: 1,
+    section: 'basic',
+    category: 'Základní hra',
+    name: 'Výkopové písknutí',
+    pattern: 'písk',
+    usage: 'Začátek zápasu / pokračování hry',
+    description: 'Krátké, jasné a autoritativní písknutí. Rozhodčí tím říká: okresní fotbal právě začal.',
+  },
+  {
+    id: 'restart',
+    number: 2,
+    section: 'basic',
+    category: 'Základní hra',
+    name: 'Pokračování hry',
+    pattern: 'píp',
+    usage: 'Pokračování po krátkém přerušení',
+    description: 'Kratší a méně slavnostní než výkop. Jen rychlé znamení, že se zase hraje.',
+  },
+
+  // ── Fauly ─────────────────────────────────────────────────────────────────
+  {
+    id: 'common_foul',
+    number: 3,
+    section: 'basic',
+    category: 'Fauly',
+    name: 'Běžný faul',
+    pattern: 'písk!',
+    usage: 'Obyčejný faul bez karty',
+    description: 'Ostré krátké písknutí. Nic dramatického, ale hra se zastavuje.',
+  },
+  {
+    id: 'hard_foul',
+    number: 4,
+    section: 'basic',
+    category: 'Fauly',
+    name: 'Tvrdý faul',
+    pattern: 'pííísk!',
+    usage: 'Výraznější faul / silné přerušení',
+    description: 'Delší a důraznější hvizd. Tohle už smrdí kartou nebo aspoň dlouhým pohledem rozhodčího.',
+  },
+
+  // ── Karty ─────────────────────────────────────────────────────────────────
+  {
+    id: 'yellow_card',
+    number: 5,
+    section: 'basic',
+    category: 'Karty',
+    name: 'Žlutá karta',
+    pattern: 'písk!',
+    usage: 'První trest za faul',
+    description: 'Ostré autoritativní písknutí. Rozhodčí už sahá do kapsy a hráč dělá, že vůbec neví proč.',
+  },
+  {
+    id: 'red_card',
+    number: 6,
+    section: 'basic',
+    category: 'Karty',
+    name: 'Červená karta',
+    pattern: 'PÍÍÍSK!',
+    usage: 'Vyloučení / druhá žlutá',
+    description: 'Dlouhé agresivní písknutí. Tohle není diskuze, tohle je odchod na střídačku.',
+  },
+
+  // ── Rozhodčí ──────────────────────────────────────────────────────────────
+  {
+    id: 'strict_referee',
+    number: 7,
+    section: 'basic',
+    category: 'Rozhodčí',
+    name: 'Přísný rozhodčí',
+    pattern: 'PÍSK',
+    usage: 'Režim s kartami',
+    description: 'Čistý tvrdý tón bez humoru. Tenhle rozhodčí nepřišel debatovat.',
+  },
+  {
+    id: 'advantage',
+    number: 8,
+    section: 'basic',
+    category: 'Rozhodčí',
+    name: 'Výhoda ve hře',
+    pattern: 'píp-píp',
+    usage: 'Rozhodčí vidí faul, ale nechává pokračovat',
+    description: 'Krátké dvojpísknutí nebo signalizační tón. Faul tam byl, ale okresní spravedlnost právě běží dál.',
+  },
+
+  // ── Rozhodčí / chaos ──────────────────────────────────────────────────────
+  {
+    id: 'did_not_see',
+    number: 9,
+    section: 'basic',
+    category: 'Rozhodčí / chaos',
+    name: 'Já to neviděl',
+    pattern: 'písk?',
+    usage: 'Faul mimo výhled rozhodčího / hra pokračuje',
+    description: 'Nedůrazné, skoro omluvné písknutí. Ideální pro momenty, kdy všichni viděli všechno kromě rozhodčího.',
+  },
+  {
+    id: 'what_was_that',
+    number: 10,
+    section: 'basic',
+    category: 'Rozhodčí / chaos',
+    name: 'Co to bylo?',
+    pattern: 'písk ... píp',
+    usage: 'Divný odraz / kuriózní situace',
+    description: 'Krátké písknutí, pauza a zmatené pípnutí. Ani engine si není jistý, co se právě stalo.',
+  },
+  {
+    id: 'panic',
+    number: 11,
+    section: 'basic',
+    category: 'Rozhodčí / chaos',
+    name: 'Panické písknutí',
+    pattern: 'píp-píp-píp-písk!',
+    usage: 'Chaos ve vápně / hromadná srážka',
+    description: 'Rychlé opakované pískání. Rozhodčí ztratil kontrolu, ale aspoň má píšťalku.',
+  },
+
+  // ── Simulace zranění ──────────────────────────────────────────────────────
+  {
+    id: 'dive_accepted',
+    number: 12,
+    section: 'basic',
+    category: 'Simulace zranění',
+    name: 'Simulace uznána',
+    pattern: 'písk — písk?',
+    usage: 'Rozhodčí přeruší hru kvůli simulaci / zdržování',
+    description: 'Váhavé písknutí. Hráč leží, čas běží a rozhodčí jde zjistit, jestli se náhodou neumírá.',
+  },
+  {
+    id: 'dive_spotted',
+    number: 13,
+    section: 'basic',
+    category: 'Simulace zranění',
+    name: 'Simulace prokouknuta',
+    pattern: 'písk!',
+    usage: 'Rozhodčí pozná filmování',
+    description: 'Podrážděné ostré písknutí. Herecký výkon slabý, okresní akademie nepřijímá.',
+  },
+  {
+    id: 'time_wasting',
+    number: 14,
+    section: 'basic',
+    category: 'Simulace zranění',
+    name: 'Zdržování hry',
+    pattern: 'pííísk...',
+    usage: 'Rozhodčí zastaví hru, čas běží dál',
+    description: 'Dlouhé táhlé písknutí. Všichni stojí, hodiny běží a vedoucí tým je podezřele spokojený.',
+  },
+
+  // ── Atmosféra ─────────────────────────────────────────────────────────────
+  {
+    id: 'village_whistle',
+    number: 15,
+    section: 'basic',
+    category: 'Atmosféra',
+    name: 'Vesnická píšťalka',
+    pattern: 'písk',
+    usage: 'Default okresní atmosféra',
+    description: 'Trochu levný a lehce rozladěný charakter. Přesně ta píšťalka, kterou někdo našel v klubovně.',
+  },
+  {
+    id: 'wet_whistle',
+    number: 16,
+    section: 'basic',
+    category: 'Atmosféra',
+    name: 'Mokrá píšťalka',
+    pattern: 'pfffísk',
+    usage: 'Déšť / bláto / noční zápas',
+    description: 'Tlumené a nečisté písknutí. Hřiště je mokré, míč je těžký a rozhodčí taky.',
+  },
+  {
+    id: 'sad_whistle',
+    number: 17,
+    section: 'basic',
+    category: 'Atmosféra',
+    name: 'Smutné písknutí',
+    pattern: 'píísk↓',
+    usage: 'Prohra / vlastní gól / trapný moment',
+    description: 'Měkký klesající tón. Zvuk okamžiku, kdy i tribuna ví, že tohle se nemělo stát.',
+  },
+  {
+    id: 'happy_whistle',
+    number: 18,
+    section: 'basic',
+    category: 'Atmosféra',
+    name: 'Veselé písknutí',
+    pattern: 'píp!',
+    usage: 'Gól / výhra / povedená akce',
+    description: 'Krátké vyšší písknutí. Rozhodčí se možná usmál, ale zápis to neprokáže.',
+  },
+  {
+    id: 'distant_whistle',
+    number: 19,
+    section: 'basic',
+    category: 'Atmosféra',
+    name: 'Písknutí z dálky',
+    pattern: '(písk)',
+    usage: 'Rozhodčí je daleko od akce',
+    description: 'Tlumený vzdálený hvizd. Nikdo neví, co se pískalo, ale někde u půlky někdo mává rukama.',
+  },
+  {
+    id: 'tired_referee',
+    number: 20,
+    section: 'basic',
+    category: 'Atmosféra',
+    name: 'Unavený rozhodčí',
+    pattern: 'pff... písk',
+    usage: 'Pozdní fáze zápasu',
+    description: 'Líné písknutí bez energie. Rozhodčí už chce domů, ale míč se rozhodl ještě jednou odrazit do rohu.',
+  },
+
+  // ── Konec zápasu ──────────────────────────────────────────────────────────
+  {
+    id: 'full_time_double_long',
+    number: 21,
+    section: 'match_end',
+    category: 'Konec zápasu',
+    name: 'Konec zápasu — dvojité dlouhé',
+    pattern: 'písk — pauza — písk',
+    usage: 'Běžný konec zápasu',
+    description: 'Hlavní default pro konec utkání. Dvě delší písknutí jasně řeknou, že už je dobojováno.',
+  },
+  {
+    id: 'full_time_triple_classic',
+    number: 22,
+    section: 'match_end',
+    category: 'Konec zápasu',
+    name: 'Konec zápasu — trojité klasické',
+    pattern: 'písk — písk — pííísk',
+    usage: 'Velký konec / finále / důležitý zápas',
+    description: 'Slavnostnější konečný hvizd. Tohle je verze pro zápas, o kterém se bude mluvit minimálně do zavíračky.',
+  },
+  {
+    id: 'full_time_tired',
+    number: 23,
+    section: 'match_end',
+    category: 'Konec zápasu',
+    name: 'Konec zápasu — unavený rozhodčí',
+    pattern: 'písk... písk',
+    usage: 'Okresní zápas, rozhodčí už chce domů',
+    description: 'Slabší dvojité písknutí. Zápas skončil hlavně proto, že už toho bylo dost.',
+  },
+  {
+    id: 'full_time_chaos',
+    number: 24,
+    section: 'match_end',
+    category: 'Konec zápasu',
+    name: 'Konec zápasu — dramatický chaos',
+    pattern: 'písk-písk — pííísk',
+    usage: 'Konec po sporné situaci nebo chaosu',
+    description: 'Rychlé dvojpísknutí a dlouhý závěr. Ideální pro konec, kdy ještě tři hráči protestují a jeden leží v síti.',
+  },
+];
