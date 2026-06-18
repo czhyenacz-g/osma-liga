@@ -31,27 +31,39 @@ Migrace: `20260618000003_add_club_points_to_online_matches`
 ### API endpointy
 
 - `GET /api/osma-liga/clubs/:slug/stats` — veřejný, bez API klíče
-  - Vrací: matches, wins, draws, losses, goalsFor, goalsAgainst, goalDifference, points
+  - Vrací: `stats` (matches/wins/draws/losses/goalsFor/goalsAgainst/goalDifference/points) + `topPlayers[]`
   - Zápasy bez klubu jsou ignorovány v agregaci
   - Endpoint nepadá na starých zápasech
+  - `discordId` se nikdy nevrací
 
-- `GET /api/osma-liga/online-matches` a `/:id` — nyní obsahují `homeClubPoints`/`awayClubPoints`
+- `GET /api/osma-liga/online-matches` a `/:id` — obsahují `homeClubPoints`/`awayClubPoints`
+
+### Top hráči klubu
+
+- Počítají se jen přihlášení hráči (`OsmaUser` — přihlášení přes Discord)
+- Anonymní hráči (null `userId`) se ignorují
+- Body hráče = součet `homeClubPoints`/`awayClubPoints` z jeho zápasů za daný klub (3/1/0 za zápas)
+- Řazení: body DESC → výhry DESC → rozdíl skóre DESC → góly DESC → jméno ASC
+- Vrací top 5, prázdné pole pokud žádní přihlášení hráči
+- Sezóny a týdenní reset nejsou implementované — všechna data jsou kumulativní
 
 ### Frontend
 
 - **Detail zápasu** (`/zapasy/[id]`): zobrazuje "+N bod(y) pro klub" u každého klubu
-- **Detail klubu** (`/kluby/[slug]`): blok "Statistiky klubu" s tabulkou zápasy/výhry/remízy/prohry/skóre/rozdíl/body
+- **Detail klubu** (`/kluby/[slug]`):
+  - blok "Statistiky klubu" — zápasy/výhry/remízy/prohry/skóre/rozdíl/body
+  - blok "Nejlepší hráči" — top 5 s avatarem, jménem, body/zápasy/výhrami
+  - empty state pro kluby bez přihlášených hráčů
 
 ## Co zatím NENÍ implementováno
 
-- Top hráči — příští krok
 - Sezóny — nejsou v plánu pro MVP
-- Tabulka všech klubů — možný další krok
 - Týdenní reset bodů — není v plánu
 - Osobní XP hráčů
+- Globální žebříček hráčů
+- Tabulka všech klubů seřazená podle bodů
 
 ## Další kroky (návrh)
 
 1. Tabulka klubů na `/kluby` seřazená podle bodů
-2. Top hráči na detailu klubu (podle počtu výher s daným klubem)
-3. Sezóny — reset bodů po určitém počtu zápasů nebo datum
+2. Sezóny — reset bodů po určitém počtu zápasů nebo datum
