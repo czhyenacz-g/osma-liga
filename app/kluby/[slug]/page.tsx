@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CLUBS, getClubBySlug } from "@/data/clubs";
+import { getClubs, getClub } from "@/lib/clubs";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
 
@@ -10,13 +10,14 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return CLUBS.map((club) => ({ slug: club.slug }));
+export async function generateStaticParams() {
+  const clubs = await getClubs();
+  return clubs.map((club) => ({ slug: club.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const club = getClubBySlug(slug);
+  const club = await getClub(slug);
   if (!club) return {};
   const description = `${club.description} ${club.seasonComment}`.slice(0, 160);
   return {
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ClubDetailPage({ params }: Props) {
   const { slug } = await params;
-  const club = getClubBySlug(slug);
+  const club = await getClub(slug);
   if (!club) notFound();
 
   const isNahoda = club.slug === "nahoda-fc";

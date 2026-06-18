@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { CLUBS } from "@/data/clubs";
+import { getClubs } from "@/lib/clubs";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
 
@@ -11,7 +11,8 @@ export const metadata: Metadata = {
     "Přehled klubů Osmé ligy — fiktivní okresní soutěže plné ambicí, odrazů a zápasů, které se jen tak nevzdávají.",
 };
 
-export default function KlubyPage() {
+export default async function KlubyPage() {
+  const clubs = await getClubs();
   return (
     <>
       <div
@@ -40,7 +41,7 @@ export default function KlubyPage() {
           </p>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {CLUBS.map((club) => (
+            {clubs.map((club) => (
               <Link
                 key={club.id}
                 href={`/kluby/${club.slug}`}
