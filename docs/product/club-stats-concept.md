@@ -1,61 +1,57 @@
-# Club Stats — Concept & Roadmap
+# Klubové statistiky — koncept
 
 ## Aktuální stav (implementováno)
 
-Online zápas nyní ukládá `homeClubId` a `awayClubId` do `OsmaOnlineMatch`.
+### Body klubů — systém 3/1/0
 
-### Jak to funguje
+Každý online zápas uděluje body podle výsledku:
 
-1. Hráč vybere klub v dropdown (lobby nebo room page).
-2. `clubId` se pošle server-side přes Next.js API route → Project Hub API.
-3. API validuje, že `clubId` existuje v DB a `isActive = true`.
-4. Klub se uloží do room state (`homeClubId` / `awayClubId`).
-5. Po skončení zápasu se klub persistuje k `OsmaOnlineMatch`.
-6. Detail zápasu (`/zapasy/[id]`) zobrazuje název klubu u každého hráče.
+- výhra = 3 body
+- remíza = 1 bod pro každý klub
+- prohra = 0 bodů
 
-### Datový model
+Body se počítají při uložení online výsledku (`saveOnlineMatchResult`) a ukládají se do `OsmaOnlineMatch.homeClubPoints` / `awayClubPoints`.
 
-```
-OsmaOnlineMatch
-  homeClubId  String?  → FK OsmaClub.id (ON DELETE SET NULL)
-  awayClubId  String?  → FK OsmaClub.id (ON DELETE SET NULL)
-```
+Starší zápasy bez uložených bodů mají fallback: body se dopočítají ze skóre v reálném čase při agregaci.
 
-### API
+### DB schéma
 
-`GET /api/osma-liga/online-matches` a `GET /api/osma-liga/online-matches/:id`
-vrací volitelně:
-```json
-{
-  "homeClub": { "id": "nahoda-fc", "slug": "nahoda-fc", "name": "Náhoda FC", ... },
-  "awayClub": null
+```prisma
+model OsmaOnlineMatch {
+  ...
+  homeClubId     String?
+  awayClubId     String?
+  homeClubPoints Int?    // 3/1/0, null u starých zápasů bez klubů
+  awayClubPoints Int?
 }
 ```
 
----
+Migrace: `20260618000003_add_club_points_to_online_matches`
 
-## Co zatím není implementováno
+### API endpointy
 
-- **Bodování klubů** — výsledky online zápasů se zatím na body klubů nepřepočítávají.
-- **Tabulka klubů** — žádná tabulka s 3/1/0 body.
-- **Top hráči klubu** — vazba hráč ↔ klub není zatím vedena.
-- **Statistiky klubů** — počty gólů, výher, proher per klub.
-- **Sezóny** — klubová data jsou bez sezónní struktury.
+- `GET /api/osma-liga/clubs/:slug/stats` — veřejný, bez API klíče
+  - Vrací: matches, wins, draws, losses, goalsFor, goalsAgainst, goalDifference, points
+  - Zápasy bez klubu jsou ignorovány v agregaci
+  - Endpoint nepadá na starých zápasech
 
----
+- `GET /api/osma-liga/online-matches` a `/:id` — nyní obsahují `homeClubPoints`/`awayClubPoints`
 
-## Plánovaný další krok
+### Frontend
 
-### Bodování 3/1/0
+- **Detail zápasu** (`/zapasy/[id]`): zobrazuje "+N bod(y) pro klub" u každého klubu
+- **Detail klubu** (`/kluby/[slug]`): blok "Statistiky klubu" s tabulkou zápasy/výhry/remízy/prohry/skóre/rozdíl/body
 
-Při save online match vypočítat body:
-- výhra: 3 body pro vítěze
-- remíza: 1 bod oběma
-- prohra: 0 bodů
+## Co zatím NENÍ implementováno
 
-Přidat model `OsmaClubSeason` nebo pole `points`, `wins`, `draws`, `losses` přímo na `OsmaClub`.
+- Top hráči — příští krok
+- Sezóny — nejsou v plánu pro MVP
+- Tabulka všech klubů — možný další krok
+- Týdenní reset bodů — není v plánu
+- Osobní XP hráčů
 
-### Top hráči klubu
+## Další kroky (návrh)
 
-Propojit `OsmaUser` s `OsmaClub` přes volitelný `OsmaUser.defaultClubId`.
-Pak lze zobrazit, kolik zápasů odehrál každý hráč za daný klub.
+1. Tabulka klubů na `/kluby` seřazená podle bodů
+2. Top hráči na detailu klubu (podle počtu výher s daným klubem)
+3. Sezóny — reset bodů po určitém počtu zápasů nebo datum
