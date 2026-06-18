@@ -25,6 +25,8 @@ const GOAL_MESSAGES = [
   'Brankář šel na párek.',
   'Fyzika rezignovala.',
   'Okresní fotbal v plné kráse.',
+  'Hlavně, že se to třepe v síti, způsob neřeš!',
+  'Zelená je tjáva, fotbal to je hja.',
 ];
 
 const HOME_OWN_GOAL_MESSAGES = [
