@@ -84,7 +84,7 @@ export default function LeagueHeader({ compact = false }: { compact?: boolean })
             <div className="hidden lg:block h-14 w-px bg-white/10 shrink-0" />
 
             {/* SVG slogan + auth status pod ním — desktop */}
-            <div className="hidden lg:flex shrink-0 flex-col items-center gap-1">
+            <div className="hidden lg:flex shrink-0 flex-col items-end gap-3">
               <Image
                 src="/var-slogan.svg"
                 alt="VAR nemáme, hraj dál."
