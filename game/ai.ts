@@ -96,7 +96,9 @@ export function updateAI(state: GameState, dt: number): void {
 
       // ── Kick ─────────────────────────────────────────────────────────────
       if (chaserDist < BOT_KICK_RANGE && p.kickCooldown <= 0) {
-        const variation = (Math.random() - 0.5) * 50;
+        // Tighter aim in finishing zone (ball in attacking half near player's goal)
+        const inFinishingZone = ball.pos.x < FIELD_CX;
+        const variation = (Math.random() - 0.5) * (inFinishingZone ? 20 : 50);
 
         // Base attack direction: toward home (left) goal
         const attackDir = normalize({
