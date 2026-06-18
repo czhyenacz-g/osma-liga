@@ -54,6 +54,14 @@ Migrace: `20260618000003_add_club_points_to_online_matches`
   - blok "Statistiky klubu" — zápasy/výhry/remízy/prohry/skóre/rozdíl/body
   - blok "Nejlepší hráči" — top 5 s avatarem, jménem, body/zápasy/výhrami
   - empty state pro kluby bez přihlášených hráčů
+- **Přehled klubů** (`/kluby`):
+  - tabulka všech aktivních klubů nad klubovými kartami
+  - sloupce Z/V/R/P/Skóre/+/-/Body
+  - řazení: body DESC → rozdíl skóre DESC → góly DESC → název ASC
+  - první místo lehce zlatě zvýrazněno (pokud má body)
+  - horizontální scroll na mobilu
+  - každý řádek je odkaz na detail klubu
+  - kluby bez zápasů zobrazeny s nulami
 
 ## Co zatím NENÍ implementováno
 
@@ -61,9 +69,7 @@ Migrace: `20260618000003_add_club_points_to_online_matches`
 - Týdenní reset bodů — není v plánu
 - Osobní XP hráčů
 - Globální žebříček hráčů
-- Tabulka všech klubů seřazená podle bodů
 
 ## Další kroky (návrh)
 
-1. Tabulka klubů na `/kluby` seřazená podle bodů
-2. Sezóny — reset bodů po určitém počtu zápasů nebo datum
+1. Sezóny — reset bodů po určitém počtu zápasů nebo datum
