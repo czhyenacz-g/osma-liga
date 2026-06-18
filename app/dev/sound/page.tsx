@@ -135,6 +135,101 @@ function playWhistle(id: string) {
   if (pattern) playPattern(pattern);
 }
 
+// ── Tone.js engine (lazy import) ─────────────────────────────────────────────
+
+type ToneNote = {
+  freq: number;      // Hz
+  duration: number;  // seconds
+  gap?: number;      // seconds after note (default 0.05)
+  descend?: boolean; // freq drops to ~75% over duration
+};
+
+const TJ_S = 3300;
+const TJ_H = 3800;
+const TJ_L = 2600;
+
+const TONE_JS_MAP: Record<string, ToneNote[]> = {
+  kickoff:               [{ freq: TJ_S, duration: 0.27 }],
+  restart:               [{ freq: TJ_H, duration: 0.14 }],
+  common_foul:           [{ freq: TJ_S, duration: 0.30 }],
+  hard_foul:             [{ freq: TJ_S, duration: 0.83 }],
+  yellow_card:           [{ freq: TJ_S, duration: 0.33 }],
+  red_card:              [{ freq: TJ_L, duration: 1.20 }],
+  strict_referee:        [{ freq: 3000, duration: 0.42 }],
+  advantage:             [{ freq: TJ_H, duration: 0.14, gap: 0.10 }, { freq: TJ_H, duration: 0.14 }],
+  did_not_see:           [{ freq: TJ_S, duration: 0.21, gap: 0.05 }, { freq: TJ_L, duration: 0.14 }],
+  what_was_that:         [{ freq: TJ_S, duration: 0.23, gap: 0.38 }, { freq: TJ_H, duration: 0.11 }],
+  panic:                 [
+    { freq: TJ_H, duration: 0.11, gap: 0.08 },
+    { freq: TJ_H, duration: 0.11, gap: 0.08 },
+    { freq: TJ_H, duration: 0.11, gap: 0.08 },
+    { freq: TJ_S, duration: 0.42 },
+  ],
+  dive_accepted:         [{ freq: TJ_S, duration: 0.24, gap: 0.28 }, { freq: TJ_L, duration: 0.21 }],
+  dive_spotted:          [{ freq: TJ_S, duration: 0.33 }],
+  time_wasting:          [{ freq: TJ_S, duration: 1.28 }],
+  village_whistle:       [{ freq: 2900, duration: 0.27 }],
+  wet_whistle:           [{ freq: 2700, duration: 0.15, gap: 0.04 }, { freq: 3000, duration: 0.27 }],
+  sad_whistle:           [{ freq: TJ_S, duration: 0.68, descend: true }],
+  happy_whistle:         [{ freq: TJ_H, duration: 0.17 }],
+  distant_whistle:       [{ freq: TJ_S, duration: 0.27 }],
+  tired_referee:         [{ freq: 2700, duration: 0.27, gap: 0.08 }, { freq: 3000, duration: 0.33 }],
+  full_time_double_long:    [{ freq: TJ_S, duration: 0.53, gap: 0.45 }, { freq: TJ_S, duration: 0.53 }],
+  full_time_triple_classic: [
+    { freq: TJ_S, duration: 0.33, gap: 0.18 },
+    { freq: TJ_S, duration: 0.33, gap: 0.18 },
+    { freq: TJ_S, duration: 0.98 },
+  ],
+  full_time_tired:          [{ freq: 2900, duration: 0.42, gap: 0.50 }, { freq: 2900, duration: 0.33 }],
+  full_time_chaos:          [
+    { freq: TJ_S, duration: 0.21, gap: 0.08 },
+    { freq: TJ_S, duration: 0.21, gap: 0.28 },
+    { freq: TJ_L, duration: 1.13 },
+  ],
+};
+
+async function playToneWhistle(id: string) {
+  const notes = TONE_JS_MAP[id];
+  if (!notes) return;
+
+  const Tone = await import('tone');
+  await Tone.start();
+
+  const vibrato = new Tone.Vibrato(10, 0.12);
+  const filter  = new Tone.Filter(2500, 'highpass');
+  const vol     = new Tone.Volume(-7);
+  const synth   = new Tone.Synth({
+    oscillator: { type: 'sine' },
+    envelope: { attack: 0.015, decay: 0.04, sustain: 0.85, release: 0.15 },
+  });
+
+  synth.chain(vibrato, filter, vol, Tone.Destination);
+
+  let now = Tone.now() + 0.04;
+  let totalDur = 0;
+
+  for (const note of notes) {
+    const gap = note.gap ?? 0.05;
+    if (note.descend) {
+      synth.triggerAttack(note.freq, now);
+      synth.frequency.setValueAtTime(note.freq, now);
+      synth.frequency.exponentialRampToValueAtTime(note.freq * 0.75, now + note.duration);
+      synth.triggerRelease(now + note.duration);
+    } else {
+      synth.triggerAttackRelease(note.freq, note.duration, now);
+    }
+    now += note.duration + gap;
+    totalDur += note.duration + gap;
+  }
+
+  setTimeout(() => {
+    synth.dispose();
+    vibrato.dispose();
+    filter.dispose();
+    vol.dispose();
+  }, (totalDur + 0.5) * 1000);
+}
+
 // ── UI ────────────────────────────────────────────────────────────────────────
 
 const CATEGORY_ORDER = [
@@ -158,12 +253,33 @@ function groupByCategory(sounds: WhistleSound[]) {
 }
 
 function WhistleCard({ s }: { s: WhistleSound }) {
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying]         = useState(false);
+  const [playingTone, setPlayingTone] = useState(false);
 
   const handlePlay = () => {
     playWhistle(s.id);
     setPlaying(true);
     setTimeout(() => setPlaying(false), 600);
+  };
+
+  const handlePlayTone = () => {
+    setPlayingTone(true);
+    playToneWhistle(s.id).finally(() => {
+      setTimeout(() => setPlayingTone(false), 600);
+    });
+  };
+
+  const btnBase: React.CSSProperties = {
+    borderRadius: 8,
+    padding: '5px 10px',
+    fontSize: 11,
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'background 0.15s, color 0.15s',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    width: 80,
+    textAlign: 'center',
   };
 
   return (
@@ -209,25 +325,31 @@ function WhistleCard({ s }: { s: WhistleSound }) {
         </p>
       </div>
 
-      {/* Tlačítko */}
-      <button
-        onClick={handlePlay}
-        style={{
-          background: playing ? '#6dbf8a' : 'rgba(109,191,138,0.15)',
-          border: '1px solid rgba(109,191,138,0.35)',
-          color: playing ? '#041f14' : '#6dbf8a',
-          borderRadius: 8,
-          padding: '6px 14px',
-          fontSize: 12,
-          fontWeight: 700,
-          cursor: 'pointer',
-          transition: 'background 0.15s, color 0.15s',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}
-      >
-        {playing ? '▶' : 'Přehrát'}
-      </button>
+      {/* Tlačítka */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flexShrink: 0 }}>
+        <button
+          onClick={handlePlay}
+          style={{
+            ...btnBase,
+            background: playing ? '#6dbf8a' : 'rgba(109,191,138,0.15)',
+            border: '1px solid rgba(109,191,138,0.35)',
+            color: playing ? '#041f14' : '#6dbf8a',
+          }}
+        >
+          {playing ? '▶' : 'WebAudio'}
+        </button>
+        <button
+          onClick={handlePlayTone}
+          style={{
+            ...btnBase,
+            background: playingTone ? '#d6a94a' : 'rgba(214,169,74,0.12)',
+            border: '1px solid rgba(214,169,74,0.35)',
+            color: playingTone ? '#041f14' : '#d6a94a',
+          }}
+        >
+          {playingTone ? '▶' : 'Tone.js'}
+        </button>
+      </div>
     </div>
   );
 }
