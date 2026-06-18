@@ -83,6 +83,21 @@ type ClubStatsResponse = {
 
 const EMPTY_STATS: ClubStats = { matches: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0 };
 
+export type StandingEntry = {
+  club: { id: string; slug: string; name: string; shortName: string | null; bannerPath: string | null; logoPath: string | null };
+  stats: ClubStats;
+};
+
+export async function getClubStandings(): Promise<StandingEntry[]> {
+  const data = await fetchFromApi<{ standings: StandingEntry[] }>('/api/osma-liga/clubs/standings');
+  if (data && Array.isArray(data.standings)) return data.standings;
+  // Fallback: all static clubs with zero stats
+  return STATIC_CLUBS.map((c) => ({
+    club: { id: c.id, slug: c.slug, name: c.name, shortName: null, bannerPath: c.banner, logoPath: null },
+    stats: { ...EMPTY_STATS },
+  }));
+}
+
 export async function getClubStats(slug: string): Promise<{ stats: ClubStats; topPlayers: ClubTopPlayer[] }> {
   const data = await fetchFromApi<ClubStatsResponse>(`/api/osma-liga/clubs/${slug}/stats`);
   if (data && typeof data === 'object' && data.stats) {

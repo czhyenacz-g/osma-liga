@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { getClubs } from "@/lib/clubs";
+import { getClubs, getClubStandings } from "@/lib/clubs";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
 
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function KlubyPage() {
-  const clubs = await getClubs();
+  const [clubs, standings] = await Promise.all([getClubs(), getClubStandings()]);
+
   return (
     <>
       <div
@@ -40,6 +41,81 @@ export default async function KlubyPage() {
             naznačuje opak.
           </p>
 
+          {/* Tabulka klubů */}
+          <div className="mb-12">
+            <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+              <h2 className="text-base font-black text-gray-900 uppercase tracking-wide">Tabulka klubů</h2>
+              <p className="text-xs text-gray-400">Výhra 3 body · Remíza 1 bod · Prohra 0 bodů</p>
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+              <table className="w-full text-sm" style={{ minWidth: 520 }}>
+                <thead>
+                  <tr className="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200" style={{ background: '#f9fafb' }}>
+                    <th className="px-3 py-2.5 text-left w-8">#</th>
+                    <th className="px-3 py-2.5 text-left">Klub</th>
+                    <th className="px-3 py-2.5 text-center w-10" title="Zápasy">Z</th>
+                    <th className="px-3 py-2.5 text-center w-10" title="Výhry">V</th>
+                    <th className="px-3 py-2.5 text-center w-10" title="Remízy">R</th>
+                    <th className="px-3 py-2.5 text-center w-10" title="Prohry">P</th>
+                    <th className="px-3 py-2.5 text-center w-16" title="Skóre">Skóre</th>
+                    <th className="px-3 py-2.5 text-center w-12" title="Rozdíl skóre">+/-</th>
+                    <th className="px-3 py-2.5 text-center w-12" title="Body">Body</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {standings.map((entry, i) => {
+                    const isFirst = i === 0 && entry.stats.points > 0;
+                    return (
+                      <tr
+                        key={entry.club.id}
+                        className="border-b border-gray-100 last:border-0 transition"
+                        style={{ background: isFirst ? 'rgba(216,173,69,0.06)' : 'white' }}
+                      >
+                        <td className="px-3 py-2.5 text-center">
+                          <span className="text-xs font-bold text-gray-300">{i + 1}</span>
+                        </td>
+                        <td className="px-3 py-2.5">
+                          <Link
+                            href={`/kluby/${entry.club.slug}`}
+                            className="flex items-center gap-2 hover:opacity-75 transition"
+                          >
+                            {entry.club.bannerPath && (
+                              <Image
+                                src={entry.club.bannerPath}
+                                alt={entry.club.name}
+                                width={28}
+                                height={28}
+                                className="object-contain shrink-0"
+                              />
+                            )}
+                            <span className="font-semibold text-gray-800 text-xs leading-snug">
+                              {entry.club.shortName ?? entry.club.name}
+                            </span>
+                          </Link>
+                        </td>
+                        <td className="px-3 py-2.5 text-center text-xs text-gray-600 tabular-nums">{entry.stats.matches}</td>
+                        <td className="px-3 py-2.5 text-center text-xs text-gray-600 tabular-nums">{entry.stats.wins}</td>
+                        <td className="px-3 py-2.5 text-center text-xs text-gray-600 tabular-nums">{entry.stats.draws}</td>
+                        <td className="px-3 py-2.5 text-center text-xs text-gray-600 tabular-nums">{entry.stats.losses}</td>
+                        <td className="px-3 py-2.5 text-center text-xs text-gray-500 tabular-nums">{entry.stats.goalsFor}:{entry.stats.goalsAgainst}</td>
+                        <td className="px-3 py-2.5 text-center text-xs tabular-nums" style={{ color: entry.stats.goalDifference > 0 ? '#16a34a' : entry.stats.goalDifference < 0 ? '#dc2626' : '#9ca3af' }}>
+                          {entry.stats.goalDifference > 0 ? `+${entry.stats.goalDifference}` : entry.stats.goalDifference}
+                        </td>
+                        <td className="px-3 py-2.5 text-center">
+                          <span className="text-sm font-black tabular-nums" style={{ color: entry.stats.points > 0 ? '#063f24' : '#d1d5db' }}>
+                            {entry.stats.points}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Klubové karty */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {clubs.map((club) => (
               <Link
