@@ -21,7 +21,7 @@ import {
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
-  'Tohle chtěl centru.',
+  'Tohle měl být centr? Ale počítá se.',
   'Brankář šel na párek.',
   'Fyzika rezignovala.',
   'Okresní fotbal v plné kráse.',
