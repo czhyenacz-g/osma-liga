@@ -62,6 +62,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [fsStatus, setFsStatus] = useState<'idle' | 'unavailable'>('idle');
+  const [showMilestone, setShowMilestone] = useState(false);
   const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false });
   const gameWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -131,6 +132,11 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
     setMatchScore(null);
     setSaveState('idle');
     setGamePhase('idle');
+  }, []);
+
+  const handleFirstMilestone = useCallback(() => {
+    setShowMilestone(true);
+    setTimeout(() => setShowMilestone(false), 3000);
   }, []);
 
   const handleFullscreen = async () => {
@@ -245,9 +251,32 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
             <GameCanvas
               onMatchEnd={handleMatchEnd}
               onRestart={handleRestart}
+              onFirstMilestone={handleFirstMilestone}
               touchInputRef={touchRef}
               homeTeamName={homeTeamName}
             />
+
+            {showMilestone && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '8%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'rgba(4,31,20,0.88)',
+                  border: '1px solid rgba(214,169,74,0.4)',
+                  borderRadius: 10,
+                  padding: '8px 18px',
+                  color: '#d6a94a',
+                  fontWeight: 'bold',
+                  fontSize: 13,
+                  whiteSpace: 'nowrap',
+                  pointerEvents: 'none',
+                }}
+              >
+                Tohle už vypadá jako fotbal. Skoro.
+              </div>
+            )}
 
             {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
             {matchScore !== null && (

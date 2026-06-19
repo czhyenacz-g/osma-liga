@@ -14,11 +14,12 @@ import type { GameState, InputState, TouchInput } from '@/game/types';
 interface Props {
   onMatchEnd?: (score: { home: number; away: number }) => void;
   onRestart?: () => void;
+  onFirstMilestone?: () => void;
   touchInputRef?: MutableRefObject<TouchInput>;
   homeTeamName?: string;
 }
 
-export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef, homeTeamName }: Props) {
+export default function GameCanvas({ onMatchEnd, onRestart, onFirstMilestone, touchInputRef, homeTeamName }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef, homeT
     let rafId: number;
     let lastTime = performance.now();
     let prevPhase = gameState.phase;
+    let milestoneFired = false;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -82,6 +84,12 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef, homeT
         onMatchEnd?.({ home: gameState.score.home, away: gameState.score.away });
       }
 
+      // Notify parent once after the first goal or the first kick, whichever comes first
+      if (!milestoneFired && (merged.kick || (prevPhase !== 'goal' && gameState.phase === 'goal'))) {
+        milestoneFired = true;
+        onFirstMilestone?.();
+      }
+
       // Notify parent on restart so save UI can reset
       if (wasRestart) {
         onRestart?.();
@@ -102,7 +110,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, touchInputRef, homeT
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
     };
-  }, [onMatchEnd, onRestart, touchInputRef, homeTeamName]);
+  }, [onMatchEnd, onRestart, onFirstMilestone, touchInputRef, homeTeamName]);
 
   return (
     <canvas
