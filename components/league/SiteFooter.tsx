@@ -19,7 +19,7 @@ export default function SiteFooter() {
       <div className="mx-auto max-w-[1240px] px-6 pt-12 pb-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
           <div
-            className="flex-1 rounded-xl px-7 py-7 lg:max-w-2xl"
+            className="lg:basis-1/2 rounded-xl px-7 py-7"
             style={{
               background: "rgba(6,63,36,0.55)",
               border: "1px solid rgba(216,173,69,0.28)",
@@ -45,6 +45,23 @@ export default function SiteFooter() {
               nebo samostatnou malou klubovou prezentaci, aby se o vašem týmu, zápasech a lidech kolem
               hřiště vědělo víc.
             </p>
+
+            <div
+              className="rounded-lg px-4 py-4 mb-5"
+              style={{ background: "rgba(216,173,69,0.08)", border: "1px solid rgba(216,173,69,0.22)" }}
+            >
+              <p className="text-sm font-bold mb-3" style={{ color: "#d8ad45" }}>
+                Chcete podobnou stránku pro svůj klub?
+              </p>
+              <a
+                href="mailto:info@osmaliga.cz?subject=Stránka pro skutečný klub"
+                className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-bold transition hover:opacity-90"
+                style={{ background: "#d8ad45", color: "#052e1a" }}
+              >
+                Ozvat se
+              </a>
+            </div>
+
             <p className="text-sm mb-1" style={{ color: "rgba(209,250,229,0.82)" }}>
               Napište na{" "}
               <a
@@ -61,16 +78,16 @@ export default function SiteFooter() {
             </p>
           </div>
 
-          <div className="w-full lg:w-[280px] shrink-0 flex flex-col gap-2">
-            <div className="flex-1 min-h-[220px]">
+          <div className="w-full lg:basis-1/2 flex flex-col gap-2">
+            <div className="flex-1 min-h-[320px] lg:min-h-0">
               <ClubPreviewLightbox
                 src="/tupoljany_preview.webp"
                 alt="Ukázka klubové stránky v Osmé lize"
-                caption="Ukázka klubové stránky v Osmé lize"
+                caption="Ukázka klubové stránky"
               />
             </div>
             <p className="text-center text-[11px] italic" style={{ color: "rgba(209,250,229,0.4)" }}>
-              Ukázka klubové stránky v Osmé lize
+              Ukázka klubové stránky
             </p>
           </div>
         </div>
