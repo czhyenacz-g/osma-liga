@@ -109,7 +109,7 @@ export default function MatchHero() {
                   className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold transition hover:opacity-90"
                   style={{ background: "#d6a94a", color: "#052e1a" }}
                 >
-                  Nastoupit k zápasu
+                  Hrát fotbal online
                 </Link>
                 <a
                   href="#kluby"

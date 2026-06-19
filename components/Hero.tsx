@@ -43,7 +43,7 @@ export default function Hero() {
         {/* CTA */}
         <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
           <button className="w-full rounded-xl bg-green-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-500 sm:w-auto">
-            Nastoupit k zápasu
+            Hrát fotbal online
           </button>
           <button className="w-full rounded-xl border border-white/20 px-6 py-3 text-sm font-medium text-white/70 transition hover:bg-white/10 sm:w-auto">
             Zjistit, proč jsme postoupili
