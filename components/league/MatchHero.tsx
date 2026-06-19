@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import MissingMatchReportModal from "@/components/MissingMatchReportModal";
 
 function CalendarIcon({ className }: { className?: string }) {
   return (
@@ -39,6 +43,8 @@ function ShirtIcon({ className }: { className?: string }) {
 }
 
 export default function MatchHero() {
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
   return (
     <section
       id="uvod"
@@ -170,6 +176,7 @@ export default function MatchHero() {
 
               <button
                 type="button"
+                onClick={() => setIsReportModalOpen(true)}
                 className="w-full rounded-xl border-2 py-2 text-xs font-bold uppercase tracking-widest transition hover:bg-gray-50"
                 style={{ borderColor: "#052e1a", color: "#052e1a" }}
               >
@@ -180,6 +187,11 @@ export default function MatchHero() {
 
         </div>
       </div>
+
+      <MissingMatchReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+      />
     </section>
   );
 }
