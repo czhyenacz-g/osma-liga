@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import MatchHero from "@/components/league/MatchHero";
-import LookingForOpponentCallout from "@/components/league/LookingForOpponentCallout";
+import HomepageOpponentCallout from "@/components/league/HomepageOpponentCallout";
 import ClubGrid from "@/components/league/ClubGrid";
 import NewsSection from "@/components/league/NewsSection";
 import LeagueTable from "@/components/league/LeagueTable";
@@ -58,7 +58,7 @@ export default function HomePage() {
         <MatchHero />
       </div>
 
-      <LookingForOpponentCallout />
+      <HomepageOpponentCallout />
 
       <main>
         <RecentResults />

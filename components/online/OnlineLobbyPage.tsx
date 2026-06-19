@@ -24,6 +24,11 @@ type CreatedGame = {
   expiresAt: string;
 };
 
+type TrainingChallenge = {
+  code: string;
+  club: { name: string; shortName: string | null } | null;
+};
+
 export default function OnlineLobbyPage() {
   const searchParams = useSearchParams();
   const clubParam = searchParams.get('club');
@@ -38,6 +43,14 @@ export default function OnlineLobbyPage() {
   const [loadingGames, setLoadingGames] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedClubId, setSelectedClubId] = useState<string>(initialClub);
+  const [trainingChallenge, setTrainingChallenge] = useState<TrainingChallenge | null>(null);
+
+  useEffect(() => {
+    fetch('/api/training-challenges/active')
+      .then((r) => r.json() as Promise<{ game: TrainingChallenge | null }>)
+      .then((d) => setTrainingChallenge(d.game))
+      .catch(() => {});
+  }, []);
 
   const fetchGames = useCallback(async () => {
     try {
@@ -113,6 +126,27 @@ export default function OnlineLobbyPage() {
           Třetí hráč má zatím smůlu.
         </p>
       </div>
+
+      {trainingChallenge?.club && (
+        <div
+          className="w-full max-w-md rounded-xl p-4 text-center"
+          style={{ background: 'rgba(214,169,74,0.1)', border: '1px solid rgba(214,169,74,0.3)' }}
+        >
+          <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#6dbf8a' }}>
+            Tréninkový zápas čeká
+          </p>
+          <p className="text-sm font-bold" style={{ color: '#d6a94a' }}>
+            {trainingChallenge.club.shortName ?? trainingChallenge.club.name} hledají soupeře pro tréninkový zápas.
+          </p>
+          <Link
+            href={`/hra/online/${trainingChallenge.code}`}
+            className="inline-block mt-2 text-xs font-bold underline"
+            style={{ color: '#d6a94a' }}
+          >
+            Nastoupit →
+          </Link>
+        </div>
+      )}
 
       {/* Create game section */}
       <div
