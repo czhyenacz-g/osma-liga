@@ -16,10 +16,11 @@ const OnlineGameClient = dynamic(
 
 type GameRoom = {
   code: string;
-  status: 'waiting' | 'full' | 'expired';
+  status: 'waiting' | 'full' | 'playing' | 'finished' | 'expired';
   players: number;
   maxPlayers: number;
   expiresAt: string;
+  onlineMatchId?: string | null;
 };
 
 type JoinResponse = {
@@ -87,16 +88,13 @@ export default function OnlineRoomPage({
       if (res.ok) {
         const data = await res.json() as GameRoom;
         setRoom(data);
-        if (data.status === 'full' && myToken) {
-          setIsHost(true);
-        }
       }
     } catch {
       // silent
     } finally {
       setLoading(false);
     }
-  }, [upperCode, myToken]);
+  }, [upperCode]);
 
   useEffect(() => {
     void fetchRoom();
@@ -162,9 +160,14 @@ export default function OnlineRoomPage({
     }
   }
 
-  // If we have a token and both players are ready, show the game client
+  // If we have a token and both players are ready, show the game client.
+  // A match already in progress is entered immediately — no point waiting
+  // behind a confirmation click when it's already live.
   const isFull = room?.status === 'full';
-  if (enterGame && myToken && isFull) {
+  const isPlaying = room?.status === 'playing';
+  const isFinished = room?.status === 'finished';
+  const isWaiting = room?.status === 'waiting';
+  if (myToken && (isPlaying || (enterGame && isFull))) {
     return <OnlineGameClient gameCode={upperCode} playerToken={myToken} />;
   }
 
@@ -238,22 +241,56 @@ export default function OnlineRoomPage({
           </p>
         )}
 
-        {/* Stav hráčů */}
-        <div className="flex justify-center gap-6">
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-2xl">👤</span>
-            <span className="text-xs text-white font-semibold">Hostitel</span>
-            <span className="text-xs" style={{ color: '#86efac' }}>připojen</span>
+        {/* Zápas už běží a já k němu nemám token */}
+        {isPlaying && !hasToken && (
+          <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
+            Zápas už běží, nelze se připojit. Tribuna zatím není otevřená.
+          </p>
+        )}
+
+        {/* Zápas skončil */}
+        {isFinished && (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-semibold" style={{ color: '#86efac' }}>
+              Zápas skončil.
+            </p>
+            {room.onlineMatchId && (
+              <Link
+                href={`/zapasy/${room.onlineMatchId}`}
+                className="w-full py-2.5 rounded-lg font-bold text-sm transition hover:opacity-90"
+                style={{ background: 'rgba(214,169,74,0.15)', color: '#d6a94a', border: '1px solid rgba(214,169,74,0.3)' }}
+              >
+                Zobrazit detail zápasu
+              </Link>
+            )}
+            <Link
+              href="/hra/multiplayer"
+              className="w-full py-2.5 rounded-lg font-bold text-sm transition hover:opacity-90"
+              style={{ background: '#d6a94a', color: '#041f14' }}
+            >
+              Najít nový zápas
+            </Link>
           </div>
-          <div className="flex items-center text-2xl" style={{ color: 'rgba(209,250,229,0.2)' }}>vs</div>
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-2xl">{isFull ? '👤' : '👻'}</span>
-            <span className="text-xs text-white font-semibold">Host</span>
-            <span className="text-xs" style={{ color: isFull ? '#86efac' : 'rgba(209,250,229,0.35)' }}>
-              {isFull ? 'připojen' : 'čeká se...'}
-            </span>
+        )}
+
+        {/* Stav hráčů — jen před začátkem zápasu */}
+        {(isWaiting || isFull) && (
+          <div className="flex justify-center gap-6">
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-2xl">👤</span>
+              <span className="text-xs text-white font-semibold">Hostitel</span>
+              <span className="text-xs" style={{ color: '#86efac' }}>připojen</span>
+            </div>
+            <div className="flex items-center text-2xl" style={{ color: 'rgba(209,250,229,0.2)' }}>vs</div>
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-2xl">{isFull ? '👤' : '👻'}</span>
+              <span className="text-xs text-white font-semibold">Host</span>
+              <span className="text-xs" style={{ color: isFull ? '#86efac' : 'rgba(209,250,229,0.35)' }}>
+                {isFull ? 'připojen' : 'čeká se...'}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Stavy */}
         {isFull && hasToken && isHost && (
@@ -286,7 +323,7 @@ export default function OnlineRoomPage({
           </div>
         )}
 
-        {!isFull && hasToken && isHost && (
+        {isWaiting && hasToken && isHost && (
           <div className="flex flex-col gap-2">
             <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
               Čekáme na soupeře...
@@ -324,7 +361,7 @@ export default function OnlineRoomPage({
           </p>
         )}
 
-        {!isFull && !hasToken && (
+        {isWaiting && !hasToken && (
           <>
             <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
               Hostitel čeká na soupeře. Připoj se!
