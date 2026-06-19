@@ -78,17 +78,12 @@ export default function SiteFooter() {
             </p>
           </div>
 
-          <div className="w-full lg:basis-1/2 flex flex-col gap-2">
-            <div className="flex-1 min-h-[320px] lg:min-h-0">
-              <ClubPreviewLightbox
-                src="/tupoljany_preview.webp"
-                alt="Ukázka klubové stránky v Osmé lize"
-                caption="Ukázka klubové stránky"
-              />
-            </div>
-            <p className="text-center text-[11px] italic" style={{ color: "rgba(209,250,229,0.4)" }}>
-              Ukázka klubové stránky
-            </p>
+          <div className="w-full lg:basis-1/2 min-h-[320px] lg:min-h-0">
+            <ClubPreviewLightbox
+              src="/tupoljany_preview.webp"
+              alt="Ukázka klubové stránky v Osmé lize"
+              caption="Ukázka klubové stránky"
+            />
           </div>
         </div>
       </div>
