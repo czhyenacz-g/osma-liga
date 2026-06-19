@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import MissingMatchReportModal from "@/components/MissingMatchReportModal";
 import type { ActiveChallenge } from "@/lib/game/activeChallenge";
+import { CLUBS } from "@/data/clubs";
 
 function CalendarIcon({ className }: { className?: string }) {
   return (
@@ -40,6 +41,35 @@ function ShirtIcon({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 6l4-3h2a3 3 0 0 0 6 0h2l4 3-2.5 3L17 8v11H7V8L4.5 9 3 6z" />
     </svg>
+  );
+}
+
+function ChallengeMatchup({ clubSlug }: { clubSlug: string | null }) {
+  const club = clubSlug ? CLUBS.find((c) => c.slug === clubSlug) : undefined;
+
+  return (
+    <div className="flex items-center justify-center gap-3">
+      <div className="flex flex-col items-center gap-1">
+        {club ? (
+          <Image src={club.banner} alt={club.name} width={56} height={56} className="object-contain" />
+        ) : (
+          <div className="h-14 w-14 rounded-full bg-gray-100" />
+        )}
+        <span className="text-[10px] font-bold text-gray-700 text-center leading-tight max-w-[90px]">
+          {club?.name ?? "Soupeř"}
+        </span>
+      </div>
+      <span className="text-lg font-black text-gray-300">vs.</span>
+      <div className="flex flex-col items-center gap-1">
+        <div
+          className="h-14 w-14 rounded-full flex items-center justify-center text-xl font-black"
+          style={{ background: "rgba(214,169,74,0.12)", color: "#d6a94a", border: "1px dashed rgba(214,169,74,0.5)" }}
+        >
+          ?
+        </div>
+        <span className="text-[10px] font-bold text-gray-400 text-center leading-tight">Ty?</span>
+      </div>
+    </div>
   );
 }
 
@@ -148,7 +178,8 @@ export default function MatchHero({ challenge }: { challenge?: ActiveChallenge }
                     Online zápas čeká
                   </p>
                 </div>
-                <div className="px-5 py-8 flex flex-col items-center gap-4 text-center">
+                <div className="px-5 py-6 flex flex-col items-center gap-4 text-center">
+                  <ChallengeMatchup clubSlug={challenge.clubSlug} />
                   <p className="text-sm text-gray-700 leading-relaxed">
                     Někdo vyvěsil výzvu na návsi.
                     <br />
@@ -170,7 +201,8 @@ export default function MatchHero({ challenge }: { challenge?: ActiveChallenge }
                     Tréninkový zápas čeká
                   </p>
                 </div>
-                <div className="px-5 py-8 flex flex-col items-center gap-4 text-center">
+                <div className="px-5 py-6 flex flex-col items-center gap-4 text-center">
+                  <ChallengeMatchup clubSlug={challenge.clubSlug} />
                   <p className="text-sm text-gray-700 leading-relaxed">
                     {challenge.message}
                     <br />

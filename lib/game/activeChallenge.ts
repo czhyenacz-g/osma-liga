@@ -3,7 +3,7 @@ import { pickTrainingChallengeMessage } from '@/lib/game/trainingChallengeMessag
 const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
 const HUB_KEY = process.env.PROJECT_HUB_API_KEY ?? '';
 
-type HumanCallout = { code: string; club: { name: string; shortName: string | null } | null };
+type HumanCallout = { code: string; club: { name: string; shortName: string | null; slug: string } | null };
 type TrainingChallenge = {
   code: string;
   club: { id: string; name: string; shortName: string | null; slug: string } | null;
@@ -11,8 +11,8 @@ type TrainingChallenge = {
 };
 
 export type ActiveChallenge =
-  | { type: 'human'; code: string }
-  | { type: 'training'; code: string; message: string }
+  | { type: 'human'; code: string; clubSlug: string | null }
+  | { type: 'training'; code: string; message: string; clubSlug: string | null }
   | null;
 
 async function fetchJson<T>(path: string): Promise<T | null> {
@@ -39,13 +39,18 @@ export async function getActiveHomepageChallenge(): Promise<ActiveChallenge> {
 
   const humanGame = humanData?.game ?? null;
   if (humanGame) {
-    return { type: 'human', code: humanGame.code };
+    return { type: 'human', code: humanGame.code, clubSlug: humanGame.club?.slug ?? null };
   }
 
   const trainingGame = trainingData?.game ?? null;
   if (trainingGame?.club) {
     const clubName = trainingGame.club.shortName ?? trainingGame.club.name;
-    return { type: 'training', code: trainingGame.code, message: pickTrainingChallengeMessage(clubName) };
+    return {
+      type: 'training',
+      code: trainingGame.code,
+      message: pickTrainingChallengeMessage(clubName),
+      clubSlug: trainingGame.club.slug,
+    };
   }
 
   return null;
