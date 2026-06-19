@@ -179,6 +179,25 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
               Spustit zápas
             </button>
 
+            <div className="mt-2 text-center" style={{ color: 'rgba(209,250,229,0.55)' }}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: 'rgba(209,250,229,0.7)' }}>
+                Jak se hraje
+              </p>
+              {isMobile ? (
+                <div className="text-xs leading-relaxed">
+                  <p>Pohyb: levý ovladač</p>
+                  <p>Kop: tlačítko KOP</p>
+                  <p className="mt-1.5">Otoč telefon na šířku, okresní fotbal se na výšku nevejde.</p>
+                </div>
+              ) : (
+                <div className="text-xs leading-relaxed">
+                  <p>Pohyb: WASD / šipky</p>
+                  <p>Kop: mezerník</p>
+                  <p>Cíl: dostat míč do brány</p>
+                </div>
+              )}
+            </div>
+
             {isMobile && (
               <div className="flex flex-col items-center gap-1.5">
                 <button
