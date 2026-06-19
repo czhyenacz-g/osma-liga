@@ -30,39 +30,44 @@ export default function SiteFooter() {
               className="text-xs font-black uppercase tracking-[0.18em] mb-4"
               style={{ color: "#d8ad45" }}
             >
-              Spolupráce a skutečné kluby
+              Spolupráce, reklama a skutečné kluby
             </p>
             <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
               Osmá liga začala jako hra a recese kolem okresního fotbalu. Postupně ale zjišťuju,
-              že by z ní mohlo být i něco užitečného pro skutečné malé kluby.
+              že by z ní mohlo být i něco užitečného pro skutečné malé kluby, lokální podniky a
+              lidi kolem hřiště.
             </p>
-            <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
-              Pokud jste tým z nižší soutěže, máte starý web, jen Facebook, nebo se na internetu
-              skoro nedáte najít, klidně se ozvěte. Můžu vám zkusit připravit jednoduchou
-              klubovou stránku — buď přímo tady na Osmé lize, nebo jako samostatnou malou
-              prezentaci.
+            <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(209,250,229,0.82)" }}>
+              Máte hospodu u hřiště, obchod, službu, značku nebo projekt, který patří k fotbalu,
+              vesnici nebo okresnímu životu? Na Osmé lize může být prostor pro vaši reklamu,
+              partnerství nebo sponzoring zápasu, klubu či celé soutěže.
             </p>
 
             <div
-              className="rounded-lg px-4 py-4 mb-5"
+              className="rounded-lg px-4 py-4 mb-5 flex flex-col gap-2"
               style={{ background: "rgba(216,173,69,0.08)", border: "1px solid rgba(216,173,69,0.22)" }}
             >
-              <p className="text-sm font-bold mb-3" style={{ color: "#d8ad45" }}>
-                Chcete podobnou stránku pro svůj klub?
-              </p>
               <a
-                href="mailto:info@osmaliga.cz?subject=Stránka pro skutečný klub"
+                href="mailto:info@osmaliga.cz?subject=Partnerství s Osmou ligou"
                 className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-bold transition hover:opacity-90"
                 style={{ background: "#d8ad45", color: "#052e1a" }}
               >
-                Ozvat se
+                Chci být partner
+              </a>
+              <a
+                href="mailto:info@osmaliga.cz?subject=Stránka pro skutečný klub"
+                className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-bold transition hover:opacity-90"
+                style={{ background: "rgba(216,173,69,0.12)", color: "#d8ad45", border: "1px solid rgba(216,173,69,0.4)" }}
+              >
+                Chci stránku pro klub
               </a>
             </div>
 
             <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(209,250,229,0.82)" }}>
-              Stejně tak se můžete ozvat, pokud máte hospodu u hřiště, obchod, službu nebo
-              projekt, který patří k fotbalu, vesnici nebo okresnímu životu. Časem tu může být
-              prostor i pro lokální partnery.
+              A pokud jste skutečný tým z nižší soutěže, máte starý web, jen Facebook, nebo se na
+              internetu skoro nedáte najít, klidně se ozvěte taky. Můžu vám zkusit připravit
+              jednoduchou klubovou stránku — buď přímo tady na Osmé lize, nebo jako samostatnou
+              malou prezentaci.
             </p>
 
             <p className="text-sm mb-1" style={{ color: "rgba(209,250,229,0.82)" }}>
