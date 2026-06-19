@@ -33,17 +33,14 @@ export default function SiteFooter() {
               Spolupráce a skutečné kluby
             </p>
             <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
-              Máte značku, hospodu, obchod, službu nebo projekt, který patří k fotbalu, vesnici nebo
-              okresnímu životu? Na Osmé lize může být prostor i pro vaši reklamu.
+              Osmá liga začala jako hra a recese kolem okresního fotbalu. Postupně ale zjišťuju,
+              že by z ní mohlo být i něco užitečného pro skutečné malé kluby.
             </p>
             <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
-              A pokud jste skutečný tým z nižší soutěže a na těchto stránkách se zatím nevidíte,
-              ozvěte se. Rádi vás časem přidáme mezi kluby, které drží okresní fotbal při životě.
-            </p>
-            <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(209,250,229,0.82)" }}>
-              Za drobný poplatek vám můžeme připravit i jednoduchou stránku klubu přímo na Osmé lize —
-              nebo samostatnou malou klubovou prezentaci, aby se o vašem týmu, zápasech a lidech kolem
-              hřiště vědělo víc.
+              Pokud jste tým z nižší soutěže, máte starý web, jen Facebook, nebo se na internetu
+              skoro nedáte najít, klidně se ozvěte. Můžu vám zkusit připravit jednoduchou
+              klubovou stránku — buď přímo tady na Osmé lize, nebo jako samostatnou malou
+              prezentaci.
             </p>
 
             <div
@@ -62,6 +59,12 @@ export default function SiteFooter() {
               </a>
             </div>
 
+            <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(209,250,229,0.82)" }}>
+              Stejně tak se můžete ozvat, pokud máte hospodu u hřiště, obchod, službu nebo
+              projekt, který patří k fotbalu, vesnici nebo okresnímu životu. Časem tu může být
+              prostor i pro lokální partnery.
+            </p>
+
             <p className="text-sm mb-1" style={{ color: "rgba(209,250,229,0.82)" }}>
               Napište na{" "}
               <a
@@ -73,9 +76,18 @@ export default function SiteFooter() {
               </a>
               .
             </p>
-            <p className="text-xs mt-4 italic" style={{ color: "rgba(209,250,229,0.4)" }}>
+            <p className="text-xs mt-2 mb-5 italic" style={{ color: "rgba(209,250,229,0.4)" }}>
               Hrdinové okresu si zaslouží být vidět.
             </p>
+
+            <div className="pt-4" style={{ borderTop: "1px solid rgba(216,173,69,0.2)" }}>
+              <p className="text-sm font-bold" style={{ color: "#d8ad45" }}>
+                Hynek Dařbujan
+              </p>
+              <p className="text-xs" style={{ color: "rgba(209,250,229,0.5)" }}>
+                trenér Náhoda FC a správce okresního chaosu
+              </p>
+            </div>
           </div>
 
           <div className="w-full lg:basis-1/2 min-h-[320px] lg:min-h-0">
