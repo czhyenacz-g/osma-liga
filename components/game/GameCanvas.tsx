@@ -14,12 +14,12 @@ import type { GameState, InputState, TouchInput } from '@/game/types';
 interface Props {
   onMatchEnd?: (score: { home: number; away: number }) => void;
   onRestart?: () => void;
-  onFirstMilestone?: () => void;
+  onFirstGoal?: () => void;
   touchInputRef?: MutableRefObject<TouchInput>;
   homeTeamName?: string;
 }
 
-export default function GameCanvas({ onMatchEnd, onRestart, onFirstMilestone, touchInputRef, homeTeamName }: Props) {
+export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, touchInputRef, homeTeamName }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstMilestone, to
     let rafId: number;
     let lastTime = performance.now();
     let prevPhase = gameState.phase;
-    let milestoneFired = false;
+    let firstGoalFired = false;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -84,10 +84,10 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstMilestone, to
         onMatchEnd?.({ home: gameState.score.home, away: gameState.score.away });
       }
 
-      // Notify parent once after the first goal or the first kick, whichever comes first
-      if (!milestoneFired && (merged.kick || (prevPhase !== 'goal' && gameState.phase === 'goal'))) {
-        milestoneFired = true;
-        onFirstMilestone?.();
+      // Notify parent once after the first goal of the match
+      if (!firstGoalFired && prevPhase !== 'goal' && gameState.phase === 'goal') {
+        firstGoalFired = true;
+        onFirstGoal?.();
       }
 
       // Notify parent on restart so save UI can reset
@@ -110,7 +110,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstMilestone, to
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
     };
-  }, [onMatchEnd, onRestart, onFirstMilestone, touchInputRef, homeTeamName]);
+  }, [onMatchEnd, onRestart, onFirstGoal, touchInputRef, homeTeamName]);
 
   return (
     <canvas

@@ -5,8 +5,10 @@ import { useOnlineGame } from './useOnlineGame';
 import OnlineGameCanvas from './OnlineGameCanvas';
 import MobileTouchControls from '@/components/game/MobileTouchControls';
 import MobileOrientationOverlay from '@/components/game/MobileOrientationOverlay';
+import MatchCommentaryToast from '@/components/game/MatchCommentaryToast';
 import { playGoalSound } from '@/lib/audio/whistleEngine';
 import type { TouchInput } from '@/game/types';
+import { firstGoalMessages, fullTimeMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 
 interface KeyState {
   up: boolean;
@@ -28,6 +30,8 @@ export default function OnlineGameClient({
 
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [firstGoalMessage, setFirstGoalMessage] = useState<string | null>(null);
+  const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
 
   // Play goal-restart whistle when goalMessage appears (tracks previous to fire only once per goal)
   const prevGoalMsgRef = useRef('');
@@ -38,6 +42,37 @@ export default function OnlineGameClient({
     }
     prevGoalMsgRef.current = msg;
   }, [snapshot?.goalMessage]);
+
+  // Reset commentary state whenever a new game room is joined
+  const firstGoalShownRef = useRef(false);
+  const fullTimeShownRef = useRef(false);
+  const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    firstGoalShownRef.current = false;
+    fullTimeShownRef.current = false;
+    if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);
+    setFirstGoalMessage(null);
+    setFullTimeMessage(null);
+  }, [gameCode]);
+
+  // First goal detection — fires once per match, on the first goal scored by either side
+  useEffect(() => {
+    if (!snapshot) return;
+    const totalGoals = snapshot.score.home + snapshot.score.away;
+    if (totalGoals >= 1 && !firstGoalShownRef.current) {
+      firstGoalShownRef.current = true;
+      setFirstGoalMessage(pickRandomMessage(firstGoalMessages));
+      firstGoalTimeoutRef.current = setTimeout(() => setFirstGoalMessage(null), 2500);
+    }
+  }, [snapshot]);
+
+  // Full time detection — fires once when the match transitions to finished
+  useEffect(() => {
+    if (gameStatus === 'finished' && !fullTimeShownRef.current) {
+      fullTimeShownRef.current = true;
+      setFullTimeMessage(pickRandomMessage(fullTimeMessages));
+    }
+  }, [gameStatus]);
 
   useEffect(() => {
     const check = () => {
@@ -192,6 +227,11 @@ export default function OnlineGameClient({
             </p>
           )}
           <p className="text-sm" style={subtleText}>Náhoda FC vs FK Pařezov</p>
+          {fullTimeMessage && (
+            <p className="text-xs italic max-w-sm mx-auto" style={subtleText}>
+              {fullTimeMessage}
+            </p>
+          )}
         </div>
         <div className="flex gap-3">
           <Link
@@ -220,6 +260,7 @@ export default function OnlineGameClient({
       <div
         className="w-full"
         style={{
+          position: 'relative',
           maxWidth: 960,
           touchAction: 'none',
           userSelect: 'none',
@@ -237,6 +278,8 @@ export default function OnlineGameClient({
             <p className="text-sm" style={subtleText}>Načítám hru...</p>
           </div>
         )}
+
+        <MatchCommentaryToast message={firstGoalMessage} />
       </div>
       {!isMobile && (
         <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>

@@ -4,11 +4,13 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { playFullTimeWhistle, playKickoffWhistle, unlockAudio } from '@/lib/audio/whistleEngine';
 import GameCanvas from './GameCanvas';
+import MatchCommentaryToast from './MatchCommentaryToast';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
 import { MATCH_DURATION } from '@/game/constants';
 import type { TouchInput } from '@/game/types';
 import { CLUBS } from '@/data/clubs';
+import { firstGoalMessages, fullTimeMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 type GamePhase = 'idle' | 'countdown' | 'playing';
@@ -62,9 +64,11 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [fsStatus, setFsStatus] = useState<'idle' | 'unavailable'>('idle');
-  const [showMilestone, setShowMilestone] = useState(false);
+  const [firstGoalMessage, setFirstGoalMessage] = useState<string | null>(null);
+  const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
   const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false });
   const gameWrapperRef = useRef<HTMLDivElement>(null);
+  const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Orientation / mobile detection
   useEffect(() => {
@@ -123,6 +127,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
   const handleMatchEnd = useCallback((score: { home: number; away: number }) => {
     setMatchScore(score);
     setSaveState('idle');
+    setFullTimeMessage(pickRandomMessage(fullTimeMessages));
     playFullTimeWhistle();
   }, []);
 
@@ -132,11 +137,15 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
     setMatchScore(null);
     setSaveState('idle');
     setGamePhase('idle');
+    if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);
+    setFirstGoalMessage(null);
+    setFullTimeMessage(null);
   }, []);
 
-  const handleFirstMilestone = useCallback(() => {
-    setShowMilestone(true);
-    setTimeout(() => setShowMilestone(false), 3000);
+  const handleFirstGoal = useCallback(() => {
+    if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);
+    setFirstGoalMessage(pickRandomMessage(firstGoalMessages));
+    firstGoalTimeoutRef.current = setTimeout(() => setFirstGoalMessage(null), 2500);
   }, []);
 
   const handleFullscreen = async () => {
@@ -251,32 +260,12 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
             <GameCanvas
               onMatchEnd={handleMatchEnd}
               onRestart={handleRestart}
-              onFirstMilestone={handleFirstMilestone}
+              onFirstGoal={handleFirstGoal}
               touchInputRef={touchRef}
               homeTeamName={homeTeamName}
             />
 
-            {showMilestone && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '8%',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  background: 'rgba(4,31,20,0.88)',
-                  border: '1px solid rgba(214,169,74,0.4)',
-                  borderRadius: 10,
-                  padding: '8px 18px',
-                  color: '#d6a94a',
-                  fontWeight: 'bold',
-                  fontSize: 13,
-                  whiteSpace: 'nowrap',
-                  pointerEvents: 'none',
-                }}
-              >
-                Tohle už vypadá jako fotbal. Skoro.
-              </div>
-            )}
+            <MatchCommentaryToast message={matchScore === null ? firstGoalMessage : null} />
 
             {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
             {matchScore !== null && (
@@ -362,6 +351,12 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
 
       {isMobile && gamePhase === 'playing' && matchScore === null && (
         <MobileTouchControls touchRef={touchRef} />
+      )}
+
+      {matchScore !== null && fullTimeMessage && (
+        <p className="text-xs italic text-center max-w-sm" style={{ color: 'rgba(209,250,229,0.5)' }}>
+          {fullTimeMessage}
+        </p>
       )}
 
       {matchScore !== null && (
