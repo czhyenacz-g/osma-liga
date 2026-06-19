@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { absoluteUrl, ogImageUrl } from '@/lib/seo';
 
 const HUB_URL = process.env.PROJECT_HUB_API_URL ?? 'http://localhost:3001';
 
@@ -136,12 +137,23 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const match = await fetchMatch(id);
+  const url = absoluteUrl(`/zapasy/${id}`);
+
   if (!match) {
-    return { title: 'Zápas nenalezen | Osmá liga' };
+    return { title: 'Detail zápasu', alternates: { canonical: url } };
   }
+
+  const shortTitle = `${match.homeTeamName} ${match.homeScore}:${match.awayScore} ${match.awayTeamName}`;
+  const fullTitle = `${shortTitle} | Osmá liga`;
+  const description = `Detail online zápasu Osmé ligy: ${match.homeTeamName} proti ${match.awayTeamName}, výsledek ${match.homeScore}:${match.awayScore}.`;
+  const image = ogImageUrl(shortTitle);
+
   return {
-    title: `${match.homeTeamName} ${match.homeScore}:${match.awayScore} ${match.awayTeamName} | Osmá liga`,
-    description: 'Detail online zápasu Osmé ligy včetně průběhu a gólů.',
+    title: shortTitle,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title: fullTitle, description, url, images: [{ url: image }] },
+    twitter: { title: fullTitle, description, images: [image] },
   };
 }
 

@@ -5,7 +5,7 @@ import GameNavLink from '@/components/ui/GameNavLink';
 import { CLUBS } from '@/data/clubs';
 
 export const metadata: Metadata = {
-  title: 'Zápas proti botovi — Osmá liga',
+  title: 'Zápas proti botovi',
 };
 
 export default async function HraBotPage({

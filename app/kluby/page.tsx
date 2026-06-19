@@ -4,11 +4,28 @@ import Link from "next/link";
 import { getClubs, getClubStandings } from "@/lib/clubs";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
+import { absoluteUrl, ogImageUrl } from "@/lib/seo";
+
+const TITLE = "Kluby Osmé ligy";
+const DESCRIPTION =
+  "Přehled klubů Osmé ligy, aktuální forma za posledních 30 dní, tabulka a klubové profily.";
 
 export const metadata: Metadata = {
-  title: "Kluby Osmé ligy | Osmá liga",
-  description:
-    "Přehled klubů Osmé ligy — fiktivní okresní soutěže plné ambicí, odrazů a zápasů, které se jen tak nevzdávají.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: {
+    canonical: absoluteUrl("/kluby"),
+  },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: absoluteUrl("/kluby"),
+    images: [{ url: ogImageUrl(TITLE) }],
+  },
+  twitter: {
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default async function KlubyPage() {

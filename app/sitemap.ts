@@ -1,25 +1,25 @@
 import type { MetadataRoute } from "next";
-import { CLUBS } from "@/data/clubs";
+import { getClubs } from "@/lib/clubs";
+import { CLUBS as STATIC_CLUBS } from "@/data/clubs";
+import { absoluteUrl } from "@/lib/seo";
 
-const BASE = "https://www.osmaliga.cz";
-
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: BASE, lastModified: now, changeFrequency: "daily", priority: 1 },
-    { url: `${BASE}/satna`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${BASE}/hra/bot`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${BASE}/hra/multiplayer`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${BASE}/hra/online`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
-    { url: `${BASE}/kluby`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: absoluteUrl("/"), lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: absoluteUrl("/kluby"), lastModified: now, changeFrequency: "daily", priority: 0.9 },
   ];
 
-  const clubRoutes: MetadataRoute.Sitemap = CLUBS.map((club) => ({
-    url: `${BASE}/kluby/${club.slug}`,
+  // Only public, indexable club pages. Falls back to static club data if the
+  // API is unavailable so the build/sitemap never fails because of it.
+  const clubs = await getClubs().catch(() => STATIC_CLUBS);
+
+  const clubRoutes: MetadataRoute.Sitemap = clubs.map((club) => ({
+    url: absoluteUrl(`/kluby/${club.slug}`),
     lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
   }));
 
   return [...staticRoutes, ...clubRoutes];

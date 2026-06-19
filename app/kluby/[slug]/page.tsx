@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getClubs, getClub, getClubStats } from "@/lib/clubs";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
+import { absoluteUrl, ogImageUrl } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -19,10 +20,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const club = await getClub(slug);
   if (!club) return {};
-  const description = `${club.description} ${club.seasonComment}`.slice(0, 160);
+
+  const fullTitle = `${club.name} | Osmá liga`;
+  const description = (
+    club.description
+      ? `${club.description} ${club.seasonComment}`.trim()
+      : `Profil klubu ${club.name} v Osmé lize. Aktuální forma, nejlepší hráči a možnost zahrát si za klub online.`
+  ).slice(0, 160);
+  const url = absoluteUrl(`/kluby/${club.slug}`);
+
   return {
-    title: `${club.name} | Kluby Osmé ligy`,
+    title: club.name,
     description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: fullTitle,
+      description,
+      url,
+      images: [{ url: club.banner || ogImageUrl(club.name) }],
+    },
+    twitter: {
+      title: fullTitle,
+      description,
+    },
   };
 }
 
@@ -34,8 +54,20 @@ export default async function ClubDetailPage({ params }: Props) {
 
   const isNahoda = club.slug === "nahoda-fc";
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `${club.name} | Osmá liga`,
+    url: absoluteUrl(`/kluby/${club.slug}`),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <div
         style={{
           backgroundImage: "url(/top_background.webp)",

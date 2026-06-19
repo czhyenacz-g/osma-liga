@@ -4,9 +4,9 @@ import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Obecní přebor — Osmá liga",
+  title: "Obecní přebor",
   description: "Hraní Osmé ligy je zatím dostupné jen v EU.",
-  robots: { index: false },
+  robots: { index: false, follow: false },
 };
 
 export default function ObecniPreborPage() {

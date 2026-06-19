@@ -5,8 +5,9 @@ import { getSession } from '@/lib/auth/session';
 import GameNavLink from '@/components/ui/GameNavLink';
 
 export const metadata: Metadata = {
-  title: 'Šatna | Osmá liga',
+  title: 'Šatna',
   description: 'Vyber si zápas v Osmé lize — proti botovi, online s druhým hráčem nebo se připoj pomocí kódu.',
+  robots: { index: false, follow: false },
 };
 
 const cardBase: React.CSSProperties = {

@@ -3,25 +3,29 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import { GOATCOUNTER_CODE } from "./config/analytics";
+import { siteUrl, siteName, defaultDescription, defaultOgImage } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Osmá liga — oficiální web soutěže",
-  description:
-    "Fiktivní web Osmé ligy a připravované arkádové fotbalové hry. Sleduj Náhoda FC a další kluby nižší soutěže.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteName,
+    template: `%s | ${siteName}`,
+  },
+  description: defaultDescription,
   openGraph: {
-    title: "Osmá liga — oficiální web soutěže",
-    description:
-      "Fiktivní web Osmé ligy a připravované arkádové fotbalové hry. Sleduj Náhoda FC a další kluby nižší soutěže.",
-    url: "https://osmaliga.cz",
-    siteName: "Osmá liga",
+    title: siteName,
+    description: defaultDescription,
+    url: siteUrl,
+    siteName,
     locale: "cs_CZ",
     type: "website",
+    images: [{ url: defaultOgImage }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Osmá liga — oficiální web soutěže",
-    description:
-      "Fiktivní web Osmé ligy a připravované arkádové fotbalové hry. Sleduj Náhoda FC a další kluby nižší soutěže.",
+    title: siteName,
+    description: defaultDescription,
+    images: [defaultOgImage],
   },
 };
 
