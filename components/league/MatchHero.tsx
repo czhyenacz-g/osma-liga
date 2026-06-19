@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import MissingMatchReportModal from "@/components/MissingMatchReportModal";
+import type { ActiveChallenge } from "@/lib/game/activeChallenge";
 
 function CalendarIcon({ className }: { className?: string }) {
   return (
@@ -42,7 +43,7 @@ function ShirtIcon({ className }: { className?: string }) {
   );
 }
 
-export default function MatchHero() {
+export default function MatchHero({ challenge }: { challenge?: ActiveChallenge }) {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   return (
@@ -131,58 +132,113 @@ export default function MatchHero() {
           {/* Svislá linka — desktop */}
           <div className="hidden lg:block w-px self-stretch bg-white/10 shrink-0" />
 
-          {/* ── PRAVÁ KARTA: příští zápas ── */}
-          <div className="w-full lg:w-[360px] shrink-0 rounded-2xl bg-white shadow-2xl overflow-hidden mt-8 lg:mt-0">
-            <div className="px-5 py-3" style={{ background: "#052e1a" }}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
-                Příští zápas
-              </p>
-            </div>
-
-            <div className="px-5 py-5 space-y-4">
-              {/* Loga + vs */}
-              <div className="flex items-center justify-center gap-3">
-                <div className="flex flex-col items-center gap-1">
-                  <Image src="/nahoda_banner.webp" alt="Náhoda FC" width={56} height={56} className="object-contain" />
-                  <span className="text-[10px] font-bold text-gray-700 text-center leading-tight">Náhoda FC</span>
+          {/* ── PRAVÁ KARTA: příští zápas / aktivní výzva ── */}
+          <div
+            className="w-full lg:w-[360px] shrink-0 rounded-2xl bg-white shadow-2xl overflow-hidden mt-8 lg:mt-0"
+            style={
+              challenge
+                ? { border: "2px solid #d6a94a", boxShadow: "0 0 28px rgba(214,169,74,0.3)" }
+                : undefined
+            }
+          >
+            {challenge?.type === "human" ? (
+              <>
+                <div className="px-5 py-3" style={{ background: "#052e1a" }}>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                    Online zápas čeká
+                  </p>
                 </div>
-                <span className="text-lg font-black text-gray-300">vs.</span>
-                <div className="flex flex-col items-center gap-1">
-                  <Image src="/banners/fk_parezov.webp" alt="FK Pařezov" width={56} height={56} className="object-contain" />
-                  <span className="text-[10px] font-bold text-gray-700 text-center leading-tight">FK Pařezov</span>
+                <div className="px-5 py-8 flex flex-col items-center gap-4 text-center">
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Někdo vyvěsil výzvu na návsi.
+                    <br />
+                    Kdo klikne první, jde na plac.
+                  </p>
+                  <Link
+                    href={`/hra/online/${challenge.code}`}
+                    className="w-full rounded-xl py-2.5 text-xs font-bold uppercase tracking-widest text-center transition hover:opacity-90"
+                    style={{ background: "#d6a94a", color: "#052e1a" }}
+                  >
+                    Přidat se k zápasu
+                  </Link>
                 </div>
-              </div>
+              </>
+            ) : challenge?.type === "training" ? (
+              <>
+                <div className="px-5 py-3" style={{ background: "#052e1a" }}>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                    Tréninkový zápas čeká
+                  </p>
+                </div>
+                <div className="px-5 py-8 flex flex-col items-center gap-4 text-center">
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {challenge.message}
+                    <br />
+                    Kdo klikne první, jde na plac.
+                  </p>
+                  <Link
+                    href={`/hra/online/${challenge.code}`}
+                    className="w-full rounded-xl py-2.5 text-xs font-bold uppercase tracking-widest text-center transition hover:opacity-90"
+                    style={{ background: "#d6a94a", color: "#052e1a" }}
+                  >
+                    Nastoupit proti nim
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="px-5 py-3" style={{ background: "#052e1a" }}>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                    Příští zápas
+                  </p>
+                </div>
 
-              <div className="h-px bg-gray-100" />
+                <div className="px-5 py-5 space-y-4">
+                  {/* Loga + vs */}
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="flex flex-col items-center gap-1">
+                      <Image src="/nahoda_banner.webp" alt="Náhoda FC" width={56} height={56} className="object-contain" />
+                      <span className="text-[10px] font-bold text-gray-700 text-center leading-tight">Náhoda FC</span>
+                    </div>
+                    <span className="text-lg font-black text-gray-300">vs.</span>
+                    <div className="flex flex-col items-center gap-1">
+                      <Image src="/banners/fk_parezov.webp" alt="FK Pařezov" width={56} height={56} className="object-contain" />
+                      <span className="text-[10px] font-bold text-gray-700 text-center leading-tight">FK Pařezov</span>
+                    </div>
+                  </div>
 
-              <ul className="space-y-1.5">
-                <li className="flex items-start gap-2">
-                  <CalendarIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
-                  <span className="text-xs text-gray-600 leading-snug">neděle 14:00</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <MapPinIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
-                  <span className="text-xs text-gray-600 leading-snug">Hřiště za hasičárnou</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <ClockIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
-                  <span className="text-xs text-gray-600 leading-snug">Sraz: 13:20</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <ShirtIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
-                  <span className="text-xs text-gray-600 leading-snug">Dresy: bere ten, kdo je najde</span>
-                </li>
-              </ul>
+                  <div className="h-px bg-gray-100" />
 
-              <button
-                type="button"
-                onClick={() => setIsReportModalOpen(true)}
-                className="w-full rounded-xl border-2 py-2 text-xs font-bold uppercase tracking-widest transition hover:bg-gray-50"
-                style={{ borderColor: "#052e1a", color: "#052e1a" }}
-              >
-                Více o zápase
-              </button>
-            </div>
+                  <ul className="space-y-1.5">
+                    <li className="flex items-start gap-2">
+                      <CalendarIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                      <span className="text-xs text-gray-600 leading-snug">neděle 14:00</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <MapPinIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                      <span className="text-xs text-gray-600 leading-snug">Hřiště za hasičárnou</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ClockIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                      <span className="text-xs text-gray-600 leading-snug">Sraz: 13:20</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ShirtIcon className="shrink-0 h-4 w-4 text-emerald-800 mt-0.5" />
+                      <span className="text-xs text-gray-600 leading-snug">Dresy: bere ten, kdo je najde</span>
+                    </li>
+                  </ul>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsReportModalOpen(true)}
+                    className="w-full rounded-xl border-2 py-2 text-xs font-bold uppercase tracking-widest transition hover:bg-gray-50"
+                    style={{ borderColor: "#052e1a", color: "#052e1a" }}
+                  >
+                    Více o zápase
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
         </div>

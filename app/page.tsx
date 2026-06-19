@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import MatchHero from "@/components/league/MatchHero";
-import HomepageOpponentCallout from "@/components/league/HomepageOpponentCallout";
+import { getActiveHomepageChallenge } from "@/lib/game/activeChallenge";
 import ClubGrid from "@/components/league/ClubGrid";
 import NewsSection from "@/components/league/NewsSection";
 import LeagueTable from "@/components/league/LeagueTable";
@@ -31,7 +31,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const challenge = await getActiveHomepageChallenge();
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -55,10 +57,8 @@ export default function HomePage() {
         }}
       >
         <LeagueHeader />
-        <MatchHero />
+        <MatchHero challenge={challenge} />
       </div>
-
-      <HomepageOpponentCallout />
 
       <main>
         <RecentResults />
