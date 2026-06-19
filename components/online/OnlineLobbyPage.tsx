@@ -88,7 +88,7 @@ export default function OnlineLobbyPage() {
       const data = await res.json() as CreatedGame;
       setCreated(data);
       if (typeof window !== 'undefined') {
-        sessionStorage.setItem(`osma-lobby-token-${data.code}`, data.playerToken);
+        sessionStorage.setItem(`osma-lobby-host-token-${data.code}`, data.playerToken);
       }
       void fetchGames();
     } catch {

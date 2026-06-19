@@ -58,12 +58,15 @@ export default function OnlineRoomPage({
   const [selectedClubId, setSelectedClubId] = useState<string>(CLUBS[1]?.slug ?? CLUBS[0]?.slug ?? 'tj-sokol-tupoljany');
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = sessionStorage.getItem(`osma-lobby-token-${upperCode}`);
-      if (token) {
-        setMyToken(token);
-        setIsHost(true);
-      }
+    if (typeof window === 'undefined') return;
+    const hostToken = sessionStorage.getItem(`osma-lobby-host-token-${upperCode}`);
+    const guestToken = sessionStorage.getItem(`osma-lobby-guest-token-${upperCode}`);
+    if (hostToken) {
+      setMyToken(hostToken);
+      setIsHost(true);
+    } else if (guestToken) {
+      setMyToken(guestToken);
+      setIsHost(false);
     }
   }, [upperCode]);
 
@@ -124,7 +127,7 @@ export default function OnlineRoomPage({
       }
       const data = await res.json() as JoinResponse;
       if (typeof window !== 'undefined') {
-        sessionStorage.setItem(`osma-lobby-token-${upperCode}`, data.playerToken);
+        sessionStorage.setItem(`osma-lobby-guest-token-${upperCode}`, data.playerToken);
       }
       setMyToken(data.playerToken);
       setIsHost(false);
