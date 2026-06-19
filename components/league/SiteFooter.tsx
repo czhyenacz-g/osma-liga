@@ -126,7 +126,7 @@ export default function SiteFooter() {
             <p className="text-sm" style={{ color: "rgba(209,250,229,0.6)" }}>
               Hynek Dařbujan
               <br />
-              <span className="text-xs" style={{ color: "rgba(209,250,229,0.4)" }}>trenér Náhoda FC</span>
+              <span className="text-xs" style={{ color: "rgba(209,250,229,0.4)" }}>trenér Náhoda FC a programátor těchto stránek</span>
             </p>
             <a
               href="mailto:info@osmaliga.cz"

@@ -2,26 +2,34 @@
 
 import { useEffect, useState } from 'react';
 
-const missingMatchReportMessages = [
+const upcomingMatchInfoMessages = [
   {
-    title: 'Zápis o utkání se bohužel ztratil.',
-    text: 'Podle výboru ho měl zapisovatel v kapse tepláků. Tepláky se našly, zápis ne.',
+    title: 'Sestava ještě není vyvěšená.',
+    text: 'Trenér ji prý napsal na účtenku, ale hospoda už zavřela.',
   },
   {
-    title: 'Zápis se nedochoval.',
-    text: 'Rozhodčí tvrdí, že všechno viděl. Bohužel si nic nezapsal.',
+    title: 'Zápasová nominace zatím chybí.',
+    text: 'Půlka týmu ještě nepotvrdila, jestli může. Druhá půlka neví, kde má kopačky.',
   },
   {
-    title: 'Detail zápasu zatím není k dispozici.',
-    text: 'Zápis leží někde mezi šatnou, výčepem a šestnáctkou.',
+    title: 'Rozpis zápasu už visí, sestava zatím ne.',
+    text: 'V okresním fotbale se nejdřív ví, kdy se hraje. Kdo přijde, to se řeší cestou.',
   },
   {
-    title: 'Zápis o utkání chybí.',
-    text: 'Domácí tvrdí, že byl. Hosté tvrdí, že nebyl. Výbor zasedá.',
+    title: 'Sestava se teprve skládá.',
+    text: 'Trenér má plán. Jen čeká, kdo mu zvedne telefon.',
   },
   {
-    title: 'Více o zápase zatím nemáme.',
-    text: 'Pamětníci se neshodnou ani na výsledku, natož na průběhu.',
+    title: 'Místo zápasu už je jasné.',
+    text: 'Teď se jen na výboru dolaďuje, kdo bude po závěrečném hvizdu spokojenější.',
+  },
+  {
+    title: 'Rozpis je hotový, delegace se ladí.',
+    text: 'Hledá se rozhodčí s pevným názorem a pružným výkladem pravidel.',
+  },
+  {
+    title: 'Termín zápasu známe.',
+    text: 'Výsledek samozřejmě ne. Jen někteří funkcionáři vypadají nezvykle klidně.',
   },
 ];
 
@@ -31,12 +39,12 @@ type Props = {
 };
 
 export default function MissingMatchReportModal({ isOpen, onClose }: Props) {
-  const [message, setMessage] = useState(missingMatchReportMessages[0]);
+  const [message, setMessage] = useState(upcomingMatchInfoMessages[0]);
 
   useEffect(() => {
     if (isOpen) {
       setMessage(
-        missingMatchReportMessages[Math.floor(Math.random() * missingMatchReportMessages.length)]
+        upcomingMatchInfoMessages[Math.floor(Math.random() * upcomingMatchInfoMessages.length)]
       );
     }
   }, [isOpen]);
