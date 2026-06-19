@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { getSession } from '@/lib/auth/session';
 
 export default async function AuthStatus() {
@@ -7,19 +8,21 @@ export default async function AuthStatus() {
   if (session) {
     return (
       <div className="flex items-center gap-2 shrink-0">
-        {session.avatarUrl && (
-          <Image
-            src={session.avatarUrl}
-            alt={session.globalName ?? session.username}
-            width={28}
-            height={28}
-            className="rounded-full"
-            unoptimized
-          />
-        )}
-        <span className="hidden sm:block text-xs text-white/70 max-w-[96px] truncate">
-          {session.globalName ?? session.username}
-        </span>
+        <Link href="/muj-profil" className="flex items-center gap-2 hover:opacity-80 transition">
+          {session.avatarUrl && (
+            <Image
+              src={session.avatarUrl}
+              alt={session.globalName ?? session.username}
+              width={28}
+              height={28}
+              className="rounded-full"
+              unoptimized
+            />
+          )}
+          <span className="hidden sm:block text-xs text-white/70 max-w-[96px] truncate">
+            {session.globalName ?? session.username}
+          </span>
+        </Link>
         <form method="POST" action="/api/auth/logout">
           <button
             type="submit"

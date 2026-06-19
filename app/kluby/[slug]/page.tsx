@@ -6,6 +6,7 @@ import { getClubs, getClub, getClubStats } from "@/lib/clubs";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
 import { absoluteUrl, ogImageUrl } from "@/lib/seo";
+import { formatPoints, formatMatches } from "@/lib/format";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -250,18 +251,6 @@ export default async function ClubDetailPage({ params }: Props) {
       <SiteFooter />
     </>
   );
-}
-
-function formatPoints(points: number): string {
-  if (points === 1) return '1 bod';
-  if (points >= 2 && points <= 4) return `${points} body`;
-  return `${points} bodů`;
-}
-
-function formatMatches(matches: number): string {
-  if (matches === 1) return '1 zápas';
-  if (matches >= 2 && matches <= 4) return `${matches} zápasy`;
-  return `${matches} zápasů`;
 }
 
 function StatRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
