@@ -116,6 +116,7 @@ export default function OnlineLobbyPage() {
 
       {/* Create game section */}
       <div
+        id="vytvorit-zapas"
         className="w-full max-w-md rounded-xl p-6 flex flex-col gap-4"
         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(214,169,74,0.2)' }}
       >
@@ -186,7 +187,22 @@ export default function OnlineLobbyPage() {
         {loadingGames ? (
           <p className="text-xs" style={{ color: 'rgba(209,250,229,0.35)' }}>Načítám...</p>
         ) : games.length === 0 ? (
-          <p className="text-xs" style={{ color: 'rgba(209,250,229,0.35)' }}>Žádné aktivní hry. Založ první!</p>
+          <div
+            className="rounded-xl p-5 text-center flex flex-col items-center gap-3"
+            style={{ background: 'rgba(6,63,36,0.5)', border: '1px solid rgba(214,169,74,0.22)' }}
+          >
+            <p className="text-sm font-bold text-white">Na návsi je zatím ticho.</p>
+            <p className="text-xs leading-relaxed max-w-xs" style={{ color: 'rgba(209,250,229,0.55)' }}>
+              Nikdo zrovna nečeká na soupeře. Založ zápas a buď první, kdo dneska rozkope okres.
+            </p>
+            <a
+              href="#vytvorit-zapas"
+              className="inline-flex items-center justify-center rounded-lg px-5 py-2 text-xs font-bold transition hover:opacity-90"
+              style={{ background: '#d6a94a', color: '#041f14' }}
+            >
+              Založit online zápas
+            </a>
+          </div>
         ) : (
           <div className="flex flex-col gap-2">
             {games.map((g) => (
