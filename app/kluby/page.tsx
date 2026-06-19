@@ -6,9 +6,9 @@ import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
 import { absoluteUrl, ogImageUrl } from "@/lib/seo";
 
-const TITLE = "Kluby Osmé ligy";
+const TITLE = "Kluby Osmé online ligy";
 const DESCRIPTION =
-  "Přehled klubů Osmé ligy, aktuální forma za posledních 30 dní, tabulka a klubové profily.";
+  "Přehled fiktivních klubů Osmé online ligy, aktuální forma za posledních 30 dní, tabulka a klubové profily.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -51,11 +51,11 @@ export default async function KlubyPage() {
             </Link>
           </div>
 
-          <h1 className="text-2xl font-black text-gray-900 mb-2">Kluby Osmé ligy</h1>
+          <h1 className="text-2xl font-black text-gray-900 mb-2">Kluby Osmé online ligy</h1>
           <p className="text-sm text-gray-500 mb-10 max-w-2xl">
-            Jedenáct klubů, jeden míč a tolik ambicí, kolik dovolí stav trávníku. Osmá liga není
-            jen soutěž — je to přehlídka týmů, které se odmítají vzdát, i když jim tabulka někdy
-            naznačuje opak.
+            Jedenáct fiktivních okresních klubů, jeden míč a tolik ambicí, kolik dovolí stav
+            trávníku. Osmá liga je zatím herní svět — kluby, tabulka i forma vznikají z online
+            zápasů odehraných přímo tady na webu.
           </p>
 
           {/* Tabulka klubů */}

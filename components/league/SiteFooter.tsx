@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ClubPreviewLightbox from "@/components/ClubPreviewLightbox";
 
 const NAV = [
   { label: "Úvod",      href: "#uvod" },
@@ -16,47 +17,62 @@ export default function SiteFooter() {
     >
       {/* Partner / spolupráce box */}
       <div className="mx-auto max-w-[1240px] px-6 pt-12 pb-8">
-        <div
-          className="max-w-2xl rounded-xl px-7 py-7"
-          style={{
-            background: "rgba(6,63,36,0.55)",
-            border: "1px solid rgba(216,173,69,0.28)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.22)",
-          }}
-        >
-          <p
-            className="text-xs font-black uppercase tracking-[0.18em] mb-4"
-            style={{ color: "#d8ad45" }}
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
+          <div
+            className="flex-1 rounded-xl px-7 py-7 lg:max-w-2xl"
+            style={{
+              background: "rgba(6,63,36,0.55)",
+              border: "1px solid rgba(216,173,69,0.28)",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.22)",
+            }}
           >
-            Spolupráce a skutečné kluby
-          </p>
-          <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
-            Máte značku, hospodu, obchod, službu nebo projekt, který patří k fotbalu, vesnici nebo
-            okresnímu životu? Na Osmé lize může být prostor i pro vaši reklamu.
-          </p>
-          <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
-            A pokud jste skutečný tým z nižší soutěže a na těchto stránkách se zatím nevidíte,
-            ozvěte se. Rádi vás časem přidáme mezi kluby, které drží okresní fotbal při životě.
-          </p>
-          <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(209,250,229,0.82)" }}>
-            Za drobný poplatek vám můžeme připravit i jednoduchou stránku klubu přímo na Osmé lize —
-            nebo samostatnou malou klubovou prezentaci, aby se o vašem týmu, zápasech a lidech kolem
-            hřiště vědělo víc.
-          </p>
-          <p className="text-sm mb-1" style={{ color: "rgba(209,250,229,0.82)" }}>
-            Napište na{" "}
-            <a
-              href="mailto:info@osmaliga.cz"
-              className="font-semibold transition hover:opacity-80"
+            <p
+              className="text-xs font-black uppercase tracking-[0.18em] mb-4"
               style={{ color: "#d8ad45" }}
             >
-              info@osmaliga.cz
-            </a>
-            .
-          </p>
-          <p className="text-xs mt-4 italic" style={{ color: "rgba(209,250,229,0.4)" }}>
-            Hrdinové okresu si zaslouží být vidět.
-          </p>
+              Spolupráce a skutečné kluby
+            </p>
+            <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
+              Máte značku, hospodu, obchod, službu nebo projekt, který patří k fotbalu, vesnici nebo
+              okresnímu životu? Na Osmé lize může být prostor i pro vaši reklamu.
+            </p>
+            <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(209,250,229,0.82)" }}>
+              A pokud jste skutečný tým z nižší soutěže a na těchto stránkách se zatím nevidíte,
+              ozvěte se. Rádi vás časem přidáme mezi kluby, které drží okresní fotbal při životě.
+            </p>
+            <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(209,250,229,0.82)" }}>
+              Za drobný poplatek vám můžeme připravit i jednoduchou stránku klubu přímo na Osmé lize —
+              nebo samostatnou malou klubovou prezentaci, aby se o vašem týmu, zápasech a lidech kolem
+              hřiště vědělo víc.
+            </p>
+            <p className="text-sm mb-1" style={{ color: "rgba(209,250,229,0.82)" }}>
+              Napište na{" "}
+              <a
+                href="mailto:info@osmaliga.cz"
+                className="font-semibold transition hover:opacity-80"
+                style={{ color: "#d8ad45" }}
+              >
+                info@osmaliga.cz
+              </a>
+              .
+            </p>
+            <p className="text-xs mt-4 italic" style={{ color: "rgba(209,250,229,0.4)" }}>
+              Hrdinové okresu si zaslouží být vidět.
+            </p>
+          </div>
+
+          <div className="w-full lg:w-[280px] shrink-0 flex flex-col gap-2">
+            <div className="flex-1 min-h-[220px]">
+              <ClubPreviewLightbox
+                src="/tupoljany_preview.webp"
+                alt="Ukázka klubové stránky v Osmé lize"
+                caption="Ukázka klubové stránky v Osmé lize"
+              />
+            </div>
+            <p className="text-center text-[11px] italic" style={{ color: "rgba(209,250,229,0.4)" }}>
+              Ukázka klubové stránky v Osmé lize
+            </p>
+          </div>
         </div>
       </div>
 
