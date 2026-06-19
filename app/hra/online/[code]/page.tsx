@@ -51,6 +51,9 @@ export default function OnlineRoomPage({
   const [isHost, setIsHost] = useState(false);
   const [enterGame, setEnterGame] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
+  const [postingCallout, setPostingCallout] = useState(false);
+  const [calloutExpiresAt, setCalloutExpiresAt] = useState<string | null>(null);
+  const [calloutError, setCalloutError] = useState<string | null>(null);
   // Default: second club for guest, first for host (will be overridden by actual role)
   const [selectedClubId, setSelectedClubId] = useState<string>(CLUBS[1]?.slug ?? CLUBS[0]?.slug ?? 'tj-sokol-tupoljany');
 
@@ -130,6 +133,29 @@ export default function OnlineRoomPage({
       setJoinError('Nepodařilo se připojit. Zkus to znovu.');
     } finally {
       setJoining(false);
+    }
+  }
+
+  async function handlePostCallout() {
+    if (!myToken) return;
+    setPostingCallout(true);
+    setCalloutError(null);
+    try {
+      const res = await fetch(`/api/online-games/${upperCode}/looking-for-opponent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerToken: myToken }),
+      });
+      if (!res.ok) {
+        setCalloutError('Nepodařilo se vyvěsit výzvu. Zkus to znovu.');
+        return;
+      }
+      const data = await res.json() as { expiresAt: string };
+      setCalloutExpiresAt(data.expiresAt);
+    } catch {
+      setCalloutError('Nepodařilo se vyvěsit výzvu. Zkus to znovu.');
+    } finally {
+      setPostingCallout(false);
     }
   }
 
@@ -258,9 +284,35 @@ export default function OnlineRoomPage({
         )}
 
         {!isFull && hasToken && isHost && (
-          <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
-            Čekáme na soupeře...
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
+              Čekáme na soupeře...
+            </p>
+
+            {!calloutExpiresAt ? (
+              <>
+                <button
+                  onClick={() => { void handlePostCallout(); }}
+                  disabled={postingCallout}
+                  className="w-full py-2.5 rounded-lg font-bold text-sm transition disabled:opacity-50"
+                  style={{ background: 'rgba(214,169,74,0.15)', color: '#d6a94a', border: '1px solid rgba(214,169,74,0.3)' }}
+                >
+                  {postingCallout ? 'Vyvěšuji...' : 'Vyvěsit výzvu na náves'}
+                </button>
+                <p className="text-xs" style={{ color: 'rgba(209,250,229,0.4)' }}>
+                  Nikdo se zatím nepřipojil. Výzva se na chvíli ukáže na titulní stránce.
+                </p>
+                {calloutError && (
+                  <p className="text-xs" style={{ color: '#f87171' }}>{calloutError}</p>
+                )}
+              </>
+            ) : (
+              <p className="text-xs font-semibold" style={{ color: '#86efac' }}>
+                Výzva visí na návsi. Teď už jen čekat, kdo půjde kolem. Platí do{' '}
+                {new Date(calloutExpiresAt).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })}.
+              </p>
+            )}
+          </div>
         )}
 
         {isFull && !hasToken && (
