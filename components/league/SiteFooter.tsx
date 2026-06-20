@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import ClubPreviewLightbox from "@/components/ClubPreviewLightbox";
 
 const NAV = [
@@ -192,6 +193,23 @@ export default function SiteFooter() {
       >
         <p className="text-[11px] leading-relaxed" style={{ color: "rgba(209,250,229,0.35)" }}>
           Osmá liga je herní fotbalový svět s fiktivními kluby, výsledky a online zápasy. Náhoda FC je fiktivní klub.
+        </p>
+        <p className="mt-2 text-[11px]" style={{ color: "rgba(209,250,229,0.25)" }}>
+          Ligový svět:{" "}
+          {[
+            { slug: "treti-liga", label: "3. liga" },
+            { slug: "ctvrta-liga", label: "4. liga" },
+            { slug: "pata-liga", label: "5. liga" },
+            { slug: "sesta-liga", label: "6. liga" },
+            { slug: "sedma-liga", label: "7. liga" },
+          ].map((l, i) => (
+            <span key={l.slug}>
+              {i > 0 && " · "}
+              <Link href={`/${l.slug}`} className="transition hover:opacity-80" style={{ color: "rgba(209,250,229,0.4)" }}>
+                {l.label}
+              </Link>
+            </span>
+          ))}
         </p>
       </div>
     </footer>
