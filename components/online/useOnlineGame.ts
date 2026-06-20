@@ -20,6 +20,8 @@ export interface OnlineSnapshot {
   ball: { x: number; y: number };
   players: OnlinePlayer[];
   goalMessage: string;
+  homeClubName?: string | null;
+  awayClubName?: string | null;
 }
 
 export function useOnlineGame(gameCode: string, playerToken: string) {

@@ -21,6 +21,7 @@ type GameRoom = {
   maxPlayers: number;
   expiresAt: string;
   onlineMatchId?: string | null;
+  homeClubSlug?: string | null;
 };
 
 type JoinResponse = {
@@ -57,6 +58,7 @@ export default function OnlineRoomPage({
   const [calloutError, setCalloutError] = useState<string | null>(null);
   // Default: second club for guest, first for host (will be overridden by actual role)
   const [selectedClubId, setSelectedClubId] = useState<string>(CLUBS[1]?.slug ?? CLUBS[0]?.slug ?? 'tj-sokol-tupoljany');
+  const homeClubSlug = room?.homeClubSlug ?? null;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -366,7 +368,11 @@ export default function OnlineRoomPage({
             <p className="text-sm" style={{ color: 'rgba(209,250,229,0.6)' }}>
               Hostitel čeká na soupeře. Připoj se!
             </p>
-            <ClubSelect value={selectedClubId} onChange={setSelectedClubId} />
+            <ClubSelect
+              value={selectedClubId}
+              onChange={setSelectedClubId}
+              excludeSlugs={homeClubSlug ? [homeClubSlug] : []}
+            />
             <button
               onClick={() => { void handleJoin(); }}
               disabled={joining}

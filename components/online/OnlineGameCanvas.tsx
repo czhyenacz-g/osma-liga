@@ -170,8 +170,10 @@ function drawFrame(
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'white';
   ctx.font = 'bold 16px monospace';
+  const homeName = snap.homeClubName ?? 'Domácí';
+  const awayName = snap.awayClubName ?? 'Hosté';
   ctx.fillText(
-    `Náhoda FC  ${snap.score.home}  :  ${snap.score.away}  FK Pařezov`,
+    `${homeName}  ${snap.score.home}  :  ${snap.score.away}  ${awayName}`,
     CANVAS_W / 2,
     hm - 7,
   );

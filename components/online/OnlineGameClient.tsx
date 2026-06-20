@@ -226,7 +226,9 @@ export default function OnlineGameClient({
               {snapshot.score.home} : {snapshot.score.away}
             </p>
           )}
-          <p className="text-sm" style={subtleText}>Náhoda FC vs FK Pařezov</p>
+          <p className="text-sm" style={subtleText}>
+            {snapshot?.homeClubName ?? 'Domácí'} vs {snapshot?.awayClubName ?? 'Hosté'}
+          </p>
           {fullTimeMessage && (
             <p className="text-xs italic max-w-sm mx-auto" style={subtleText}>
               {fullTimeMessage}

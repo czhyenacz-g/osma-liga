@@ -8,12 +8,20 @@ interface Props {
   value: string;
   onChange: (slug: string) => void;
   label?: string;
+  excludeSlugs?: string[];
 }
 
-export default function ClubSelect({ value, onChange, label = 'Tvůj klub' }: Props) {
+export default function ClubSelect({ value, onChange, label = 'Tvůj klub', excludeSlugs = [] }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const selected = CLUBS.find((c) => c.slug === value) ?? CLUBS[0];
+  const options = CLUBS.filter((c) => !excludeSlugs.includes(c.slug));
+  const selected = options.find((c) => c.slug === value) ?? options[0];
+
+  useEffect(() => {
+    if (excludeSlugs.includes(value) && options[0]) {
+      onChange(options[0].slug);
+    }
+  }, [value, excludeSlugs, options, onChange]);
 
   useEffect(() => {
     if (!open) return;
@@ -85,7 +93,7 @@ export default function ClubSelect({ value, onChange, label = 'Tvůj klub' }: Pr
             overflowY: 'auto',
           }}
         >
-          {CLUBS.map((c) => {
+          {options.map((c) => {
             const isActive = c.slug === value;
             return (
               <button
