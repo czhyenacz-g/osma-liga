@@ -49,6 +49,7 @@ export default function OnlineRoomPage({
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
+  const [joinRequiresLogin, setJoinRequiresLogin] = useState(false);
   const [myToken, setMyToken] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [enterGame, setEnterGame] = useState(false);
@@ -107,6 +108,7 @@ export default function OnlineRoomPage({
   async function handleJoin() {
     setJoining(true);
     setJoinError(null);
+    setJoinRequiresLogin(false);
     try {
       const res = await fetch(`/api/online-games/${upperCode}/join`, {
         method: 'POST',
@@ -119,6 +121,11 @@ export default function OnlineRoomPage({
       }
       if (res.status === 404) {
         setNotFound(true);
+        return;
+      }
+      if (res.status === 401) {
+        setJoinError('Tenhle zápas si vyžaduje přihlášení přes Discord.');
+        setJoinRequiresLogin(true);
         return;
       }
       if (!res.ok) {
@@ -382,7 +389,15 @@ export default function OnlineRoomPage({
               {joining ? 'Připojuji...' : 'Připojit se jako host'}
             </button>
             {joinError && (
-              <p className="text-xs" style={{ color: '#f87171' }}>{joinError}</p>
+              <p className="text-xs" style={{ color: '#f87171' }}>
+                {joinError}
+                {joinRequiresLogin && (
+                  <>
+                    {' '}
+                    <a href="/api/auth/login" style={{ color: '#d6a94a' }}>Přihlásit se</a>
+                  </>
+                )}
+              </p>
             )}
           </>
         )}

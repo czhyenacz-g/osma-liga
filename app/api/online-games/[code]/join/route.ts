@@ -47,6 +47,10 @@ export async function POST(
       return NextResponse.json({ error: 'Game is full' }, { status: 409 });
     }
 
+    if (res.status === 401) {
+      return NextResponse.json({ error: 'Discord login required to join a training challenge' }, { status: 401 });
+    }
+
     if (!res.ok) {
       console.error('[online-games/join] hub API error:', res.status);
       return NextResponse.json({ error: 'Chyba serveru.' }, { status: 500 });

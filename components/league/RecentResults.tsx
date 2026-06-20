@@ -2,9 +2,10 @@ import Link from 'next/link';
 
 function formatMatchMode(mode: string | null | undefined): string {
   switch (mode) {
-    case 'multiplayer':  return 'Online zápas';
-    case 'singleplayer': return 'Trénink proti botovi';
-    default:             return 'Zápas Osmé ligy';
+    case 'multiplayer':        return 'Online zápas';
+    case 'training_challenge': return 'Tréninkový zápas';
+    case 'singleplayer':       return 'Trénink proti botovi';
+    default:                   return 'Zápas Osmé ligy';
   }
 }
 
