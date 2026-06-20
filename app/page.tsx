@@ -11,7 +11,7 @@ import { absoluteUrl, ogImageUrl, siteName, siteUrl } from "@/lib/seo";
 
 const TITLE = "Osmá liga — okresní fotbal, který se bere až moc vážně";
 const DESCRIPTION =
-  "Parodický i hratelný svět okresního fotbalu. Kluby, tabulka, online zápasy a hláška: VAR nemáme, hraj dál.";
+  "Osmá liga je online fotbalový svět inspirovaný 8. ligou a okresním fotbalem. Sleduj kluby, výsledky, výzvy k zápasu a nastup na plac.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -39,6 +39,7 @@ export default async function HomePage() {
     "@type": "WebSite",
     name: siteName,
     url: siteUrl,
+    description: DESCRIPTION,
   };
 
   return (

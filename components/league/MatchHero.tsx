@@ -91,6 +91,12 @@ export default function MatchHero({ challenge }: { challenge?: ActiveChallenge }
           <div className="flex-1 min-w-0 text-white space-y-5">
             <div className="max-w-[720px] space-y-5">
 
+              {/* Úvodní popis — co je Osmá liga */}
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-[640px]">
+                Fiktivní okresní kluby, živé výzvy, výsledky a zápasy, do kterých můžeš rovnou nastoupit.
+                Inspirací je 8. liga a okresní fotbal.
+              </p>
+
               {/* Badge */}
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-emerald-600/90 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-white">

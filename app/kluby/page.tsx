@@ -8,7 +8,7 @@ import { absoluteUrl, ogImageUrl } from "@/lib/seo";
 
 const TITLE = "Kluby Osmé online ligy";
 const DESCRIPTION =
-  "Přehled fiktivních klubů Osmé online ligy, aktuální forma za posledních 30 dní, tabulka a klubové profily.";
+  "Přehled fiktivních okresních klubů herního světa inspirovaného 8. ligou. Sleduj formu, body a výsledky Osmé ligy.";
 
 export const metadata: Metadata = {
   title: TITLE,

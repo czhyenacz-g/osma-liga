@@ -191,7 +191,7 @@ export default function SiteFooter() {
         style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
       >
         <p className="text-[11px] leading-relaxed" style={{ color: "rgba(209,250,229,0.35)" }}>
-          Osmá liga je připravovaná arkádová fotbalová hra a parodie klubového webu. Náhoda FC je fiktivní klub.
+          Osmá liga je herní fotbalový svět s fiktivními kluby, výsledky a online zápasy. Náhoda FC je fiktivní klub.
         </p>
       </div>
     </footer>
