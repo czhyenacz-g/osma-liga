@@ -164,6 +164,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
           homeScore: matchScore.home,
           awayScore: matchScore.away,
           durationSeconds: MATCH_DURATION,
+          ...(homeClubSlug ? { homeClubSlug } : {}),
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -20,7 +20,7 @@ const BANK: Record<string, SoundDefinition> = {
   '01-tone': {
     key: '01-tone', number: 1, baseId: 'kickoff', engine: 'tone',
     name: 'Výkopové písknutí',
-    notes: [{ freq: TJ_S, dur: 0.83 }],
+    notes: [{ freq: TJ_S + 300, dur: 0.83 }],
   },
   '01-webaudio': {
     key: '01-webaudio', number: 1, baseId: 'kickoff', engine: 'webaudio',
@@ -45,7 +45,7 @@ const BANK: Record<string, SoundDefinition> = {
   'goal-tone': {
     key: 'goal-tone', number: 2, baseId: 'restart', engine: 'tone',
     name: 'Gólové písknutí',
-    notes: [{ freq: TJ_H, dur: 1.05 }],
+    notes: [{ freq: TJ_H + 300, dur: 1.05 }],
     volDb: -3,
   },
 
@@ -255,7 +255,7 @@ const BANK: Record<string, SoundDefinition> = {
   '19-tone': {
     key: '19-tone', number: 19, baseId: 'distant_whistle', engine: 'tone',
     name: 'Písknutí z dálky',
-    notes: [{ freq: TJ_S, dur: 0.27 }],
+    notes: [{ freq: TJ_S + 300, dur: 0.27 }],
     volDb: -14,  // quieter than default −7 dB
   },
   '19-webaudio': {
@@ -280,7 +280,7 @@ const BANK: Record<string, SoundDefinition> = {
   '21-tone': {
     key: '21-tone', number: 21, baseId: 'full_time_double_long', engine: 'tone',
     name: 'Konec zápasu — dvojité dlouhé',
-    notes: [{ freq: TJ_S, dur: 0.53, gap: 0.45 }, { freq: TJ_S, dur: 0.53 }],
+    notes: [{ freq: TJ_S + 300, dur: 0.53, gap: 0.45 }, { freq: TJ_S + 300, dur: 0.53 }],
     volDb: -4,
   },
   '21-webaudio': {

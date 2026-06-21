@@ -20,6 +20,7 @@ export interface OnlineSnapshot {
   ball: { x: number; y: number };
   players: OnlinePlayer[];
   goalMessage: string;
+  isOwnGoal?: boolean;
   homeClubName?: string | null;
   awayClubName?: string | null;
 }

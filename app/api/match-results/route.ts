@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Neplatný JSON.' }, { status: 400 });
   }
 
-  const { homeScore, awayScore, durationSeconds } = body as Record<string, unknown>;
+  const { homeScore, awayScore, durationSeconds, homeClubSlug } = body as Record<string, unknown>;
 
   if (!isValidScore(homeScore) || !isValidScore(awayScore) || !isValidDuration(durationSeconds)) {
     return NextResponse.json(
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
         homeScore,
         awayScore,
         durationSeconds: Math.round(durationSeconds as number),
+        ...(typeof homeClubSlug === 'string' && homeClubSlug ? { homeClubSlug } : {}),
       }),
     });
 
