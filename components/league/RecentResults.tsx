@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getRecentMatchResultMessage } from '@/lib/game/matchResultMessages';
 
 function formatMatchMode(mode: string | null | undefined): string {
   switch (mode) {
@@ -50,6 +51,7 @@ function relativeTime(dateStr: string): string {
 
 export default async function RecentResults() {
   const results = await fetchRecentResults();
+  const usedResultMessages = new Set<string>();
 
   return (
     <section id="vysledky" className="py-10 px-6" style={{ background: '#0a1f10' }}>
@@ -68,6 +70,7 @@ export default async function RecentResults() {
         ) : (
           <ul className="space-y-3">
             {results.map((r) => {
+              const resultMessage = getRecentMatchResultMessage(r, usedResultMessages);
               const detailHref = r.onlineMatchId ? `/zapasy/${r.onlineMatchId}` : null;
               const inner = (
                 <>
@@ -90,11 +93,9 @@ export default async function RecentResults() {
                     <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                       {formatMatchMode(r.mode)} &middot; {relativeTime(r.playedAt)}
                     </span>
-                    {r.matchComment && (
-                      <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.28)' }}>
-                        {r.matchComment}
-                      </span>
-                    )}
+                    <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                      {resultMessage}
+                    </span>
                     {detailHref && (
                       <span className="text-[11px] font-semibold" style={{ color: 'rgba(214,169,74,0.65)' }}>
                         Detail zápasu →
