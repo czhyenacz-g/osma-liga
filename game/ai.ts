@@ -59,7 +59,11 @@ function chaseTarget(ballPos: Vec2): Vec2 {
 
 export function updateAI(state: GameState, dt: number): void {
   const { ball, players } = state;
-  const botPlayers = players.filter(p => p.team === 'away');
+  // Players currently leaving/on the bench/returning (temporaryRemoval.ts)
+  // are handled entirely there — exclude them from chasing and formation.
+  const removedIds = new Set(state.temporaryRemovals.map(r => r.playerId));
+  const botPlayers = players.filter(p => p.team === 'away' && !removedIds.has(p.id));
+  if (botPlayers.length === 0) return;
 
   // Identify bot player closest to ball
   let chaser: Player = botPlayers[0];

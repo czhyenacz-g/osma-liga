@@ -97,12 +97,16 @@ export function checkGoal(state: GameState): 'home' | 'away' | null {
   return null;
 }
 
-// Gentle push: separate overlapping players from ball and add small impulse
+// Gentle push: separate overlapping players from ball and add small impulse.
+// Players currently leaving/on the bench/returning (temporaryRemoval.ts)
+// don't physically interact with the ball.
 export function resolvePlayerBallCollisions(state: GameState): void {
   const { ball, players } = state;
   const minDist = PLAYER_RADIUS + BALL_RADIUS;
+  const removedIds = new Set(state.temporaryRemovals.map((r) => r.playerId));
 
   for (const p of players) {
+    if (removedIds.has(p.id)) continue;
     const d = dist(p.pos, ball.pos);
     if (d < minDist && d > 0.001) {
       const dir = normalize({ x: ball.pos.x - p.pos.x, y: ball.pos.y - p.pos.y });

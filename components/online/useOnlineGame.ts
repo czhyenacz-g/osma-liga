@@ -10,6 +10,9 @@ export interface OnlinePlayer {
   y: number;
   active: boolean;
   label: string;
+  // Temporarily removed (random substitution, see project-hub-api's
+  // gameEngine/temporaryRemoval.ts) — not eligible as active or support.
+  removed?: boolean;
 }
 
 export interface OnlineSnapshot {

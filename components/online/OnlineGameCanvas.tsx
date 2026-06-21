@@ -138,7 +138,7 @@ function drawFrame(
   // Players (from interpolated render state)
   for (const rp of render.players) {
     const isHome = rp.team === 'home';
-    const isMyTeam = (role === 'home' && isHome) || (role === 'guest' && !isHome);
+    ctx.globalAlpha = rp.removed ? 0.45 : 1;
     ctx.beginPath();
     ctx.arc(rp.rx, rp.ry, PLAYER_RADIUS, 0, Math.PI * 2);
     ctx.fillStyle = isHome
@@ -153,6 +153,7 @@ function drawFrame(
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(rp.label, rp.rx, rp.ry);
+    ctx.globalAlpha = 1;
   }
 
   // Ball (from interpolated render state)
@@ -265,6 +266,7 @@ export default function OnlineGameCanvas({
         rp.active = tp.active;
         rp.team = tp.team;
         rp.label = tp.label;
+        rp.removed = tp.removed;
       }
 
       drawFrame(ctx!, r, target, role);

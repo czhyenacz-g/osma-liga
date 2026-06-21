@@ -31,6 +31,16 @@ export const fullTimeMessages = [
   'Okresní fotbal dnes znovu prokázal, že fyzika je jen doporučení.',
 ];
 
+// Random substitution toast — kept short so it doesn't crowd the pitch.
+export const substitutionMessages = [
+  'Střídání! Někdo jde na lavičku přemýšlet o životě.',
+  'Střídání! Chvilka oddechu se počítá.',
+  'Střídání! Lavička volá.',
+  'Střídání! Za chvíli zpátky, nikam nespěchej.',
+  'Střídání! I okresní hvězdy potřebují pauzu.',
+  'Střídání! Vrátí se, jen co vychladne.',
+];
+
 export function pickRandomMessage(messages: string[]): string {
   return messages[Math.floor(Math.random() * messages.length)];
 }

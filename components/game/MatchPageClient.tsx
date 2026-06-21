@@ -10,7 +10,7 @@ import MobileOrientationOverlay from './MobileOrientationOverlay';
 import { MATCH_DURATION } from '@/game/constants';
 import type { TouchInput } from '@/game/types';
 import { CLUBS } from '@/data/clubs';
-import { firstGoalMessages, fullTimeMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
+import { firstGoalMessages, fullTimeMessages, substitutionMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 type GamePhase = 'idle' | 'countdown' | 'playing';
@@ -65,10 +65,12 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
   const [isMobile, setIsMobile] = useState(false);
   const [fsStatus, setFsStatus] = useState<'idle' | 'unavailable'>('idle');
   const [firstGoalMessage, setFirstGoalMessage] = useState<string | null>(null);
+  const [substitutionMessage, setSubstitutionMessage] = useState<string | null>(null);
   const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
   const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
   const gameWrapperRef = useRef<HTMLDivElement>(null);
   const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const substitutionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Orientation / mobile detection
   useEffect(() => {
@@ -139,6 +141,8 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
     setGamePhase('idle');
     if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);
     setFirstGoalMessage(null);
+    if (substitutionTimeoutRef.current) clearTimeout(substitutionTimeoutRef.current);
+    setSubstitutionMessage(null);
     setFullTimeMessage(null);
   }, []);
 
@@ -146,6 +150,12 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
     if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);
     setFirstGoalMessage(pickRandomMessage(firstGoalMessages));
     firstGoalTimeoutRef.current = setTimeout(() => setFirstGoalMessage(null), 2500);
+  }, []);
+
+  const handleSubstitution = useCallback(() => {
+    if (substitutionTimeoutRef.current) clearTimeout(substitutionTimeoutRef.current);
+    setSubstitutionMessage(pickRandomMessage(substitutionMessages));
+    substitutionTimeoutRef.current = setTimeout(() => setSubstitutionMessage(null), 2500);
   }, []);
 
   const handleFullscreen = async () => {
@@ -270,11 +280,12 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
               onMatchEnd={handleMatchEnd}
               onRestart={handleRestart}
               onFirstGoal={handleFirstGoal}
+              onSubstitution={handleSubstitution}
               touchInputRef={touchRef}
               homeTeamName={homeTeamName}
             />
 
-            <MatchCommentaryToast message={matchScore === null ? firstGoalMessage : null} />
+            <MatchCommentaryToast message={matchScore === null ? (firstGoalMessage ?? substitutionMessage) : null} />
 
             {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
             {matchScore !== null && (

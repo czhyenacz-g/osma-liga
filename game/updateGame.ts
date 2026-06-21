@@ -18,6 +18,10 @@ import {
   BALL_RADIUS,
   BALL_CONTROL_RADIUS, BALL_CONTROL_DAMPING, BALL_CONTROL_FORCE, BALL_CONTROL_INPUT_FORCE, BALL_CONTROL_OFFSET,
 } from './constants';
+import {
+  TemporaryRemovalConfig, DEFAULT_TEMPORARY_REMOVAL_CONFIG,
+  updateTemporaryRemovals, getRemovedPlayerIds,
+} from './temporaryRemoval';
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
@@ -49,7 +53,11 @@ function pickMessage(pool: string[]): string {
 
 function resetPositions(state: GameState): void {
   const fresh = createInitialState();
+  // Players currently leaving/on the bench/returning stay put — yanking them
+  // back onto the pitch on a goal reset would bypass their bench timer.
+  const removedIds = getRemovedPlayerIds(state);
   for (let i = 0; i < state.players.length; i++) {
+    if (removedIds.has(state.players[i].id)) continue;
     state.players[i].pos = { ...fresh.players[i].pos };
     state.players[i].vel = { x: 0, y: 0 };
     state.players[i].kickCooldown = 0;
@@ -63,7 +71,12 @@ function resetPositions(state: GameState): void {
   state.isOwnGoal = false;
 }
 
-export function updateGame(state: GameState, input: InputState, dt: number): GameState {
+export function updateGame(
+  state: GameState,
+  input: InputState,
+  dt: number,
+  temporaryRemovalConfig: TemporaryRemovalConfig = DEFAULT_TEMPORARY_REMOVAL_CONFIG,
+): GameState {
   if (input.restart) {
     input.restart = false;
     return createInitialState();
@@ -88,12 +101,19 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     return state;
   }
 
+  // ── Temporary removals (MVP: random substitution) ────────────────────────
+  // Runs before active-player resolution so a freshly removed player is
+  // excluded from selection in the same tick it leaves.
+  updateTemporaryRemovals(state, dt, temporaryRemovalConfig);
+  const removedIds = getRemovedPlayerIds(state);
+
   // ── Active player selection with hysteresis ──────────────────────────────
   // The current active player stays active until a different player is clearly
   // closer by ACTIVE_PLAYER_SWITCH_MARGIN, preventing jitter when two players
   // are at similar distances from the ball.
 
-  const homePlayers = state.players.filter(p => p.team === 'home');
+  const homePlayers = state.players.filter(p => p.team === 'home' && !removedIds.has(p.id));
+  if (homePlayers.length === 0) return state; // never happens in MVP — pickPlayerToRemove keeps at least one
 
   let nearest = homePlayers[0];
   let nearestDist = Infinity;
@@ -119,6 +139,14 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
       : autoCurrent;
   }
   state.autoActivePlayerId = auto.id;
+
+  // A manual pick that became temporarily removed (e.g. random substitution
+  // mid-lock) immediately loses the override — automatic selection takes
+  // back over rather than waiting out the rest of the 3s lock.
+  if (state.manualActivePlayerId && removedIds.has(state.manualActivePlayerId)) {
+    state.manualActivePlayerId = null;
+    state.manualLockRemaining = 0;
+  }
 
   // ── Manual override (Q / PŘEP.) ───────────────────────────────────────────
   // Edge-detected here so holding the key only switches once. A press while

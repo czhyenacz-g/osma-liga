@@ -1,5 +1,6 @@
 import type { GameState, Player } from './types';
 import { FIELD_CX, FIELD_CY, MATCH_DURATION } from './constants';
+import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, TemporaryRemovalConfig, pickRandomTriggerSecond } from './temporaryRemoval';
 
 function makePlayer(
   id: string,
@@ -19,7 +20,9 @@ function makePlayer(
   };
 }
 
-export function createInitialState(): GameState {
+export function createInitialState(
+  temporaryRemovalConfig: TemporaryRemovalConfig = DEFAULT_TEMPORARY_REMOVAL_CONFIG,
+): GameState {
   const cx = FIELD_CX;
   const cy = FIELD_CY;
 
@@ -54,5 +57,11 @@ export function createInitialState(): GameState {
     cornerTimer: 0,
     cornerKickCount: 0,
     cornerClearCooldown: 0,
+    temporaryRemovals: [],
+    randomSubstitutionTriggerSecond: {
+      home: pickRandomTriggerSecond(temporaryRemovalConfig),
+      away: pickRandomTriggerSecond(temporaryRemovalConfig),
+    },
+    randomSubstitutionTriggered: { home: false, away: false },
   };
 }

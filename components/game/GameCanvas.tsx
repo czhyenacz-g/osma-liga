@@ -15,11 +15,12 @@ interface Props {
   onMatchEnd?: (score: { home: number; away: number }) => void;
   onRestart?: () => void;
   onFirstGoal?: () => void;
+  onSubstitution?: () => void;
   touchInputRef?: MutableRefObject<TouchInput>;
   homeTeamName?: string;
 }
 
-export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, touchInputRef, homeTeamName }: Props) {
+export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, onSubstitution, touchInputRef, homeTeamName }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, touchIn
     let lastTime = performance.now();
     let prevPhase = gameState.phase;
     let firstGoalFired = false;
+    let prevRemovalIds = new Set(gameState.temporaryRemovals.map((r) => r.playerId));
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -96,6 +98,18 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, touchIn
         onRestart?.();
       }
 
+      // Notify parent when a new temporary removal (e.g. random substitution) starts
+      const removalIds = new Set(gameState.temporaryRemovals.map((r) => r.playerId));
+      if (!wasRestart) {
+        for (const id of removalIds) {
+          if (!prevRemovalIds.has(id)) {
+            onSubstitution?.();
+            break;
+          }
+        }
+      }
+      prevRemovalIds = removalIds;
+
       prevPhase = gameState.phase;
 
       renderGame(ctx, gameState, homeTeamName);
@@ -111,7 +125,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, touchIn
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
     };
-  }, [onMatchEnd, onRestart, onFirstGoal, touchInputRef, homeTeamName]);
+  }, [onMatchEnd, onRestart, onFirstGoal, onSubstitution, touchInputRef, homeTeamName]);
 
   return (
     <canvas

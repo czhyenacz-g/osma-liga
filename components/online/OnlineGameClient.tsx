@@ -8,7 +8,7 @@ import MobileOrientationOverlay from '@/components/game/MobileOrientationOverlay
 import MatchCommentaryToast from '@/components/game/MatchCommentaryToast';
 import { playGoalSound } from '@/lib/audio/whistleEngine';
 import type { TouchInput } from '@/game/types';
-import { firstGoalMessages, fullTimeMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
+import { firstGoalMessages, fullTimeMessages, substitutionMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 
 interface KeyState {
   up: boolean;
@@ -32,6 +32,7 @@ export default function OnlineGameClient({
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [firstGoalMessage, setFirstGoalMessage] = useState<string | null>(null);
+  const [substitutionMessage, setSubstitutionMessage] = useState<string | null>(null);
   const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
 
   // Play goal-restart whistle when goalMessage appears (tracks previous to fire only once per goal)
@@ -48,13 +49,35 @@ export default function OnlineGameClient({
   const firstGoalShownRef = useRef(false);
   const fullTimeShownRef = useRef(false);
   const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const substitutionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevRemovedIdsRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     firstGoalShownRef.current = false;
     fullTimeShownRef.current = false;
     if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);
     setFirstGoalMessage(null);
+    if (substitutionTimeoutRef.current) clearTimeout(substitutionTimeoutRef.current);
+    setSubstitutionMessage(null);
+    prevRemovedIdsRef.current = new Set();
     setFullTimeMessage(null);
   }, [gameCode]);
+
+  // Substitution detection — fires a short toast whenever a player newly
+  // enters a temporary removal (random substitution, server-authoritative).
+  useEffect(() => {
+    if (!snapshot) return;
+    const removedIds = new Set(snapshot.players.filter((p) => p.removed).map((p) => p.id));
+    let hasNew = false;
+    for (const id of removedIds) {
+      if (!prevRemovedIdsRef.current.has(id)) { hasNew = true; break; }
+    }
+    prevRemovedIdsRef.current = removedIds;
+    if (hasNew) {
+      if (substitutionTimeoutRef.current) clearTimeout(substitutionTimeoutRef.current);
+      setSubstitutionMessage(pickRandomMessage(substitutionMessages));
+      substitutionTimeoutRef.current = setTimeout(() => setSubstitutionMessage(null), 2500);
+    }
+  }, [snapshot]);
 
   // First goal detection — fires once per match, on the first goal scored by either side
   useEffect(() => {
@@ -288,7 +311,7 @@ export default function OnlineGameClient({
           </div>
         )}
 
-        <MatchCommentaryToast message={firstGoalMessage} />
+        <MatchCommentaryToast message={firstGoalMessage ?? substitutionMessage} />
       </div>
       {!isMobile && (
         <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
