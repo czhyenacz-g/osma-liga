@@ -65,6 +65,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, touchIn
             right: input.right || touch.right,
             kick: input.kick || touch.kick,
             restart: input.restart,
+            switchPlayer: input.switchPlayer || touch.switchPlayer,
           }
         : input;
 

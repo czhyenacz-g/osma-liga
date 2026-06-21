@@ -66,7 +66,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
   const [fsStatus, setFsStatus] = useState<'idle' | 'unavailable'>('idle');
   const [firstGoalMessage, setFirstGoalMessage] = useState<string | null>(null);
   const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
-  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false });
+  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
   const gameWrapperRef = useRef<HTMLDivElement>(null);
   const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -91,7 +91,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
   useEffect(() => {
     const reset = () => {
       const t = touchRef.current;
-      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false;
+      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false;
     };
     window.addEventListener('blur', reset);
     document.addEventListener('visibilitychange', reset);
@@ -133,7 +133,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
 
   const handleRestart = useCallback(() => {
     const t = touchRef.current;
-    t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false;
+    t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false;
     setMatchScore(null);
     setSaveState('idle');
     setGamePhase('idle');
@@ -203,13 +203,21 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
                 <div className="text-xs leading-relaxed">
                   <p>Pohyb: levý ovladač</p>
                   <p>Kop: tlačítko KOP</p>
+                  <p>Přepnutí hráče: tlačítko PŘEP.</p>
+                  <p className="mt-1.5">
+                    Hra automaticky vybírá hráče nejblíž k míči. Tlačítkem PŘEP. si na chvíli vybereš jiného.
+                  </p>
                   <p className="mt-1.5">Otoč telefon na šířku, okresní fotbal se na výšku nevejde.</p>
                 </div>
               ) : (
                 <div className="text-xs leading-relaxed">
                   <p>Pohyb: WASD / šipky</p>
                   <p>Kop: mezerník</p>
-                  <p>Cíl: dostat míč do brány</p>
+                  <p>Přepnutí hráče: Q</p>
+                  <p className="mt-1.5">
+                    Hra automaticky vybírá hráče nejblíž k míči. Klávesou Q si na chvíli vybereš jiného.
+                  </p>
+                  <p className="mt-1.5">Cíl: dostat míč do brány</p>
                 </div>
               )}
             </div>

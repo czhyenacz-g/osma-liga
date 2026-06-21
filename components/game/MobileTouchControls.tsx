@@ -129,6 +129,47 @@ export default function MobileTouchControls({
         <div />
       </div>
 
+      {/* PŘEP. — malé sekundární tlačítko nad KOP, nepřekáží D-padu ani hřišti */}
+      <button
+        type="button"
+        draggable={false}
+        aria-label="Přepnout hráče"
+        style={{
+          position: 'fixed',
+          bottom: 100,
+          right: 26,
+          zIndex: 40,
+          width: 44,
+          height: 44,
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.13)',
+          border: '1px solid rgba(255,255,255,0.25)',
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          touchAction: 'none',
+          cursor: 'default',
+          ...NO_SELECT,
+        }}
+        onPointerDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          e.currentTarget.setPointerCapture(e.pointerId);
+          t.switchPlayer = true;
+        }}
+        onPointerUp={(e) => { e.preventDefault(); e.stopPropagation(); t.switchPlayer = false; }}
+        onPointerCancel={(e) => { e.stopPropagation(); t.switchPlayer = false; }}
+        onPointerLeave={(e) => { e.stopPropagation(); t.switchPlayer = false; }}
+        onTouchStart={(e) => { e.preventDefault(); }}
+      >
+        <span aria-hidden="true" style={NO_SELECT}>↺</span>
+        <span aria-hidden="true" style={{ fontSize: 7, opacity: 0.75, ...NO_SELECT }}>PŘEP.</span>
+      </button>
+
       {/* KOP — pravý dolní roh */}
       <button
         type="button"

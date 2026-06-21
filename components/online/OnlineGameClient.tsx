@@ -16,6 +16,7 @@ interface KeyState {
   left: boolean;
   right: boolean;
   kick: boolean;
+  switchPlayer: boolean;
 }
 
 export default function OnlineGameClient({
@@ -96,15 +97,16 @@ export default function OnlineGameClient({
     left: false,
     right: false,
     kick: false,
+    switchPlayer: false,
   });
 
-  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false });
+  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
 
   // Reset touch on blur / tab switch / orientation change
   useEffect(() => {
     const reset = () => {
       const t = touchRef.current;
-      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false;
+      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false;
     };
     window.addEventListener('blur', reset);
     document.addEventListener('visibilitychange', reset);
@@ -126,6 +128,9 @@ export default function OnlineGameClient({
         e.preventDefault();
         keysRef.current.kick = true;
       }
+      // Raw "held" state — the server engine does its own edge detection,
+      // so holding Q only triggers a single switch.
+      if (e.code === 'KeyQ') keysRef.current.switchPlayer = true;
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
@@ -134,6 +139,7 @@ export default function OnlineGameClient({
       if (['ArrowLeft', 'a', 'A'].includes(e.key)) keysRef.current.left = false;
       if (['ArrowRight', 'd', 'D'].includes(e.key)) keysRef.current.right = false;
       if (e.code === 'Space') keysRef.current.kick = false;
+      if (e.code === 'KeyQ') keysRef.current.switchPlayer = false;
     };
 
     window.addEventListener('keydown', onKeyDown);
@@ -149,6 +155,7 @@ export default function OnlineGameClient({
         left: k.left || t.left,
         right: k.right || t.right,
         kick: k.kick || t.kick,
+        switchPlayer: k.switchPlayer || t.switchPlayer,
       });
     }, 33);
 
@@ -285,10 +292,17 @@ export default function OnlineGameClient({
       </div>
       {!isMobile && (
         <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
-          WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop
+          WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop &nbsp;·&nbsp; Q = přepnout hráče
         </p>
       )}
-      {isMobile && !isPortrait && <MobileTouchControls touchRef={touchRef} />}
+      {isMobile && !isPortrait && (
+        <>
+          <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
+            D-pad = pohyb &nbsp;·&nbsp; KOP = kop &nbsp;·&nbsp; PŘEP. = přepnout hráče
+          </p>
+          <MobileTouchControls touchRef={touchRef} />
+        </>
+      )}
     </main>
   );
 }

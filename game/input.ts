@@ -1,7 +1,7 @@
 import type { InputState } from './types';
 
 export function createInputState(): InputState {
-  return { up: false, down: false, left: false, right: false, kick: false, restart: false };
+  return { up: false, down: false, left: false, right: false, kick: false, restart: false, switchPlayer: false };
 }
 
 export function attachInputListeners(input: InputState): () => void {
@@ -13,6 +13,9 @@ export function attachInputListeners(input: InputState): () => void {
       case 'ArrowRight': case 'KeyD': input.right = true; break;
       case 'Space': input.kick = true; e.preventDefault(); break;
       case 'KeyR':  input.restart = true; break;
+      // Raw "held" state — updateGame() does its own edge detection
+      // (switchKeyWasDown), so holding Q only triggers a single switch.
+      case 'KeyQ':  input.switchPlayer = true; break;
     }
   };
 
@@ -24,6 +27,7 @@ export function attachInputListeners(input: InputState): () => void {
       case 'ArrowRight': case 'KeyD': input.right = false; break;
       case 'Space': input.kick = false; break;
       case 'KeyR':  input.restart = false; break;
+      case 'KeyQ':  input.switchPlayer = false; break;
     }
   };
 

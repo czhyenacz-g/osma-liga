@@ -30,6 +30,14 @@ export interface GameState {
   goalMessage: string;
   goalTimer: number;
   activePlayerId: string;
+  // Automatic (distance + hysteresis) pick, tracked independently of manual
+  // override so the automatic algorithm keeps running in the background
+  // while a manual lock is active and resumes smoothly once it expires.
+  autoActivePlayerId: string;
+  // Manual active-player override (Q / PŘEP.) — see MANUAL_SWITCH_LOCK_DURATION.
+  manualActivePlayerId: string | null;
+  manualLockRemaining: number;
+  switchKeyWasDown: boolean;
   // Last touch tracking — used for own goal detection
   lastTouchTeam: Team | null;
   lastTouchPlayerId: string | null;
@@ -47,6 +55,7 @@ export interface InputState {
   right: boolean;
   kick: boolean;
   restart: boolean;
+  switchPlayer: boolean;
 }
 
 export interface TouchInput {
@@ -55,4 +64,5 @@ export interface TouchInput {
   left: boolean;
   right: boolean;
   kick: boolean;
+  switchPlayer: boolean;
 }

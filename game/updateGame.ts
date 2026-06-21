@@ -12,7 +12,7 @@ import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, GOAL_PAUSE,
-  ACTIVE_PLAYER_SWITCH_MARGIN, TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
+  ACTIVE_PLAYER_SWITCH_MARGIN, MANUAL_SWITCH_LOCK_DURATION, TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
@@ -105,16 +105,45 @@ export function updateGame(state: GameState, input: InputState, dt: number): Gam
     }
   }
 
-  const currentActive = homePlayers.find(p => p.id === state.activePlayerId);
-  let active: typeof nearest;
-  if (!currentActive) {
-    active = nearest;
+  // Automatic candidate — tracked via its own field (not activePlayerId) so
+  // it keeps running in the background while a manual override is active and
+  // resumes smoothly once the manual lock expires.
+  const autoCurrent = homePlayers.find(p => p.id === state.autoActivePlayerId);
+  let auto: typeof nearest;
+  if (!autoCurrent) {
+    auto = nearest;
   } else {
-    const currentDist = dist(currentActive.pos, state.ball.pos);
-    active = (nearest.id !== currentActive.id && nearestDist + ACTIVE_PLAYER_SWITCH_MARGIN < currentDist)
+    const currentDist = dist(autoCurrent.pos, state.ball.pos);
+    auto = (nearest.id !== autoCurrent.id && nearestDist + ACTIVE_PLAYER_SWITCH_MARGIN < currentDist)
       ? nearest
-      : currentActive;
+      : autoCurrent;
   }
+  state.autoActivePlayerId = auto.id;
+
+  // ── Manual override (Q / PŘEP.) ───────────────────────────────────────────
+  // Edge-detected here so holding the key only switches once. A press while
+  // already locked cycles to the next teammate and renews the 3s lock.
+  const order = homePlayers.map(p => p.id);
+  const switchEdge = input.switchPlayer && !state.switchKeyWasDown;
+  state.switchKeyWasDown = input.switchPlayer;
+
+  if (state.manualLockRemaining > 0) {
+    state.manualLockRemaining = Math.max(0, state.manualLockRemaining - dt);
+    if (switchEdge) {
+      const curId = state.manualActivePlayerId ?? order[0];
+      state.manualActivePlayerId = order[(order.indexOf(curId) + 1) % order.length];
+      state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
+    }
+  } else if (switchEdge) {
+    state.manualActivePlayerId = order[(order.indexOf(auto.id) + 1) % order.length];
+    state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
+  }
+
+  const manualPlayer = state.manualLockRemaining > 0 && state.manualActivePlayerId
+    ? homePlayers.find(p => p.id === state.manualActivePlayerId)
+    : undefined;
+  const active = manualPlayer ?? auto;
+
   state.activePlayerId = active.id;
   const activeDist = dist(active.pos, state.ball.pos);
 
