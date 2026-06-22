@@ -42,7 +42,7 @@ export const ACTIVE_PLAYER_SWITCH_MARGIN = 18;
 
 // Manual active-player switch (Q / PŘEP.) — how long a manual pick overrides
 // automatic ball-distance selection before automatic picking resumes.
-export const MANUAL_SWITCH_LOCK_DURATION = 3;
+export const MANUAL_SWITCH_LOCK_DURATION = 2;
 
 // Teammate separation — soft push to prevent overlapping
 export const TEAMMATE_SEPARATION_RADIUS = 42;
