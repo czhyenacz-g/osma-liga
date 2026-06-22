@@ -22,6 +22,10 @@ import {
   TemporaryRemovalConfig, DEFAULT_TEMPORARY_REMOVAL_CONFIG,
   updateTemporaryRemovals, getRemovedPlayerIds,
 } from './temporaryRemoval';
+import {
+  PassAndSwitchConfig, DEFAULT_PASS_AND_SWITCH_CONFIG,
+  hasBallControl, findBestPassTarget, computePassVelocity,
+} from './passAndSwitch';
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
@@ -76,6 +80,7 @@ export function updateGame(
   input: InputState,
   dt: number,
   temporaryRemovalConfig: TemporaryRemovalConfig = DEFAULT_TEMPORARY_REMOVAL_CONFIG,
+  passAndSwitchConfig: PassAndSwitchConfig = DEFAULT_PASS_AND_SWITCH_CONFIG,
 ): GameState {
   if (input.restart) {
     input.restart = false;
@@ -151,20 +156,43 @@ export function updateGame(
   // ── Manual override (Q / PŘEP.) ───────────────────────────────────────────
   // Edge-detected here so holding the key only switches once. A press while
   // already locked cycles to the next teammate and renews the 3s lock.
+  //
+  // If the player currently holding the role has the ball under control,
+  // Q/PŘEP. instead passes to the best available teammate and switches onto
+  // them (pass-and-switch) — otherwise it's a plain cycle, same as before.
   const order = homePlayers.map(p => p.id);
   const switchEdge = input.switchPlayer && !state.switchKeyWasDown;
   state.switchKeyWasDown = input.switchPlayer;
 
-  if (state.manualLockRemaining > 0) {
-    state.manualLockRemaining = Math.max(0, state.manualLockRemaining - dt);
-    if (switchEdge) {
+  const previousManualPlayer = state.manualLockRemaining > 0 && state.manualActivePlayerId
+    ? homePlayers.find(p => p.id === state.manualActivePlayerId)
+    : undefined;
+  const previousActive = previousManualPlayer ?? auto;
+
+  if (switchEdge) {
+    const opponents = state.players.filter(p => p.team === 'away' && !removedIds.has(p.id));
+    const canPass = passAndSwitchConfig.enabled && hasBallControl(previousActive, state.ball, passAndSwitchConfig);
+    const passTarget = canPass ? findBestPassTarget(previousActive, homePlayers, opponents) : null;
+
+    if (passTarget) {
+      const passVel = computePassVelocity(previousActive, passTarget, passAndSwitchConfig);
+      state.ball.vel.x += passVel.x;
+      state.ball.vel.y += passVel.y;
+      previousActive.kickCooldown = KICK_COOLDOWN;
+      state.lastTouchTeam = 'home';
+      state.lastTouchPlayerId = previousActive.id;
+      state.manualActivePlayerId = passTarget.id;
+      state.manualLockRemaining = passAndSwitchConfig.manualLockSeconds;
+    } else if (state.manualLockRemaining > 0) {
       const curId = state.manualActivePlayerId ?? order[0];
       state.manualActivePlayerId = order[(order.indexOf(curId) + 1) % order.length];
       state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
+    } else {
+      state.manualActivePlayerId = order[(order.indexOf(auto.id) + 1) % order.length];
+      state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
     }
-  } else if (switchEdge) {
-    state.manualActivePlayerId = order[(order.indexOf(auto.id) + 1) % order.length];
-    state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
+  } else if (state.manualLockRemaining > 0) {
+    state.manualLockRemaining = Math.max(0, state.manualLockRemaining - dt);
   }
 
   const manualPlayer = state.manualLockRemaining > 0 && state.manualActivePlayerId

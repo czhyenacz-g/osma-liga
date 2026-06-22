@@ -215,7 +215,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
                   <p>Kop: tlačítko KOP</p>
                   <p>Přepnutí hráče: tlačítko PŘEP.</p>
                   <p className="mt-1.5">
-                    Hra automaticky vybírá hráče nejblíž k míči. Tlačítkem PŘEP. si na chvíli vybereš jiného.
+                    Hra automaticky vybírá hráče nejblíž k míči. Tlačítkem PŘEP. si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.
                   </p>
                   <p className="mt-1.5">Otoč telefon na šířku, okresní fotbal se na výšku nevejde.</p>
                 </div>
@@ -225,7 +225,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
                   <p>Kop: mezerník</p>
                   <p>Přepnutí hráče: Q</p>
                   <p className="mt-1.5">
-                    Hra automaticky vybírá hráče nejblíž k míči. Klávesou Q si na chvíli vybereš jiného.
+                    Hra automaticky vybírá hráče nejblíž k míči. Klávesou Q si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.
                   </p>
                   <p className="mt-1.5">Cíl: dostat míč do brány</p>
                 </div>

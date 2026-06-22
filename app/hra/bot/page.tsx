@@ -41,7 +41,7 @@ export default async function HraBotPage({
         &nbsp;&nbsp;·&nbsp;&nbsp;
         <span style={{ color: '#d6a94a' }}>Space</span> &mdash; kopnout
         &nbsp;&nbsp;·&nbsp;&nbsp;
-        <span style={{ color: '#d6a94a' }}>Q</span> &mdash; přepnout hráče
+        <span style={{ color: '#d6a94a' }}>Q</span> &mdash; přepnout / přihrát
         &nbsp;&nbsp;·&nbsp;&nbsp;
         R &mdash; restart
       </p>
