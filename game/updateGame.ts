@@ -12,7 +12,8 @@ import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, GOAL_PAUSE,
-  ACTIVE_PLAYER_SWITCH_MARGIN, MANUAL_SWITCH_LOCK_DURATION, TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
+  ACTIVE_PLAYER_SWITCH_MARGIN, ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE,
+  MANUAL_SWITCH_LOCK_DURATION, TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
@@ -53,6 +54,15 @@ const AWAY_OWN_GOAL_MESSAGES = [
 
 function pickMessage(pool: string[]): string {
   return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// The current active player normally needs a clear ACTIVE_PLAYER_SWITCH_MARGIN
+// lead before losing the role (prevents flicker near the ball). But once the
+// ball is far from them — e.g. just kicked across the pitch — that bias should
+// fade out so a much-closer teammate takes over almost immediately.
+function computeSwitchMargin(currentDist: number): number {
+  const scale = Math.max(0, 1 - currentDist / ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE);
+  return ACTIVE_PLAYER_SWITCH_MARGIN * scale;
 }
 
 function resetPositions(state: GameState): void {
@@ -139,7 +149,7 @@ export function updateGame(
     auto = nearest;
   } else {
     const currentDist = dist(autoCurrent.pos, state.ball.pos);
-    auto = (nearest.id !== autoCurrent.id && nearestDist + ACTIVE_PLAYER_SWITCH_MARGIN < currentDist)
+    auto = (nearest.id !== autoCurrent.id && nearestDist + computeSwitchMargin(currentDist) < currentDist)
       ? nearest
       : autoCurrent;
   }

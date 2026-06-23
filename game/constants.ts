@@ -37,8 +37,13 @@ export const BOT_KICK_COOLDOWN = 0.85;
 // Inactive teammate support movement speed
 export const SUPPORT_PLAYER_SPEED = 120;
 
-// Active player stability: new candidate must be this many px closer before switching
+// Active player stability: new candidate must be this many px closer before switching.
+// The margin fades out as the current active player gets farther from the
+// ball (see computeSwitchMargin in updateGame.ts) — once the ball is kicked
+// across the pitch, the bias toward the old active player drops away and
+// the nearest player takes over almost immediately.
 export const ACTIVE_PLAYER_SWITCH_MARGIN = 18;
+export const ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE = 300;
 
 // Manual active-player switch (Q / PŘEP.) — how long a manual pick overrides
 // automatic ball-distance selection before automatic picking resumes.
