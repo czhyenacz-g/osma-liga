@@ -44,11 +44,17 @@ function formatTime(s: number): string {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-function drawActiveIndicator(ctx: CanvasRenderingContext2D, rp: RenderPlayer): void {
+// Visual-only kick charge feedback — how much the active player's ring
+// grows while the local player holds the shoot button. Purely client-side
+// (own input, own screen); doesn't touch the server-authoritative kick force.
+const CHARGE_RING_MAX_GROWTH = 14;
+const CHARGE_RING_MAX_MS = 1500; // mirrors KICK_MAX_CHARGE_MS server-side
+
+function drawActiveIndicator(ctx: CanvasRenderingContext2D, rp: RenderPlayer, chargeProgress: number): void {
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 300);
-  // Pulsing outer ring — matches bot game
+  // Pulsing outer ring — matches bot game, grows with chargeProgress (0..1)
   ctx.beginPath();
-  ctx.arc(rp.rx, rp.ry, PLAYER_RADIUS + 5 + pulse * 3, 0, Math.PI * 2);
+  ctx.arc(rp.rx, rp.ry, PLAYER_RADIUS + 5 + pulse * 3 + chargeProgress * CHARGE_RING_MAX_GROWTH, 0, Math.PI * 2);
   ctx.strokeStyle = `rgba(251,191,36,${0.5 + pulse * 0.45})`;
   ctx.lineWidth = 2.5;
   ctx.stroke();
@@ -80,6 +86,7 @@ function drawFrame(
   snap: OnlineSnapshot,
   role: 'home' | 'guest' | null,
   concededMessage: string,
+  kickChargeProgress: number,
 ) {
   // Clear
   ctx.fillStyle = '#030e08';
@@ -133,7 +140,7 @@ function drawFrame(
     const isHome = rp.team === 'home';
     const isMyTeam = (role === 'home' && isHome) || (role === 'guest' && !isHome);
     if (isMyTeam && rp.active) {
-      drawActiveIndicator(ctx, rp);
+      drawActiveIndicator(ctx, rp, kickChargeProgress);
     }
   }
 
@@ -207,9 +214,16 @@ function drawFrame(
 export default function OnlineGameCanvas({
   snapshot,
   role,
+  keysRef,
+  touchRef,
 }: {
   snapshot: OnlineSnapshot;
   role: 'home' | 'guest' | null;
+  // Existing local input refs (see OnlineGameClient.tsx) — reused here only
+  // to drive the charge-ring visual; never sent anywhere new, never used to
+  // decide gameplay (the server remains authoritative for the actual kick).
+  keysRef?: { current: { kick: boolean } };
+  touchRef?: { current: { kick: boolean } };
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const targetRef = useRef<OnlineSnapshot>(snapshot);
@@ -217,6 +231,7 @@ export default function OnlineGameCanvas({
   const rafRef = useRef<number>(0);
   const concededMessageRef = useRef<string>('');
   const prevGoalMessageRef = useRef<string>('');
+  const kickHeldSinceRef = useRef<number | null>(null);
 
   // Update target whenever a new snapshot arrives
   useEffect(() => {
@@ -292,13 +307,26 @@ export default function OnlineGameCanvas({
         rp.removed = tp.removed;
       }
 
-      drawFrame(ctx!, r, target, role, concededMessageRef.current);
+      // Charge-ring progress from the local kick button hold — purely visual,
+      // tracked client-side via the existing input refs (no new input system,
+      // no server round-trip).
+      const kickHeld = !!(keysRef?.current.kick || touchRef?.current.kick);
+      if (kickHeld && kickHeldSinceRef.current === null) {
+        kickHeldSinceRef.current = performance.now();
+      } else if (!kickHeld) {
+        kickHeldSinceRef.current = null;
+      }
+      const kickChargeProgress = kickHeldSinceRef.current === null
+        ? 0
+        : Math.min(1, (performance.now() - kickHeldSinceRef.current) / CHARGE_RING_MAX_MS);
+
+      drawFrame(ctx!, r, target, role, concededMessageRef.current, kickChargeProgress);
       rafRef.current = requestAnimationFrame(frame);
     }
 
     rafRef.current = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [role]); // role is stable after joining; RAF restarts only if role changes
+  }, [role, keysRef, touchRef]); // role is stable after joining; RAF restarts only if role changes
 
   return (
     <canvas

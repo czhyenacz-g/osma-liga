@@ -301,7 +301,7 @@ export default function OnlineGameClient({
         }}
       >
         {snapshot ? (
-          <OnlineGameCanvas snapshot={snapshot} role={role} />
+          <OnlineGameCanvas snapshot={snapshot} role={role} keysRef={keysRef} touchRef={touchRef} />
         ) : (
           <div
             className="flex items-center justify-center"
