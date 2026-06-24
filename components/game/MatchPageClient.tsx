@@ -212,7 +212,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
               {isMobile ? (
                 <div className="text-xs leading-relaxed">
                   <p>Pohyb: levý ovladač</p>
-                  <p>Kop: tlačítko KOP</p>
+                  <p>Kop: tlačítko KOP (krátký ťuk = slabší, podrž = silnější)</p>
                   <p>Přepnutí hráče: tlačítko PŘEP.</p>
                   <p className="mt-1.5">
                     Hra automaticky vybírá hráče nejblíž k míči. Tlačítkem PŘEP. si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.
@@ -222,7 +222,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
               ) : (
                 <div className="text-xs leading-relaxed">
                   <p>Pohyb: WASD / šipky</p>
-                  <p>Kop: mezerník</p>
+                  <p>Kop: mezerník (krátký ťuk = slabší, podrž = silnější)</p>
                   <p>Přepnutí hráče: Q</p>
                   <p className="mt-1.5">
                     Hra automaticky vybírá hráče nejblíž k míči. Klávesou Q si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.

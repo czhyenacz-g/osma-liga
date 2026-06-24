@@ -39,7 +39,7 @@ export default async function HraBotPage({
       <p className="hidden sm:block text-sm text-center font-semibold" style={{ color: 'rgba(209,250,229,0.65)' }}>
         <span style={{ color: '#d6a94a' }}>WASD</span> / šipky &mdash; pohyb
         &nbsp;&nbsp;·&nbsp;&nbsp;
-        <span style={{ color: '#d6a94a' }}>Space</span> &mdash; kopnout
+        <span style={{ color: '#d6a94a' }}>Space</span> &mdash; kopnout (podrž = silnější)
         &nbsp;&nbsp;·&nbsp;&nbsp;
         <span style={{ color: '#d6a94a' }}>Q</span> &mdash; přepnout / přihrát
         &nbsp;&nbsp;·&nbsp;&nbsp;

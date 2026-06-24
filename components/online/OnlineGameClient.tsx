@@ -315,13 +315,13 @@ export default function OnlineGameClient({
       </div>
       {!isMobile && (
         <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
-          WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop &nbsp;·&nbsp; Q = přepnout / přihrát
+          WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop (podrž = silnější) &nbsp;·&nbsp; Q = přepnout / přihrát
         </p>
       )}
       {isMobile && !isPortrait && (
         <>
           <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
-            D-pad = pohyb &nbsp;·&nbsp; KOP = kop &nbsp;·&nbsp; PŘEP. = přepnout / přihrát
+            D-pad = pohyb &nbsp;·&nbsp; KOP = kop (podrž = silnější) &nbsp;·&nbsp; PŘEP. = přepnout / přihrát
           </p>
           <MobileTouchControls touchRef={touchRef} />
         </>
