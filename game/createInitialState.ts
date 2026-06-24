@@ -51,6 +51,8 @@ export function createInitialState(
     manualActivePlayerId: null,
     manualLockRemaining: 0,
     switchKeyWasDown: false,
+    kickWasDown: false,
+    kickHeldSeconds: 0,
     lastTouchTeam: null,
     lastTouchPlayerId: null,
     isOwnGoal: false,

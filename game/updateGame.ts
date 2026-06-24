@@ -10,6 +10,7 @@ import {
 } from './physics';
 import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
+  KICK_TAP_FORCE_MULTIPLIER, KICK_MAX_CHARGE_FORCE_MULTIPLIER, KICK_MAX_CHARGE_MS,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, GOAL_PAUSE,
   ACTIVE_PLAYER_SWITCH_MARGIN, ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE,
@@ -275,23 +276,37 @@ export function updateGame(
     }
   }
 
-  // ── Space kick ────────────────────────────────────────────────────────────
+  // ── Space kick (charged: tap = weaker, hold = stronger) ───────────────────
+  // The shot fires on release, not on press. Holding ramps the force from
+  // KICK_TAP_FORCE_MULTIPLIER up to KICK_MAX_CHARGE_FORCE_MULTIPLIER over
+  // KICK_MAX_CHARGE_MS; a near-instant tap still fires immediately at the
+  // tap multiplier rather than waiting.
 
-  if (input.kick && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
-    let kickDir: Vec2;
-    if (mvLen > 0.1) {
-      kickDir = { x: mvx / PLAYER_SPEED, y: mvy / PLAYER_SPEED };
-    } else {
-      kickDir = normalize({
-        x: FIELD_R - state.ball.pos.x,
-        y: FIELD_CY - state.ball.pos.y,
-      });
+  if (input.kick) {
+    state.kickHeldSeconds = state.kickWasDown ? state.kickHeldSeconds + dt : 0;
+    state.kickWasDown = true;
+  } else {
+    if (state.kickWasDown && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
+      let kickDir: Vec2;
+      if (mvLen > 0.1) {
+        kickDir = { x: mvx / PLAYER_SPEED, y: mvy / PLAYER_SPEED };
+      } else {
+        kickDir = normalize({
+          x: FIELD_R - state.ball.pos.x,
+          y: FIELD_CY - state.ball.pos.y,
+        });
+      }
+      const chargeT = Math.min((state.kickHeldSeconds * 1000) / KICK_MAX_CHARGE_MS, 1);
+      const forceMultiplier = KICK_TAP_FORCE_MULTIPLIER
+        + (KICK_MAX_CHARGE_FORCE_MULTIPLIER - KICK_TAP_FORCE_MULTIPLIER) * chargeT;
+      state.ball.vel.x += kickDir.x * KICK_FORCE * forceMultiplier;
+      state.ball.vel.y += kickDir.y * KICK_FORCE * forceMultiplier;
+      active.kickCooldown = KICK_COOLDOWN;
+      state.lastTouchTeam = 'home';
+      state.lastTouchPlayerId = active.id;
     }
-    state.ball.vel.x += kickDir.x * KICK_FORCE;
-    state.ball.vel.y += kickDir.y * KICK_FORCE;
-    active.kickCooldown = KICK_COOLDOWN;
-    state.lastTouchTeam = 'home';
-    state.lastTouchPlayerId = active.id;
+    state.kickWasDown = false;
+    state.kickHeldSeconds = 0;
   }
 
   // ── Support positioning for inactive home players ─────────────────────────

@@ -21,6 +21,14 @@ export const PLAYER_SPEED = 210;
 export const KICK_RANGE = PLAYER_RADIUS + 22;  // 40
 export const KICK_FORCE = 486; // -10% from 540
 export const KICK_COOLDOWN = 0.25;
+
+// Charged kick — the shot fires on release of the kick button, not on press.
+// A quick tap (near-zero hold) still fires at KICK_TAP_FORCE_MULTIPLIER;
+// holding longer ramps the force up to KICK_MAX_CHARGE_FORCE_MULTIPLIER over
+// KICK_MAX_CHARGE_MS, after which holding longer has no further effect.
+export const KICK_TAP_FORCE_MULTIPLIER = 0.7;
+export const KICK_MAX_CHARGE_FORCE_MULTIPLIER = 1.5;
+export const KICK_MAX_CHARGE_MS = 1500;
 export const BUMP_FORCE = 110;
 export const RETURN_SPEED = 115;
 

@@ -55,6 +55,10 @@ export interface GameState {
   manualActivePlayerId: string | null;
   manualLockRemaining: number;
   switchKeyWasDown: boolean;
+  // Charged kick (tap = weaker, hold = stronger up to KICK_MAX_CHARGE_MS) —
+  // the shot fires on release, scaled by how long it was held.
+  kickWasDown: boolean;
+  kickHeldSeconds: number;
   // Last touch tracking — used for own goal detection
   lastTouchTeam: Team | null;
   lastTouchPlayerId: string | null;
