@@ -63,6 +63,10 @@ export interface GameState {
   lastTouchTeam: Team | null;
   lastTouchPlayerId: string | null;
   isOwnGoal: boolean;
+  // Short extra line shown under the main goal message when the human
+  // (home) team just conceded — empty when home scored.
+  isConceded: boolean;
+  concededMessage: string;
   // Corner zone timer
   cornerTimer: number;
   cornerKickCount: number;

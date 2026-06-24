@@ -56,6 +56,8 @@ export function createInitialState(
     lastTouchTeam: null,
     lastTouchPlayerId: null,
     isOwnGoal: false,
+    isConceded: false,
+    concededMessage: '',
     cornerTimer: 0,
     cornerKickCount: 0,
     cornerClearCooldown: 0,

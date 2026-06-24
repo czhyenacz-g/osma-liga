@@ -358,12 +358,18 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, home
     ctx.fillStyle = 'white';
     ctx.fillText(state.goalMessage, CANVAS_W / 2, CANVAS_H / 2 + 18);
 
+    if (state.concededMessage) {
+      ctx.font = 'italic 14px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.fillText(state.concededMessage, CANVAS_W / 2, CANVAS_H / 2 + 42);
+    }
+
     ctx.font = 'bold 26px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.65)';
     ctx.fillText(
       `${state.score.home}  :  ${state.score.away}`,
       CANVAS_W / 2,
-      CANVAS_H / 2 + 62,
+      CANVAS_H / 2 + (state.concededMessage ? 72 : 62),
     );
   }
 

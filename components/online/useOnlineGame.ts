@@ -24,6 +24,7 @@ export interface OnlineSnapshot {
   players: OnlinePlayer[];
   goalMessage: string;
   isOwnGoal?: boolean;
+  lastScorer?: 'home' | 'away' | null;
   homeClubName?: string | null;
   awayClubName?: string | null;
 }

@@ -53,6 +53,22 @@ const AWAY_OWN_GOAL_MESSAGES = [
   'Brankář čekal střelu. Dostalo se to jinak.',
 ];
 
+// Short extra line shown under the main goal message whenever the human
+// (home) team just conceded — regardless of whether it was a normal goal
+// or a home own goal, the net result for the player is the same.
+const CONCEDED_GOAL_MESSAGES = [
+  'Ale dali gól tobě.',
+  'Hele… gól to byl krásnej. Škoda, že do tvojí brány.',
+  'Tohle nebyla obrana. To byla komentovaná prohlídka trávníku.',
+  'Brankář se tváří, že to bylo mimo jeho pracovní dobu.',
+  'Na lavičce se právě někdo přestal smát.',
+  'Soupeř děkuje za volný průchod.',
+  'Tohle si obrana za rámeček nedá.',
+  'Trenér právě objevil nové vrásky.',
+  'Výčep na tribuně ztichl. Na dvě vteřiny.',
+  'Tady se někdo zapomněl vrátit z klobásy.',
+];
+
 function pickMessage(pool: string[]): string {
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -84,6 +100,8 @@ function resetPositions(state: GameState): void {
   state.lastTouchTeam = null;
   state.lastTouchPlayerId = null;
   state.isOwnGoal = false;
+  state.isConceded = false;
+  state.concededMessage = '';
 }
 
 export function updateGame(
@@ -409,6 +427,11 @@ export function updateGame(
     } else {
       state.goalMessage = pickMessage(GOAL_MESSAGES);
     }
+
+    // Conceded by the human (home) team — true for a normal away goal and
+    // for a home own goal alike, since either way home's net was breached.
+    state.isConceded = scored === 'away';
+    state.concededMessage = state.isConceded ? pickMessage(CONCEDED_GOAL_MESSAGES) : '';
 
     state.goalTimer = GOAL_PAUSE;
   }

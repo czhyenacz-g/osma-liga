@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import type { OnlineSnapshot, OnlinePlayer } from './useOnlineGame';
+import { concededGoalMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 
 // Constants mirroring server
 const CANVAS_W = 960;
@@ -78,6 +79,7 @@ function drawFrame(
   render: RenderState,
   snap: OnlineSnapshot,
   role: 'home' | 'guest' | null,
+  concededMessage: string,
 ) {
   // Clear
   ctx.fillStyle = '#030e08';
@@ -194,6 +196,11 @@ function drawFrame(
     ctx.fillStyle = 'white';
     ctx.font = '22px sans-serif';
     ctx.fillText(snap.goalMessage, CANVAS_W / 2, CANVAS_H / 2 + 20);
+    if (concededMessage) {
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = 'italic 14px sans-serif';
+      ctx.fillText(concededMessage, CANVAS_W / 2, CANVAS_H / 2 + 44);
+    }
   }
 }
 
@@ -208,6 +215,8 @@ export default function OnlineGameCanvas({
   const targetRef = useRef<OnlineSnapshot>(snapshot);
   const renderRef = useRef<RenderState | null>(null);
   const rafRef = useRef<number>(0);
+  const concededMessageRef = useRef<string>('');
+  const prevGoalMessageRef = useRef<string>('');
 
   // Update target whenever a new snapshot arrives
   useEffect(() => {
@@ -219,7 +228,21 @@ export default function OnlineGameCanvas({
         players: snapshot.players.map((p) => ({ ...p, rx: p.x, ry: p.y, pvx: 0, pvy: 0 })),
       };
     }
-  }, [snapshot]);
+
+    // Conceded-goal sub-message is perspective-dependent (same goal is a
+    // "scored" for one player and "conceded" for the other), so it's picked
+    // client-side from the server-authoritative lastScorer, once per goal.
+    const msg = snapshot.goalMessage ?? '';
+    if (msg && msg !== prevGoalMessageRef.current) {
+      const concededByMe =
+        (role === 'home' && snapshot.lastScorer === 'away') ||
+        (role === 'guest' && snapshot.lastScorer === 'home');
+      concededMessageRef.current = concededByMe ? pickRandomMessage(concededGoalMessages) : '';
+    } else if (!msg) {
+      concededMessageRef.current = '';
+    }
+    prevGoalMessageRef.current = msg;
+  }, [snapshot, role]);
 
   // RAF loop — starts once, reads target via ref, no snapshot dependency
   useEffect(() => {
@@ -269,7 +292,7 @@ export default function OnlineGameCanvas({
         rp.removed = tp.removed;
       }
 
-      drawFrame(ctx!, r, target, role);
+      drawFrame(ctx!, r, target, role, concededMessageRef.current);
       rafRef.current = requestAnimationFrame(frame);
     }
 

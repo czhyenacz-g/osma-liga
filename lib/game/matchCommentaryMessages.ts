@@ -41,6 +41,22 @@ export const substitutionMessages = [
   'Střídání! Vrátí se, jen co vychladne.',
 ];
 
+// Shown under the main goal message to whichever connected player just
+// conceded — perspective-dependent, so picked client-side (see
+// OnlineGameCanvas.tsx), not baked into the shared server snapshot.
+export const concededGoalMessages = [
+  'Ale dali gól tobě.',
+  'Hele… gól to byl krásnej. Škoda, že do tvojí brány.',
+  'Tohle nebyla obrana. To byla komentovaná prohlídka trávníku.',
+  'Brankář se tváří, že to bylo mimo jeho pracovní dobu.',
+  'Na lavičce se právě někdo přestal smát.',
+  'Soupeř děkuje za volný průchod.',
+  'Tohle si obrana za rámeček nedá.',
+  'Trenér právě objevil nové vrásky.',
+  'Výčep na tribuně ztichl. Na dvě vteřiny.',
+  'Tady se někdo zapomněl vrátit z klobásy.',
+];
+
 export function pickRandomMessage(messages: string[]): string {
   return messages[Math.floor(Math.random() * messages.length)];
 }
