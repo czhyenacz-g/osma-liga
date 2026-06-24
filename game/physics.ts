@@ -2,7 +2,7 @@ import type { Vec2, GameState } from './types';
 import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B,
   GOAL_T, GOAL_B,
-  BALL_RADIUS, BALL_MAX_SPEED,
+  BALL_RADIUS, BALL_MAX_SPEED, BALL_WALL_RESTITUTION,
   PLAYER_RADIUS, BUMP_FORCE,
 } from './constants';
 
@@ -61,12 +61,12 @@ export function updateBallPhysics(state: GameState, dt: number): void {
   // Bounce top wall
   if (ball.pos.y - BALL_RADIUS < FIELD_T) {
     ball.pos.y = FIELD_T + BALL_RADIUS;
-    ball.vel.y = Math.abs(ball.vel.y) * 0.75;
+    ball.vel.y = Math.abs(ball.vel.y) * BALL_WALL_RESTITUTION;
   }
   // Bounce bottom wall
   if (ball.pos.y + BALL_RADIUS > FIELD_B) {
     ball.pos.y = FIELD_B - BALL_RADIUS;
-    ball.vel.y = -Math.abs(ball.vel.y) * 0.75;
+    ball.vel.y = -Math.abs(ball.vel.y) * BALL_WALL_RESTITUTION;
   }
 
   // Bounce left wall only if ball is outside goal opening
@@ -74,7 +74,7 @@ export function updateBallPhysics(state: GameState, dt: number): void {
     const inGoalY = ball.pos.y >= GOAL_T && ball.pos.y <= GOAL_B;
     if (!inGoalY) {
       ball.pos.x = FIELD_L + BALL_RADIUS;
-      ball.vel.x = Math.abs(ball.vel.x) * 0.75;
+      ball.vel.x = Math.abs(ball.vel.x) * BALL_WALL_RESTITUTION;
     }
   }
   // Bounce right wall only if outside goal opening
@@ -82,7 +82,7 @@ export function updateBallPhysics(state: GameState, dt: number): void {
     const inGoalY = ball.pos.y >= GOAL_T && ball.pos.y <= GOAL_B;
     if (!inGoalY) {
       ball.pos.x = FIELD_R - BALL_RADIUS;
-      ball.vel.x = -Math.abs(ball.vel.x) * 0.75;
+      ball.vel.x = -Math.abs(ball.vel.x) * BALL_WALL_RESTITUTION;
     }
   }
 }

@@ -35,6 +35,10 @@ export const RETURN_SPEED = 115;
 // Ball
 export const BALL_RADIUS = 10;
 export const BALL_MAX_SPEED = 800;
+// Energy retained when the ball bounces off a field wall/edge.
+// Mirrors project-hub-api/src/gameEngine/constants.ts so /hra/bot and the
+// online engine (multiplayer + training challenge) feel the same.
+export const BALL_WALL_RESTITUTION = 0.75;
 
 // Bot
 export const BOT_SPEED = 165;
