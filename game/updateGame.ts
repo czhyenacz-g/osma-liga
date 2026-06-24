@@ -19,6 +19,9 @@ import {
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
   BALL_CONTROL_RADIUS, BALL_CONTROL_DAMPING, BALL_CONTROL_FORCE, BALL_CONTROL_INPUT_FORCE, BALL_CONTROL_OFFSET,
+  BALL_RETENTION_RADIUS, BALL_RETENTION_NO_OPPONENT_RADIUS, BALL_RETENTION_MAX_BALL_SPEED,
+  BALL_RETENTION_STRENGTH, BALL_STOP_DAMPING,
+  KICK_CONTACT_RANGE, KICK_CONTACT_BALL_NUDGE, KICK_CONTACT_FORCE_MULTIPLIER,
 } from './constants';
 import {
   TemporaryRemovalConfig, DEFAULT_TEMPORARY_REMOVAL_CONFIG,
@@ -80,6 +83,18 @@ function pickMessage(pool: string[]): string {
 function computeSwitchMargin(currentDist: number): number {
   const scale = Math.max(0, 1 - currentDist / ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE);
   return ACTIVE_PLAYER_SWITCH_MARGIN * scale;
+}
+
+// Distance from `pos` to the nearest player NOT on `team` — used to keep
+// the retention/contact-clearance tweaks from kicking in during a real duel.
+function nearestOpponentDistance(state: GameState, pos: Vec2, team: 'home' | 'away'): number {
+  let nearest = Infinity;
+  for (const p of state.players) {
+    if (p.team === team) continue;
+    const d = dist(p.pos, pos);
+    if (d < nearest) nearest = d;
+  }
+  return nearest;
 }
 
 function resetPositions(state: GameState): void {
@@ -292,6 +307,24 @@ export function updateGame(
       state.ball.vel.x += (tx / tLen) * force * dt;
       state.ball.vel.y += (ty / tLen) * force * dt;
     }
+
+    // Tighter retention while basically stopped or just cutting sharply —
+    // blends the ball's velocity toward the player's own, so it follows a
+    // stop/turn instead of visibly coasting away on momentum. Skipped near
+    // an opponent (stays contestable in a real duel) and skipped on a fast
+    // ball (never fights a ball that was just struck).
+    const ballSpeed = Math.hypot(state.ball.vel.x, state.ball.vel.y);
+    if (activeDist < BALL_RETENTION_RADIUS && ballSpeed < BALL_RETENTION_MAX_BALL_SPEED) {
+      const oppDist = nearestOpponentDistance(state, state.ball.pos, 'home');
+      if (oppDist > BALL_RETENTION_NO_OPPONENT_RADIUS) {
+        state.ball.vel.x += (active.vel.x - state.ball.vel.x) * BALL_RETENTION_STRENGTH;
+        state.ball.vel.y += (active.vel.y - state.ball.vel.y) * BALL_RETENTION_STRENGTH;
+        if (!hasInput) {
+          state.ball.vel.x *= BALL_STOP_DAMPING;
+          state.ball.vel.y *= BALL_STOP_DAMPING;
+        }
+      }
+    }
   }
 
   // ── Space kick (charged: tap = weaker, hold = stronger) ───────────────────
@@ -315,8 +348,25 @@ export function updateGame(
         });
       }
       const chargeT = Math.min((state.kickHeldSeconds * 1000) / KICK_MAX_CHARGE_MS, 1);
-      const forceMultiplier = KICK_TAP_FORCE_MULTIPLIER
+      let forceMultiplier = KICK_TAP_FORCE_MULTIPLIER
         + (KICK_MAX_CHARGE_FORCE_MULTIPLIER - KICK_TAP_FORCE_MULTIPLIER) * chargeT;
+
+      // Kicking out of contact/a scrum (opponent crowding the ball): nudge
+      // the ball forward along the kick direction first so it clearly pops
+      // out instead of looking swallowed by nearby bodies, and give the
+      // kick a clearance boost. A normal open kick is untouched.
+      const inContact = nearestOpponentDistance(state, state.ball.pos, 'home') < KICK_CONTACT_RANGE;
+      if (inContact) {
+        state.ball.pos.x += kickDir.x * KICK_CONTACT_BALL_NUDGE;
+        state.ball.pos.y += kickDir.y * KICK_CONTACT_BALL_NUDGE;
+        state.ball.pos = clampPos(
+          state.ball.pos,
+          FIELD_L + BALL_RADIUS, FIELD_R - BALL_RADIUS,
+          FIELD_T + BALL_RADIUS, FIELD_B - BALL_RADIUS,
+        );
+        forceMultiplier *= KICK_CONTACT_FORCE_MULTIPLIER;
+      }
+
       state.ball.vel.x += kickDir.x * KICK_FORCE * forceMultiplier;
       state.ball.vel.y += kickDir.y * KICK_FORCE * forceMultiplier;
       active.kickCooldown = KICK_COOLDOWN;
