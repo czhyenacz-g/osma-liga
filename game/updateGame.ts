@@ -7,6 +7,7 @@ import {
   checkGoal,
   resolvePlayerBallCollisions,
   dist, normalize, clampPos,
+  snapBallInFrontOfKicker,
 } from './physics';
 import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
@@ -350,6 +351,11 @@ export function updateGame(
       const chargeT = Math.min((state.kickHeldSeconds * 1000) / KICK_MAX_CHARGE_MS, 1);
       let forceMultiplier = KICK_TAP_FORCE_MULTIPLIER
         + (KICK_MAX_CHARGE_FORCE_MULTIPLIER - KICK_TAP_FORCE_MULTIPLIER) * chargeT;
+
+      // Snap the ball just outside the kicker's own collision radius before
+      // applying velocity, so the shot can't be reversed/dampened by the
+      // kicker's own resolvePlayerBallCollisions() bump later this tick.
+      snapBallInFrontOfKicker(state.ball, active.pos, kickDir);
 
       // Kicking out of contact/a scrum (opponent crowding the ball): nudge
       // the ball forward along the kick direction first so it clearly pops

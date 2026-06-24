@@ -92,6 +92,16 @@ export const KICK_CONTACT_RANGE = 50;
 export const KICK_CONTACT_BALL_NUDGE = 12;
 export const KICK_CONTACT_FORCE_MULTIPLIER = 1.3;
 
+// On every kick, the ball is snapped to sit just outside the kicker's own
+// collision radius (PLAYER_RADIUS + BALL_RADIUS) along the kick direction,
+// before kick velocity is applied. Without this, a kick fired while the
+// ball is still touching the kicker can get partially reversed later in
+// the same tick by resolvePlayerBallCollisions(), which pushes the ball
+// away from the kicker along whatever side it happens to overlap on —
+// not necessarily the kick direction. KICK_SNAP_CLEARANCE is the small
+// extra gap kept beyond that collision radius so the snap reliably clears it.
+export const KICK_SNAP_CLEARANCE = 4;
+
 // Match
 export const MATCH_DURATION = 90;
 export const GOAL_PAUSE = 2.5;

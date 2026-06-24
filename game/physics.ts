@@ -3,7 +3,7 @@ import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B,
   GOAL_T, GOAL_B,
   BALL_RADIUS, BALL_MAX_SPEED, BALL_WALL_RESTITUTION,
-  PLAYER_RADIUS, BUMP_FORCE,
+  PLAYER_RADIUS, BUMP_FORCE, KICK_SNAP_CLEARANCE,
 } from './constants';
 
 // ── Vec2 helpers ──────────────────────────────────────────────────────────────
@@ -85,6 +85,20 @@ export function updateBallPhysics(state: GameState, dt: number): void {
       ball.vel.x = -Math.abs(ball.vel.x) * BALL_WALL_RESTITUTION;
     }
   }
+}
+
+// Repositions the ball just in front of the kicker along the kick direction,
+// before kick velocity is applied. Without this, a kick fired while the ball
+// still overlaps the kicker can be partially reversed later in the same tick
+// by resolvePlayerBallCollisions(), which pushes the ball away from whichever
+// side it overlaps the kicker on — not necessarily the kick direction.
+export function snapBallInFrontOfKicker(ball: GameState['ball'], kickerPos: Vec2, kickDir: Vec2): void {
+  const snapDist = PLAYER_RADIUS + BALL_RADIUS + KICK_SNAP_CLEARANCE;
+  ball.pos = clampPos(
+    { x: kickerPos.x + kickDir.x * snapDist, y: kickerPos.y + kickDir.y * snapDist },
+    FIELD_L + BALL_RADIUS, FIELD_R - BALL_RADIUS,
+    FIELD_T + BALL_RADIUS, FIELD_B - BALL_RADIUS,
+  );
 }
 
 // Returns which team scored, or null
