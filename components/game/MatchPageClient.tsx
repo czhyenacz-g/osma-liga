@@ -55,7 +55,14 @@ async function requestGameFullscreen(element: HTMLElement | null): Promise<boole
   }
 }
 
-export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: string }) {
+interface Props {
+  homeClubSlug?: string;
+  // bot-dis training variant: away team AI disabled, longer match duration.
+  disableOpponentAI?: boolean;
+  matchDurationSeconds?: number;
+}
+
+export default function MatchPageClient({ homeClubSlug, disableOpponentAI, matchDurationSeconds }: Props) {
   const homeTeamName = (homeClubSlug && CLUBS.find((c) => c.slug === homeClubSlug)?.name) || 'Náhoda FC';
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
   const [saveState, setSaveState] = useState<SaveState>('idle');
@@ -173,7 +180,7 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
         body: JSON.stringify({
           homeScore: matchScore.home,
           awayScore: matchScore.away,
-          durationSeconds: MATCH_DURATION,
+          durationSeconds: matchDurationSeconds ?? MATCH_DURATION,
           ...(homeClubSlug ? { homeClubSlug } : {}),
         }),
       });
@@ -283,6 +290,8 @@ export default function MatchPageClient({ homeClubSlug }: { homeClubSlug?: strin
               onSubstitution={handleSubstitution}
               touchInputRef={touchRef}
               homeTeamName={homeTeamName}
+              disableOpponentAI={disableOpponentAI}
+              matchDurationSeconds={matchDurationSeconds}
             />
 
             <MatchCommentaryToast message={matchScore === null ? (firstGoalMessage ?? substitutionMessage) : null} />

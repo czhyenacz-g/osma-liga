@@ -121,16 +121,28 @@ function resetPositions(state: GameState): void {
   state.concededMessage = '';
 }
 
+export interface GameModeConfig {
+  // Disables the away-team bot AI entirely (no chase, no movement, no kicks).
+  // Used by the bot-dis ("disabled opponent") training variant.
+  disableOpponentAI?: boolean;
+  // Overrides MATCH_DURATION for this match — e.g. a longer free-practice
+  // session against a disabled opponent.
+  matchDurationSeconds?: number;
+}
+
+export const DEFAULT_GAME_MODE_CONFIG: GameModeConfig = {};
+
 export function updateGame(
   state: GameState,
   input: InputState,
   dt: number,
   temporaryRemovalConfig: TemporaryRemovalConfig = DEFAULT_TEMPORARY_REMOVAL_CONFIG,
   passAndSwitchConfig: PassAndSwitchConfig = DEFAULT_PASS_AND_SWITCH_CONFIG,
+  gameModeConfig: GameModeConfig = DEFAULT_GAME_MODE_CONFIG,
 ): GameState {
   if (input.restart) {
     input.restart = false;
-    return createInitialState();
+    return createInitialState(temporaryRemovalConfig, gameModeConfig.matchDurationSeconds);
   }
 
   if (state.phase === 'ended') return state;
@@ -429,8 +441,12 @@ export function updateGame(
   }
 
   // ── Bot AI ────────────────────────────────────────────────────────────────
+  // Skipped entirely for the bot-dis training variant — the away team stays
+  // put, no chase/kick — everything else (physics, kick, retention) unchanged.
 
-  updateAI(state, dt);
+  if (!gameModeConfig.disableOpponentAI) {
+    updateAI(state, dt);
+  }
 
   // ── Physics ───────────────────────────────────────────────────────────────
 

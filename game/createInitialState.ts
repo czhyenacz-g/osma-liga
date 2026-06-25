@@ -22,6 +22,7 @@ function makePlayer(
 
 export function createInitialState(
   temporaryRemovalConfig: TemporaryRemovalConfig = DEFAULT_TEMPORARY_REMOVAL_CONFIG,
+  matchDurationSeconds: number = MATCH_DURATION,
 ): GameState {
   const cx = FIELD_CX;
   const cy = FIELD_CY;
@@ -42,7 +43,7 @@ export function createInitialState(
       vel: { x: 0, y: 0 },
     },
     score: { home: 0, away: 0 },
-    timeLeft: MATCH_DURATION,
+    timeLeft: matchDurationSeconds,
     phase: 'playing',
     goalMessage: '',
     goalTimer: 0,

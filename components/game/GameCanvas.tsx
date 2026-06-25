@@ -18,9 +18,15 @@ interface Props {
   onSubstitution?: () => void;
   touchInputRef?: MutableRefObject<TouchInput>;
   homeTeamName?: string;
+  // bot-dis training variant: away team AI disabled, longer match duration.
+  disableOpponentAI?: boolean;
+  matchDurationSeconds?: number;
 }
 
-export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, onSubstitution, touchInputRef, homeTeamName }: Props) {
+export default function GameCanvas({
+  onMatchEnd, onRestart, onFirstGoal, onSubstitution, touchInputRef, homeTeamName,
+  disableOpponentAI, matchDurationSeconds,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -29,8 +35,10 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, onSubst
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const gameModeConfig = { disableOpponentAI, matchDurationSeconds };
+
     // Mutable refs — not React state to avoid stale closures in RAF
-    let gameState: GameState = createInitialState();
+    let gameState: GameState = createInitialState(undefined, matchDurationSeconds);
     const input: InputState = createInputState();
 
     const removeInput = attachInputListeners(input);
@@ -72,7 +80,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, onSubst
         : input;
 
       const wasRestart = merged.restart;
-      gameState = updateGame(gameState, merged, dt);
+      gameState = updateGame(gameState, merged, dt, undefined, undefined, gameModeConfig);
 
       // Kickoff on manual restart; goal sound on goal entry; pum on restart
       if (wasRestart) {
@@ -125,7 +133,7 @@ export default function GameCanvas({ onMatchEnd, onRestart, onFirstGoal, onSubst
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
     };
-  }, [onMatchEnd, onRestart, onFirstGoal, onSubstitution, touchInputRef, homeTeamName]);
+  }, [onMatchEnd, onRestart, onFirstGoal, onSubstitution, touchInputRef, homeTeamName, disableOpponentAI, matchDurationSeconds]);
 
   return (
     <canvas
