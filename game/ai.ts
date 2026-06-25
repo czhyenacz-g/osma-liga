@@ -4,7 +4,7 @@ import {
   PLAYER_RADIUS,
   BOT_SPEED, BOT_KICK_FORCE, BOT_KICK_RANGE, BOT_KICK_COOLDOWN,
 } from './constants';
-import { dist, normalize, clampPos } from './physics';
+import { dist, normalize, clampPos, separateSameTeamPlayers } from './physics';
 
 const EDGE_MARGIN = 68;
 
@@ -165,4 +165,8 @@ export function updateAI(state: GameState, dt: number): void {
       FIELD_B - PLAYER_RADIUS,
     );
   }
+
+  // Same-team anti-overlap (mirrors home team in updateGame.ts) — the chaser
+  // is the away team's "active" player and only absorbs 25% of the push.
+  separateSameTeamPlayers(botPlayers, chaser.id);
 }

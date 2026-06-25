@@ -1,9 +1,10 @@
-import type { Vec2, GameState } from './types';
+import type { Vec2, GameState, Player } from './types';
 import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B,
   GOAL_T, GOAL_B,
   BALL_RADIUS, BALL_MAX_SPEED, BALL_WALL_RESTITUTION,
   PLAYER_RADIUS, BUMP_FORCE, KICK_SNAP_CLEARANCE,
+  TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
 } from './constants';
 
 // ── Vec2 helpers ──────────────────────────────────────────────────────────────
@@ -99,6 +100,39 @@ export function snapBallInFrontOfKicker(ball: GameState['ball'], kickerPos: Vec2
     FIELD_L + BALL_RADIUS, FIELD_R - BALL_RADIUS,
     FIELD_T + BALL_RADIUS, FIELD_B - BALL_RADIUS,
   );
+}
+
+// Same-team anti-overlap: soft push apart for any two players of the same
+// team standing closer than TEAMMATE_SEPARATION_RADIUS. The active player
+// (whoever currently holds that role for their own team — the human-controlled
+// player for home, the chasing bot for away) only absorbs 25% of the push so
+// they don't feel shoved around; the other player absorbs 75%. Two non-active
+// players split the push evenly. Cross-team overlap is intentionally not
+// handled here. KISS fix — no formation/support-positioning logic involved.
+export function separateSameTeamPlayers(teamPlayers: Player[], activePlayerId: string): void {
+  for (let i = 0; i < teamPlayers.length - 1; i++) {
+    for (let j = i + 1; j < teamPlayers.length; j++) {
+      const a = teamPlayers[i];
+      const b = teamPlayers[j];
+      const dx = b.pos.x - a.pos.x;
+      const dy = b.pos.y - a.pos.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < TEAMMATE_SEPARATION_RADIUS) {
+        const nx = d > 0.1 ? dx / d : 1;
+        const ny = d > 0.1 ? dy / d : 0;
+        const totalPush = (TEAMMATE_SEPARATION_RADIUS - d) * TEAMMATE_SEPARATION_STRENGTH;
+        const aIsActive = a.id === activePlayerId;
+        const aFrac = aIsActive ? 0.25 : (b.id === activePlayerId ? 0.75 : 0.5);
+        const bFrac = 1.0 - aFrac;
+        a.pos.x -= nx * totalPush * aFrac;
+        a.pos.y -= ny * totalPush * aFrac;
+        b.pos.x += nx * totalPush * bFrac;
+        b.pos.y += ny * totalPush * bFrac;
+        a.pos = clampPos(a.pos, FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS, FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS);
+        b.pos = clampPos(b.pos, FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS, FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS);
+      }
+    }
+  }
 }
 
 // Returns which team scored, or null

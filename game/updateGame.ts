@@ -7,7 +7,7 @@ import {
   checkGoal,
   resolvePlayerBallCollisions,
   dist, normalize, clampPos,
-  snapBallInFrontOfKicker,
+  snapBallInFrontOfKicker, separateSameTeamPlayers,
 } from './physics';
 import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
@@ -16,7 +16,7 @@ import {
   PLAYER_RADIUS, GOAL_PAUSE,
   ACTIVE_PLAYER_SWITCH_MARGIN, ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE,
   AUTO_PLAYER_SWITCH_COOLDOWN_MS,
-  MANUAL_SWITCH_LOCK_DURATION, TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
+  MANUAL_SWITCH_LOCK_DURATION,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
   BALL_RADIUS,
@@ -417,29 +417,7 @@ export function updateGame(
   // Soft push to prevent home players from fully overlapping. Active player
   // receives only 25 % of the push so player control feels stable.
 
-  for (let i = 0; i < homePlayers.length - 1; i++) {
-    for (let j = i + 1; j < homePlayers.length; j++) {
-      const a = homePlayers[i];
-      const b = homePlayers[j];
-      const dx = b.pos.x - a.pos.x;
-      const dy = b.pos.y - a.pos.y;
-      const d  = Math.sqrt(dx * dx + dy * dy);
-      if (d < TEAMMATE_SEPARATION_RADIUS) {
-        const nx = d > 0.1 ? dx / d : 1;
-        const ny = d > 0.1 ? dy / d : 0;
-        const totalPush = (TEAMMATE_SEPARATION_RADIUS - d) * TEAMMATE_SEPARATION_STRENGTH;
-        const aIsActive = a.id === active.id;
-        const aFrac = aIsActive ? 0.25 : (b.id === active.id ? 0.75 : 0.5);
-        const bFrac = 1.0 - aFrac;
-        a.pos.x -= nx * totalPush * aFrac;
-        a.pos.y -= ny * totalPush * aFrac;
-        b.pos.x += nx * totalPush * bFrac;
-        b.pos.y += ny * totalPush * bFrac;
-        a.pos = clampPos(a.pos, FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS, FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS);
-        b.pos = clampPos(b.pos, FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS, FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS);
-      }
-    }
-  }
+  separateSameTeamPlayers(homePlayers, active.id);
 
   // ── Bot AI ────────────────────────────────────────────────────────────────
   // Skipped entirely for the bot-dis training variant — the away team stays
