@@ -146,6 +146,31 @@ export default async function SatnaPage({
       >
         &#8592; Zpět na web Osmé ligy
       </Link>
+
+      {/* Tichý trénink bez soupeře — skrytý mód, jen odkaz odsud */}
+      <div
+        className="w-full max-w-md p-4 flex flex-col gap-1.5 text-center"
+        style={{
+          background: 'rgba(255,255,255,0.02)',
+          border: '1px dashed rgba(209,250,229,0.15)',
+          borderRadius: 12,
+        }}
+      >
+        <p className="text-xs font-bold" style={{ color: 'rgba(209,250,229,0.5)' }}>
+          Trénink proti strašákům v zelí
+        </p>
+        <p className="text-xs leading-relaxed" style={{ color: 'rgba(209,250,229,0.4)' }}>
+          Soupeř se nehýbe, rozhodčí taky ne. Tady si můžeš v klidu ošahat pohyb, střelu,
+          přihrávku i mantinely, než vlezeš do opravdového okresního chaosu.
+        </p>
+        <Link
+          href={clubSlug ? `/hra/bot-dis?club=${clubSlug}` : '/hra/bot-dis'}
+          className="text-xs font-semibold transition hover:opacity-80"
+          style={{ color: '#d6a94a' }}
+        >
+          Jít si zakopat &#8594;
+        </Link>
+      </div>
     </main>
   );
 }
