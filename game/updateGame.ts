@@ -7,7 +7,7 @@ import {
   checkGoal,
   resolvePlayerBallCollisions,
   dist, normalize, clampPos,
-  snapBallInFrontOfKicker, separateSameTeamPlayers,
+  snapBallInFrontOfKicker, separateSameTeamPlayers, findTeammateBallReceive,
 } from './physics';
 import {
   PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
@@ -24,6 +24,7 @@ import {
   BALL_RETENTION_RADIUS, BALL_RETENTION_NO_OPPONENT_RADIUS, BALL_RETENTION_MAX_BALL_SPEED,
   BALL_RETENTION_STRENGTH, BALL_STOP_DAMPING,
   KICK_CONTACT_RANGE, KICK_CONTACT_BALL_NUDGE, KICK_CONTACT_FORCE_MULTIPLIER,
+  TEAMMATE_BALL_RECEIVE_LOCK_MS,
 } from './constants';
 import {
   TemporaryRemovalConfig, DEFAULT_TEMPORARY_REMOVAL_CONFIG,
@@ -430,6 +431,16 @@ export function updateGame(
   // ── Physics ───────────────────────────────────────────────────────────────
 
   resolvePlayerBallCollisions(state);
+
+  // Teammate ball receive — a slow/catchable ball contact on a non-active
+  // home teammate makes them the new active player (short lock) instead of
+  // just bumping off them like any other physics obstacle. Own team only.
+  const receiverId = findTeammateBallReceive(homePlayers, active.id, state.ball);
+  if (receiverId) {
+    state.manualActivePlayerId = receiverId;
+    state.manualLockRemaining = TEAMMATE_BALL_RECEIVE_LOCK_MS / 1000;
+  }
+
   updateBallPhysics(state, dt);
 
   // ── Corner zone clearance ─────────────────────────────────────────────────

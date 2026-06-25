@@ -108,6 +108,15 @@ export const KICK_CONTACT_FORCE_MULTIPLIER = 1.3;
 // extra gap kept beyond that collision radius so the snap reliably clears it.
 export const KICK_SNAP_CLEARANCE = 4;
 
+// Lets a non-active, available teammate "receive" a slow/catchable ball
+// contact and become the active player, instead of the ball just bouncing
+// off them as a random physics obstacle. Own team only — opposing players
+// never trigger this (resolvePlayerBallCollisions still bumps the ball off
+// them as before).
+export const TEAMMATE_BALL_RECEIVE_MAX_SPEED = 260;
+export const TEAMMATE_BALL_RECEIVE_EXTRA_RADIUS = 4;
+export const TEAMMATE_BALL_RECEIVE_LOCK_MS = 1200;
+
 // Match
 export const MATCH_DURATION = 90;
 export const GOAL_PAUSE = 2.5;

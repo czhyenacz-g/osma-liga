@@ -1,10 +1,11 @@
-import type { Vec2, GameState, Player } from './types';
+import type { Vec2, GameState, Player, Ball } from './types';
 import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B,
   GOAL_T, GOAL_B,
   BALL_RADIUS, BALL_MAX_SPEED, BALL_WALL_RESTITUTION,
   PLAYER_RADIUS, BUMP_FORCE, KICK_SNAP_CLEARANCE,
   TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
+  TEAMMATE_BALL_RECEIVE_MAX_SPEED, TEAMMATE_BALL_RECEIVE_EXTRA_RADIUS,
 } from './constants';
 
 // ── Vec2 helpers ──────────────────────────────────────────────────────────────
@@ -172,4 +173,26 @@ export function resolvePlayerBallCollisions(state: GameState): void {
       state.lastTouchPlayerId = p.id;
     }
   }
+}
+
+// Lets a non-active, available teammate "receive" a slow/catchable ball
+// contact instead of just bumping it like resolvePlayerBallCollisions()
+// above — returns the receiving teammate's id (caller sets them as the new
+// active player with a short lock), or null if nobody qualifies. Own team
+// only: `teammates` should already exclude the opposing team and temporarily
+// removed players. Checked separately from the generic bump above so the
+// opposing team is never affected by this.
+export function findTeammateBallReceive(
+  teammates: Player[],
+  activePlayerId: string,
+  ball: Ball,
+): string | null {
+  const ballSpeed = Math.hypot(ball.vel.x, ball.vel.y);
+  if (ballSpeed >= TEAMMATE_BALL_RECEIVE_MAX_SPEED) return null;
+  const receiveDist = PLAYER_RADIUS + BALL_RADIUS + TEAMMATE_BALL_RECEIVE_EXTRA_RADIUS;
+  for (const p of teammates) {
+    if (p.id === activePlayerId) continue;
+    if (dist(p.pos, ball.pos) < receiveDist) return p.id;
+  }
+  return null;
 }
