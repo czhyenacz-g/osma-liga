@@ -414,8 +414,8 @@ export function updateGame(
   applySupportPositioning(homePlayers, active, state.ball, dt);
 
   // ── Teammate separation ───────────────────────────────────────────────────
-  // Soft push to prevent home players from fully overlapping. Active player
-  // receives only 25 % of the push so player control feels stable.
+  // Soft push to prevent home players from fully overlapping. The active
+  // player is an anchor and is never pushed — only support players move.
 
   separateSameTeamPlayers(homePlayers, active.id);
 

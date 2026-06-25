@@ -167,6 +167,6 @@ export function updateAI(state: GameState, dt: number): void {
   }
 
   // Same-team anti-overlap (mirrors home team in updateGame.ts) — the chaser
-  // is the away team's "active" player and only absorbs 25% of the push.
+  // is the away team's "active" player and is never pushed.
   separateSameTeamPlayers(botPlayers, chaser.id);
 }

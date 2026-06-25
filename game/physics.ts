@@ -105,10 +105,11 @@ export function snapBallInFrontOfKicker(ball: GameState['ball'], kickerPos: Vec2
 // Same-team anti-overlap: soft push apart for any two players of the same
 // team standing closer than TEAMMATE_SEPARATION_RADIUS. The active player
 // (whoever currently holds that role for their own team — the human-controlled
-// player for home, the chasing bot for away) only absorbs 25% of the push so
-// they don't feel shoved around; the other player absorbs 75%. Two non-active
-// players split the push evenly. Cross-team overlap is intentionally not
-// handled here. KISS fix — no formation/support-positioning logic involved.
+// player for home, the chasing bot for away) is an anchor and never gets
+// pushed — only the support/non-active player on the other side of the
+// overlap moves. Two non-active players split the push evenly. Cross-team
+// overlap is intentionally not handled here. KISS fix — no
+// formation/support-positioning logic involved.
 export function separateSameTeamPlayers(teamPlayers: Player[], activePlayerId: string): void {
   for (let i = 0; i < teamPlayers.length - 1; i++) {
     for (let j = i + 1; j < teamPlayers.length; j++) {
@@ -122,8 +123,9 @@ export function separateSameTeamPlayers(teamPlayers: Player[], activePlayerId: s
         const ny = d > 0.1 ? dy / d : 0;
         const totalPush = (TEAMMATE_SEPARATION_RADIUS - d) * TEAMMATE_SEPARATION_STRENGTH;
         const aIsActive = a.id === activePlayerId;
-        const aFrac = aIsActive ? 0.25 : (b.id === activePlayerId ? 0.75 : 0.5);
-        const bFrac = 1.0 - aFrac;
+        const bIsActive = b.id === activePlayerId;
+        const aFrac = aIsActive ? 0 : (bIsActive ? 1 : 0.5);
+        const bFrac = bIsActive ? 0 : (aIsActive ? 1 : 0.5);
         a.pos.x -= nx * totalPush * aFrac;
         a.pos.y -= ny * totalPush * aFrac;
         b.pos.x += nx * totalPush * bFrac;
