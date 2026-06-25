@@ -31,7 +31,7 @@ import {
 } from './temporaryRemoval';
 import {
   PassAndSwitchConfig, DEFAULT_PASS_AND_SWITCH_CONFIG,
-  hasBallControl, findBestPassTarget, computePassVelocity,
+  hasBallControl, findBestPassTarget, computePassVelocity, findNearestTeammateToBall,
 } from './passAndSwitch';
 
 const GOAL_MESSAGES = [
@@ -224,13 +224,13 @@ export function updateGame(
   }
 
   // ── Manual override (Q / PŘEP.) ───────────────────────────────────────────
-  // Edge-detected here so holding the key only switches once. A press while
-  // already locked cycles to the next teammate and renews the 3s lock.
+  // Edge-detected here so holding the key only switches once.
   //
   // If the player currently holding the role has the ball under control,
-  // Q/PŘEP. instead passes to the best available teammate and switches onto
-  // them (pass-and-switch) — otherwise it's a plain cycle, same as before.
-  const order = homePlayers.map(p => p.id);
+  // Q/PŘEP. passes to the best available teammate and switches onto them
+  // (pass-and-switch). Without the ball, it switches to whichever available
+  // teammate is closest to the ball — never a blind "next in order" cycle.
+  // Temporarily removed players are already excluded from homePlayers.
   const switchEdge = input.switchPlayer && !state.switchKeyWasDown;
   state.switchKeyWasDown = input.switchPlayer;
 
@@ -253,13 +253,14 @@ export function updateGame(
       state.lastTouchPlayerId = previousActive.id;
       state.manualActivePlayerId = passTarget.id;
       state.manualLockRemaining = passAndSwitchConfig.manualLockSeconds;
-    } else if (state.manualLockRemaining > 0) {
-      const curId = state.manualActivePlayerId ?? order[0];
-      state.manualActivePlayerId = order[(order.indexOf(curId) + 1) % order.length];
-      state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
     } else {
-      state.manualActivePlayerId = order[(order.indexOf(auto.id) + 1) % order.length];
-      state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
+      const nextActive = findNearestTeammateToBall(homePlayers, state.ball, previousActive.id);
+      if (nextActive) {
+        state.manualActivePlayerId = nextActive.id;
+        state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
+      }
+      // No other teammate available (e.g. everyone else temporarily removed)
+      // — keep the current active player, don't touch the manual lock.
     }
   } else if (state.manualLockRemaining > 0) {
     state.manualLockRemaining = Math.max(0, state.manualLockRemaining - dt);

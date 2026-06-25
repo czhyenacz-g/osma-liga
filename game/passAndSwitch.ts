@@ -135,6 +135,30 @@ export function computePassVelocity(passer: Player, target: Player, config: Pass
   return { x: dir.x * force, y: dir.y * force };
 }
 
+// Q / PŘEP. without ball control = switch to whichever available teammate is
+// closest to the ball, not a blind "next in order" cycle. Always excludes
+// whoever currently holds the role, so a press changes someone even if that
+// player happens to already be the closest. Returns null if no other
+// teammate is available (caller should fall back to keeping the current
+// active player). Mirrors project-hub-api/src/gameEngine/passAndSwitch.ts.
+export function findNearestTeammateToBall(
+  teammates: Player[],
+  ball: Ball,
+  excludePlayerId: string,
+): Player | null {
+  let best: Player | null = null;
+  let bestDist = Infinity;
+  for (const p of teammates) {
+    if (p.id === excludePlayerId) continue;
+    const d = dist(p.pos, ball.pos);
+    if (d < bestDist) {
+      bestDist = d;
+      best = p;
+    }
+  }
+  return best;
+}
+
 export function getTeammatesAndOpponents(players: Player[], team: Team): { teammates: Player[]; opponents: Player[] } {
   return {
     teammates: players.filter((p) => p.team === team),
