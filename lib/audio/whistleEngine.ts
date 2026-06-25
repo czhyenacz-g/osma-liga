@@ -1,6 +1,43 @@
 import type { WhistleNote } from './types';
 import { getSound } from './soundBank';
 
+// ── Mute toggle ────────────────────────────────────────────────────────────────
+// Game-wide on/off switch for whistle/goal/restart sounds, persisted across
+// visits. Read at module load (client-only) so the very first sound after
+// page load already respects a previously saved preference.
+
+const MUTE_STORAGE_KEY = 'osma-liga:sound-muted';
+
+let muted = (() => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(MUTE_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+})();
+
+const muteListeners = new Set<(muted: boolean) => void>();
+
+export function isSoundMuted(): boolean {
+  return muted;
+}
+
+export function setSoundMuted(value: boolean): void {
+  muted = value;
+  try {
+    window.localStorage.setItem(MUTE_STORAGE_KEY, value ? '1' : '0');
+  } catch {
+    // ignore (e.g. private mode / storage disabled)
+  }
+  muteListeners.forEach((listener) => listener(muted));
+}
+
+export function onSoundMutedChange(listener: (muted: boolean) => void): () => void {
+  muteListeners.add(listener);
+  return () => muteListeners.delete(listener);
+}
+
 // ── WebAudio engine (legacy / comparison) ────────────────────────────────────
 
 function playWebAudioPattern(notes: WhistleNote[]) {
@@ -122,6 +159,7 @@ export async function unlockAudio(): Promise<void> {
 }
 
 export async function playSound(key: string): Promise<void> {
+  if (muted) return;
   const def = getSound(key);
   if (!def) {
     console.warn(`[sound] unknown key: "${key}"`);
