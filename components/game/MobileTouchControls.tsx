@@ -1,9 +1,21 @@
 'use client';
+import { useRef } from 'react';
 import type { MutableRefObject } from 'react';
 import type { TouchInput } from '@/game/types';
 
-const BTN = 48;
-const GAP = 4;
+const BTN = 60;
+const GAP = 6;
+// Velikost vizuálního kříže (3 tlačítka + 2 mezery).
+const PAD_VISUAL = BTN * 3 + GAP * 2;
+// Reálná dotyková plocha je větší než vizuál a nemá mrtvé zóny.
+const PAD_HIT = PAD_VISUAL + 40;
+const PAD_OFFSET = (PAD_HIT - PAD_VISUAL) / 2;
+
+type Dir = 'up' | 'down' | 'left' | 'right';
+
+function sectorFromOffset(dx: number, dy: number): Dir {
+  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
+}
 
 const NO_SELECT: React.CSSProperties = {
   userSelect: 'none',
@@ -19,46 +31,20 @@ const BASE_BTN: React.CSSProperties = {
   justifyContent: 'center',
   background: 'rgba(255,255,255,0.13)',
   border: '1px solid rgba(255,255,255,0.22)',
-  borderRadius: 8,
+  borderRadius: 10,
   color: 'white',
-  fontSize: 18,
+  fontSize: 22,
   touchAction: 'none',
   cursor: 'default',
   ...NO_SELECT,
 };
 
-function Btn({
-  label,
-  ariaLabel,
-  onStart,
-  onEnd,
-  style,
-}: {
-  label: string;
-  ariaLabel: string;
-  onStart: () => void;
-  onEnd: () => void;
-  style?: React.CSSProperties;
-}) {
+// Čistě vizuální šipka kříže — vstup zajišťuje hitbox vrstva nad ní.
+function Btn({ label, ariaLabel, style }: { label: string; ariaLabel: string; style?: React.CSSProperties }) {
   return (
-    <button
-      type="button"
-      draggable={false}
-      aria-label={ariaLabel}
-      style={{ ...BASE_BTN, ...style }}
-      onPointerDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.currentTarget.setPointerCapture(e.pointerId);
-        onStart();
-      }}
-      onPointerUp={(e) => { e.preventDefault(); e.stopPropagation(); onEnd(); }}
-      onPointerCancel={(e) => { e.stopPropagation(); onEnd(); }}
-      onPointerLeave={(e) => { e.stopPropagation(); onEnd(); }}
-      onTouchStart={(e) => { e.preventDefault(); }}
-    >
-      <span aria-hidden="true" style={NO_SELECT}>{label}</span>
-    </button>
+    <div aria-hidden="true" title={ariaLabel} style={{ ...BASE_BTN, ...style }}>
+      <span style={NO_SELECT}>{label}</span>
+    </div>
   );
 }
 
@@ -68,6 +54,29 @@ export default function MobileTouchControls({
   touchRef: MutableRefObject<TouchInput>;
 }) {
   const t = touchRef.current;
+  const activePointers = useRef<Map<number, Dir>>(new Map());
+
+  const recompute = () => {
+    const dirs = activePointers.current;
+    let up = false, down = false, left = false, right = false;
+    dirs.forEach((d) => {
+      if (d === 'up') up = true;
+      else if (d === 'down') down = true;
+      else if (d === 'left') left = true;
+      else right = true;
+    });
+    t.up = up;
+    t.down = down;
+    t.left = left;
+    t.right = right;
+  };
+
+  const dirFromEvent = (e: React.PointerEvent<HTMLDivElement>): Dir => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const dx = e.clientX - rect.left - rect.width / 2;
+    const dy = e.clientY - rect.top - rect.height / 2;
+    return sectorFromOffset(dx, dy);
+  };
 
   return (
     <>
@@ -78,55 +87,87 @@ export default function MobileTouchControls({
           bottom: 12,
           left: 12,
           zIndex: 40,
-          display: 'grid',
-          gridTemplateColumns: `${BTN}px ${BTN}px ${BTN}px`,
-          gridTemplateRows: `${BTN}px ${BTN}px ${BTN}px`,
-          gap: GAP,
-          touchAction: 'none',
-          ...NO_SELECT,
+          width: PAD_HIT,
+          height: PAD_HIT,
         }}
-        onTouchStart={(e) => e.preventDefault()}
-        onTouchMove={(e) => e.preventDefault()}
       >
-        {/* Řádek 1 */}
-        <div />
-        <Btn
-          label="▲"
-          ariaLabel="Nahoru"
-          onStart={() => { t.up = true; }}
-          onEnd={() => { t.up = false; }}
-        />
-        <div />
-        {/* Řádek 2 */}
-        <Btn
-          label="◀"
-          ariaLabel="Vlevo"
-          onStart={() => { t.left = true; }}
-          onEnd={() => { t.left = false; }}
-        />
+        {/* Vizuální kříž — čistě dekorativní, neovládá vstup */}
         <div
           style={{
-            width: BTN,
-            height: BTN,
-            background: 'rgba(255,255,255,0.04)',
-            borderRadius: 8,
+            position: 'absolute',
+            top: PAD_OFFSET,
+            left: PAD_OFFSET,
+            display: 'grid',
+            gridTemplateColumns: `${BTN}px ${BTN}px ${BTN}px`,
+            gridTemplateRows: `${BTN}px ${BTN}px ${BTN}px`,
+            gap: GAP,
+            pointerEvents: 'none',
+            ...NO_SELECT,
           }}
+        >
+          {/* Řádek 1 */}
+          <div />
+          <Btn label="▲" ariaLabel="Nahoru" />
+          <div />
+          {/* Řádek 2 */}
+          <Btn label="◀" ariaLabel="Vlevo" />
+          <div
+            style={{
+              width: BTN,
+              height: BTN,
+              background: 'rgba(255,255,255,0.04)',
+              borderRadius: 8,
+            }}
+          />
+          <Btn label="▶" ariaLabel="Vpravo" />
+          {/* Řádek 3 */}
+          <div />
+          <Btn label="▼" ariaLabel="Dolů" />
+          <div />
+        </div>
+
+        {/* Reálná dotyková plocha — velký čtverec bez mrtvých zón, rozdělený na 4 sektory */}
+        <div
+          role="group"
+          aria-label="Směrové ovládání"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            touchAction: 'none',
+            ...NO_SELECT,
+          }}
+          onPointerDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.setPointerCapture(e.pointerId);
+            activePointers.current.set(e.pointerId, dirFromEvent(e));
+            recompute();
+          }}
+          onPointerMove={(e) => {
+            if (!activePointers.current.has(e.pointerId)) return;
+            e.preventDefault();
+            activePointers.current.set(e.pointerId, dirFromEvent(e));
+            recompute();
+          }}
+          onPointerUp={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            activePointers.current.delete(e.pointerId);
+            recompute();
+          }}
+          onPointerCancel={(e) => {
+            e.stopPropagation();
+            activePointers.current.delete(e.pointerId);
+            recompute();
+          }}
+          onPointerLeave={(e) => {
+            e.stopPropagation();
+            activePointers.current.delete(e.pointerId);
+            recompute();
+          }}
+          onTouchStart={(e) => e.preventDefault()}
+          onTouchMove={(e) => e.preventDefault()}
         />
-        <Btn
-          label="▶"
-          ariaLabel="Vpravo"
-          onStart={() => { t.right = true; }}
-          onEnd={() => { t.right = false; }}
-        />
-        {/* Řádek 3 */}
-        <div />
-        <Btn
-          label="▼"
-          ariaLabel="Dolů"
-          onStart={() => { t.down = true; }}
-          onEnd={() => { t.down = false; }}
-        />
-        <div />
       </div>
 
       {/* PŘEP. — malé sekundární tlačítko nad KOP, nepřekáží D-padu ani hřišti */}
