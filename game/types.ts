@@ -51,6 +51,9 @@ export interface GameState {
   // override so the automatic algorithm keeps running in the background
   // while a manual lock is active and resumes smoothly once it expires.
   autoActivePlayerId: string;
+  // Cooldown (seconds) before the automatic pick is allowed to switch again —
+  // see AUTO_PLAYER_SWITCH_COOLDOWN_MS.
+  autoSwitchCooldownRemaining: number;
   // Manual active-player override (Q / PŘEP.) — see MANUAL_SWITCH_LOCK_DURATION.
   manualActivePlayerId: string | null;
   manualLockRemaining: number;

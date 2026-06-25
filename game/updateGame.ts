@@ -15,6 +15,7 @@ import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, GOAL_PAUSE,
   ACTIVE_PLAYER_SWITCH_MARGIN, ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE,
+  AUTO_PLAYER_SWITCH_COOLDOWN_MS,
   MANUAL_SWITCH_LOCK_DURATION, TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
@@ -178,15 +179,27 @@ export function updateGame(
   // Automatic candidate — tracked via its own field (not activePlayerId) so
   // it keeps running in the background while a manual override is active and
   // resumes smoothly once the manual lock expires.
+  //
+  // KISS guard against flicker: on top of the margin/fade hysteresis above,
+  // the automatic pick may switch at most once per AUTO_PLAYER_SWITCH_COOLDOWN_MS.
+  if (state.autoSwitchCooldownRemaining > 0) {
+    state.autoSwitchCooldownRemaining = Math.max(0, state.autoSwitchCooldownRemaining - dt);
+  }
+
   const autoCurrent = homePlayers.find(p => p.id === state.autoActivePlayerId);
   let auto: typeof nearest;
   if (!autoCurrent) {
     auto = nearest;
+  } else if (state.autoSwitchCooldownRemaining > 0) {
+    auto = autoCurrent;
   } else {
     const currentDist = dist(autoCurrent.pos, state.ball.pos);
     auto = (nearest.id !== autoCurrent.id && nearestDist + computeSwitchMargin(currentDist) < currentDist)
       ? nearest
       : autoCurrent;
+  }
+  if (auto.id !== state.autoActivePlayerId) {
+    state.autoSwitchCooldownRemaining = AUTO_PLAYER_SWITCH_COOLDOWN_MS / 1000;
   }
   state.autoActivePlayerId = auto.id;
 

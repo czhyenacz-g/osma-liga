@@ -57,6 +57,12 @@ export const SUPPORT_PLAYER_SPEED = 120;
 export const ACTIVE_PLAYER_SWITCH_MARGIN = 18;
 export const ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE = 300;
 
+// KISS guard against active-player flicker: the automatic (distance-based)
+// pick may switch to a new player at most once per this many ms, regardless
+// of how the margin/fade above evaluate. Manual switching (Q / PŘEP.) is
+// unaffected — this only throttles the automatic algorithm.
+export const AUTO_PLAYER_SWITCH_COOLDOWN_MS = 2000;
+
 // Manual active-player switch (Q / PŘEP.) — how long a manual pick overrides
 // automatic ball-distance selection before automatic picking resumes.
 export const MANUAL_SWITCH_LOCK_DURATION = 2;
