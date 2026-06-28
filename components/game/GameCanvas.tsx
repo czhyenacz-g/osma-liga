@@ -38,16 +38,25 @@ export default function GameCanvas({
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // These refs allow the RAF loop to read the latest prop values each tick
+  // without the effect restarting (and resetting the match) on every change.
+  const gameModeConfigRef = useRef({ disableOpponentAI, matchDurationSeconds, gameplayProfile });
+  gameModeConfigRef.current = { disableOpponentAI, matchDurationSeconds, gameplayProfile };
+  const enableBounceTimeDebugRef = useRef(enableBounceTimeDebug);
+  enableBounceTimeDebugRef.current = enableBounceTimeDebug;
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const gameModeConfig = { disableOpponentAI, matchDurationSeconds, gameplayProfile };
-
     // Mutable refs — not React state to avoid stale closures in RAF
-    let gameState: GameState = createInitialState(undefined, matchDurationSeconds, gameplayProfile);
+    let gameState: GameState = createInitialState(
+      undefined,
+      gameModeConfigRef.current.matchDurationSeconds,
+      gameModeConfigRef.current.gameplayProfile,
+    );
     const input: InputState = createInputState();
 
     const removeInput = attachInputListeners(input);
@@ -64,18 +73,15 @@ export default function GameCanvas({
     };
     window.addEventListener('keydown', onEsc);
 
-    // Debug: 'B' starts "Bounce Time!" — only wired up by /hra/bot-dis.
-    // Mutates the running gameState directly (same object the RAF loop
-    // already reads/writes each tick) rather than routing through input.ts,
-    // since this is a debug trigger, not a real gameplay input.
+    // Debug: 'B' starts "Bounce Time!" — guard via ref so this works even
+    // when enableBounceTimeDebug changes at runtime (e.g. mode switch).
     const onBounceTimeKey = (e: KeyboardEvent) => {
+      if (!enableBounceTimeDebugRef.current) return;
       if (e.key.toLowerCase() !== 'b') return;
       gameState.activeGameplayModifier = 'bounceTime';
       gameState.gameplayModifierRemainingSeconds = BOUNCE_TIME_DURATION_SECONDS;
     };
-    if (enableBounceTimeDebug) {
-      window.addEventListener('keydown', onBounceTimeKey);
-    }
+    window.addEventListener('keydown', onBounceTimeKey);
 
     let rafId: number;
     let lastTime = performance.now();
@@ -103,7 +109,7 @@ export default function GameCanvas({
         : input;
 
       const wasRestart = merged.restart;
-      gameState = updateGame(gameState, merged, dt, undefined, undefined, gameModeConfig);
+      gameState = updateGame(gameState, merged, dt, undefined, undefined, gameModeConfigRef.current);
 
       // Kickoff on manual restart; goal sound on goal entry; pum on restart
       if (wasRestart) {
@@ -164,14 +170,12 @@ export default function GameCanvas({
       removeInput();
       window.removeEventListener('keydown', onFirstKey);
       window.removeEventListener('keydown', onEsc);
-      if (enableBounceTimeDebug) {
-        window.removeEventListener('keydown', onBounceTimeKey);
-      }
+      window.removeEventListener('keydown', onBounceTimeKey);
     };
-  }, [
-    onMatchEnd, onRestart, onFirstGoal, onSubstitution, onBounceTimeChange, touchInputRef, homeTeamName,
-    disableOpponentAI, matchDurationSeconds, gameplayProfile, enableBounceTimeDebug,
-  ]);
+  // gameModeConfigRef and enableBounceTimeDebugRef are intentionally excluded —
+  // they update synchronously each render via ref assignment above, so the
+  // RAF loop always reads the latest values without triggering a game restart.
+  }, [onMatchEnd, onRestart, onFirstGoal, onSubstitution, onBounceTimeChange, touchInputRef, homeTeamName]);
 
   return (
     <canvas

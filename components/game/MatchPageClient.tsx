@@ -69,10 +69,14 @@ interface Props {
   // Debug-only: lets the 'B' key trigger "Bounce Time!" — only set by
   // /hra/bot-dis, never by the regular /hra/bot page.
   enableBounceTimeDebug?: boolean;
+  // Optional callback so a parent (e.g. BotTestClient) can react to
+  // Bounce Time start/end without reaching into internal state.
+  onBounceTimeChange?: (active: boolean) => void;
 }
 
 export default function MatchPageClient({
   homeClubSlug, disableOpponentAI, matchDurationSeconds, gameplayProfile, enableBounceTimeDebug,
+  onBounceTimeChange,
 }: Props) {
   const homeTeamName = (homeClubSlug && CLUBS.find((c) => c.slug === homeClubSlug)?.name) || 'Náhoda FC';
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
@@ -177,6 +181,11 @@ export default function MatchPageClient({
     setSubstitutionMessage(pickRandomMessage(substitutionMessages));
     substitutionTimeoutRef.current = setTimeout(() => setSubstitutionMessage(null), 2500);
   }, []);
+
+  const handleBounceTimeChange = useCallback((active: boolean) => {
+    setBounceTimeActive(active);
+    onBounceTimeChange?.(active);
+  }, [onBounceTimeChange]);
 
   const handleFullscreen = async () => {
     const ok = await requestGameFullscreen(gameWrapperRef.current);
@@ -302,7 +311,7 @@ export default function MatchPageClient({
               onRestart={handleRestart}
               onFirstGoal={handleFirstGoal}
               onSubstitution={handleSubstitution}
-              onBounceTimeChange={setBounceTimeActive}
+              onBounceTimeChange={handleBounceTimeChange}
               touchInputRef={touchRef}
               homeTeamName={homeTeamName}
               disableOpponentAI={disableOpponentAI}
