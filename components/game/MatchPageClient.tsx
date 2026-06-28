@@ -8,8 +8,10 @@ import MatchCommentaryToast from './MatchCommentaryToast';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
 import SoundToggleButton from './SoundToggleButton';
+import BounceTimeOverlay from './BounceTimeOverlay';
 import { MATCH_DURATION } from '@/game/constants';
 import type { TouchInput } from '@/game/types';
+import type { GameplayProfile } from '@/game/gameplayProfiles';
 import { CLUBS } from '@/data/clubs';
 import { firstGoalMessages, fullTimeMessages, substitutionMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 
@@ -61,9 +63,17 @@ interface Props {
   // bot-dis training variant: away team AI disabled, longer match duration.
   disableOpponentAI?: boolean;
   matchDurationSeconds?: number;
+  // Gameplay profile for this match (see game/gameplayProfiles.ts) — only
+  // ever set by /hra/bot-dis today.
+  gameplayProfile?: GameplayProfile;
+  // Debug-only: lets the 'B' key trigger "Bounce Time!" — only set by
+  // /hra/bot-dis, never by the regular /hra/bot page.
+  enableBounceTimeDebug?: boolean;
 }
 
-export default function MatchPageClient({ homeClubSlug, disableOpponentAI, matchDurationSeconds }: Props) {
+export default function MatchPageClient({
+  homeClubSlug, disableOpponentAI, matchDurationSeconds, gameplayProfile, enableBounceTimeDebug,
+}: Props) {
   const homeTeamName = (homeClubSlug && CLUBS.find((c) => c.slug === homeClubSlug)?.name) || 'Náhoda FC';
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
   const [saveState, setSaveState] = useState<SaveState>('idle');
@@ -75,6 +85,7 @@ export default function MatchPageClient({ homeClubSlug, disableOpponentAI, match
   const [firstGoalMessage, setFirstGoalMessage] = useState<string | null>(null);
   const [substitutionMessage, setSubstitutionMessage] = useState<string | null>(null);
   const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
+  const [bounceTimeActive, setBounceTimeActive] = useState(false);
   const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
   const gameWrapperRef = useRef<HTMLDivElement>(null);
   const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -152,6 +163,7 @@ export default function MatchPageClient({ homeClubSlug, disableOpponentAI, match
     if (substitutionTimeoutRef.current) clearTimeout(substitutionTimeoutRef.current);
     setSubstitutionMessage(null);
     setFullTimeMessage(null);
+    setBounceTimeActive(false);
   }, []);
 
   const handleFirstGoal = useCallback(() => {
@@ -290,13 +302,17 @@ export default function MatchPageClient({ homeClubSlug, disableOpponentAI, match
               onRestart={handleRestart}
               onFirstGoal={handleFirstGoal}
               onSubstitution={handleSubstitution}
+              onBounceTimeChange={setBounceTimeActive}
               touchInputRef={touchRef}
               homeTeamName={homeTeamName}
               disableOpponentAI={disableOpponentAI}
               matchDurationSeconds={matchDurationSeconds}
+              gameplayProfile={gameplayProfile}
+              enableBounceTimeDebug={enableBounceTimeDebug}
             />
 
             <MatchCommentaryToast message={matchScore === null ? (firstGoalMessage ?? substitutionMessage) : null} />
+            <BounceTimeOverlay active={matchScore === null && bounceTimeActive} />
 
             {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
             {matchScore !== null && (

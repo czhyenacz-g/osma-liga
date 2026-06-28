@@ -1,3 +1,5 @@
+import type { GameplayProfile, GameplayModifier } from './gameplayProfiles';
+
 export type Team = 'home' | 'away';
 export type GamePhase = 'playing' | 'goal' | 'ended';
 
@@ -78,6 +80,12 @@ export interface GameState {
   temporaryRemovals: TemporaryPlayerRemoval[];
   randomSubstitutionTriggerSecond: { home: number; away: number };
   randomSubstitutionTriggered: { home: boolean; away: boolean };
+  // Gameplay profile selected at match start (see gameplayProfiles.ts) — only
+  // ever non-'classic' in /hra/bot-dis today. A temporary modifier (e.g.
+  // "Bounce Time!") can override the profile's ball knobs for a short window.
+  gameplayProfile: GameplayProfile;
+  activeGameplayModifier: GameplayModifier;
+  gameplayModifierRemainingSeconds: number;
 }
 
 export interface InputState {

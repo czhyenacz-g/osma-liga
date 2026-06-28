@@ -42,7 +42,11 @@ export function clampPos(
 // Framerate-independent friction: retains ~35% speed per second
 const FRICTION_PER_SECOND = 0.35;
 
-export function updateBallPhysics(state: GameState, dt: number): void {
+// `wallRestitution` defaults to BALL_WALL_RESTITUTION (classic profile) but
+// callers can override it per gameplay profile/modifier — see
+// gameplayProfiles.ts and updateGame.ts. /hra/bot, multiplayer and training
+// challenge never pass an override, so they're unaffected.
+export function updateBallPhysics(state: GameState, dt: number, wallRestitution: number = BALL_WALL_RESTITUTION): void {
   const { ball } = state;
 
   ball.pos.x += ball.vel.x * dt;
@@ -63,12 +67,12 @@ export function updateBallPhysics(state: GameState, dt: number): void {
   // Bounce top wall
   if (ball.pos.y - BALL_RADIUS < FIELD_T) {
     ball.pos.y = FIELD_T + BALL_RADIUS;
-    ball.vel.y = Math.abs(ball.vel.y) * BALL_WALL_RESTITUTION;
+    ball.vel.y = Math.abs(ball.vel.y) * wallRestitution;
   }
   // Bounce bottom wall
   if (ball.pos.y + BALL_RADIUS > FIELD_B) {
     ball.pos.y = FIELD_B - BALL_RADIUS;
-    ball.vel.y = -Math.abs(ball.vel.y) * BALL_WALL_RESTITUTION;
+    ball.vel.y = -Math.abs(ball.vel.y) * wallRestitution;
   }
 
   // Bounce left wall only if ball is outside goal opening
@@ -76,7 +80,7 @@ export function updateBallPhysics(state: GameState, dt: number): void {
     const inGoalY = ball.pos.y >= GOAL_T && ball.pos.y <= GOAL_B;
     if (!inGoalY) {
       ball.pos.x = FIELD_L + BALL_RADIUS;
-      ball.vel.x = Math.abs(ball.vel.x) * BALL_WALL_RESTITUTION;
+      ball.vel.x = Math.abs(ball.vel.x) * wallRestitution;
     }
   }
   // Bounce right wall only if outside goal opening
@@ -84,7 +88,7 @@ export function updateBallPhysics(state: GameState, dt: number): void {
     const inGoalY = ball.pos.y >= GOAL_T && ball.pos.y <= GOAL_B;
     if (!inGoalY) {
       ball.pos.x = FIELD_R - BALL_RADIUS;
-      ball.vel.x = -Math.abs(ball.vel.x) * BALL_WALL_RESTITUTION;
+      ball.vel.x = -Math.abs(ball.vel.x) * wallRestitution;
     }
   }
 }

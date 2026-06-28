@@ -34,6 +34,9 @@ import {
   PassAndSwitchConfig, DEFAULT_PASS_AND_SWITCH_CONFIG,
   hasBallControl, findBestPassTarget, computePassVelocity, findNearestTeammateToBall,
 } from './passAndSwitch';
+import {
+  GameplayProfile, resolveEffectiveGameplayConfig,
+} from './gameplayProfiles';
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
@@ -129,6 +132,10 @@ export interface GameModeConfig {
   // Overrides MATCH_DURATION for this match — e.g. a longer free-practice
   // session against a disabled opponent.
   matchDurationSeconds?: number;
+  // Gameplay profile for this match (see gameplayProfiles.ts) — only ever
+  // set by /hra/bot-dis today; /hra/bot, multiplayer and training challenge
+  // never pass this, so they stay on the 'classic' default.
+  gameplayProfile?: GameplayProfile;
 }
 
 export const DEFAULT_GAME_MODE_CONFIG: GameModeConfig = {};
@@ -143,7 +150,7 @@ export function updateGame(
 ): GameState {
   if (input.restart) {
     input.restart = false;
-    return createInitialState(temporaryRemovalConfig, gameModeConfig.matchDurationSeconds);
+    return createInitialState(temporaryRemovalConfig, gameModeConfig.matchDurationSeconds, gameModeConfig.gameplayProfile);
   }
 
   if (state.phase === 'ended') return state;
@@ -164,6 +171,18 @@ export function updateGame(
     state.phase = 'ended';
     return state;
   }
+
+  // ── Gameplay profile / temporary modifier (e.g. "Bounce Time!") ──────────
+  // Ticks down the active modifier and restores the plain profile once it
+  // expires. /hra/bot, multiplayer and training challenge never set a
+  // modifier, so this is a no-op for them.
+  if (state.activeGameplayModifier !== 'none') {
+    state.gameplayModifierRemainingSeconds = Math.max(0, state.gameplayModifierRemainingSeconds - dt);
+    if (state.gameplayModifierRemainingSeconds <= 0) {
+      state.activeGameplayModifier = 'none';
+    }
+  }
+  const gameplayConfig = resolveEffectiveGameplayConfig(state.gameplayProfile, state.activeGameplayModifier);
 
   // ── Temporary removals (MVP: random substitution) ────────────────────────
   // Runs before active-player resolution so a freshly removed player is
@@ -311,9 +330,11 @@ export function updateGame(
   // When the player holds a direction, BALL_CONTROL_INPUT_FORCE is used so
   // the ball swings around to the correct side within ~1 s. Without input the
   // weaker BALL_CONTROL_FORCE is used as a gentle settle toward goal direction.
-  // Deactivated on kick so the control impulse never dampens shots.
+  // Deactivated on kick so the control impulse never dampens shots. Also
+  // deactivated entirely by gameplayConfig.ballControlEnabled (e.g. the
+  // 'bounce' profile / Bounce Time modifier) — classic/v2 keep it on.
 
-  if (!input.kick && activeDist < BALL_CONTROL_RADIUS) {
+  if (gameplayConfig.ballControlEnabled && !input.kick && activeDist < BALL_CONTROL_RADIUS) {
     state.ball.vel.x *= BALL_CONTROL_DAMPING;
     state.ball.vel.y *= BALL_CONTROL_DAMPING;
 
@@ -340,9 +361,10 @@ export function updateGame(
     // blends the ball's velocity toward the player's own, so it follows a
     // stop/turn instead of visibly coasting away on momentum. Skipped near
     // an opponent (stays contestable in a real duel) and skipped on a fast
-    // ball (never fights a ball that was just struck).
+    // ball (never fights a ball that was just struck). Also skipped entirely
+    // when gameplayConfig.ballRetentionEnabled is false.
     const ballSpeed = Math.hypot(state.ball.vel.x, state.ball.vel.y);
-    if (activeDist < BALL_RETENTION_RADIUS && ballSpeed < BALL_RETENTION_MAX_BALL_SPEED) {
+    if (gameplayConfig.ballRetentionEnabled && activeDist < BALL_RETENTION_RADIUS && ballSpeed < BALL_RETENTION_MAX_BALL_SPEED) {
       const oppDist = nearestOpponentDistance(state, state.ball.pos, 'home');
       if (oppDist > BALL_RETENTION_NO_OPPONENT_RADIUS) {
         state.ball.vel.x += (active.vel.x - state.ball.vel.x) * BALL_RETENTION_STRENGTH;
@@ -435,13 +457,16 @@ export function updateGame(
   // Teammate ball receive — a slow/catchable ball contact on a non-active
   // home teammate makes them the new active player (short lock) instead of
   // just bumping off them like any other physics obstacle. Own team only.
-  const receiverId = findTeammateBallReceive(homePlayers, active.id, state.ball);
-  if (receiverId) {
-    state.manualActivePlayerId = receiverId;
-    state.manualLockRemaining = TEAMMATE_BALL_RECEIVE_LOCK_MS / 1000;
+  // Disabled by gameplayConfig.teammateReceiveEnabled (e.g. 'bounce' profile).
+  if (gameplayConfig.teammateReceiveEnabled) {
+    const receiverId = findTeammateBallReceive(homePlayers, active.id, state.ball);
+    if (receiverId) {
+      state.manualActivePlayerId = receiverId;
+      state.manualLockRemaining = TEAMMATE_BALL_RECEIVE_LOCK_MS / 1000;
+    }
   }
 
-  updateBallPhysics(state, dt);
+  updateBallPhysics(state, dt, gameplayConfig.wallRestitution);
 
   // ── Corner zone clearance ─────────────────────────────────────────────────
 
