@@ -382,8 +382,9 @@ export function updateGame(
   // KICK_TAP_FORCE_MULTIPLIER up to KICK_MAX_CHARGE_FORCE_MULTIPLIER over
   // KICK_MAX_CHARGE_MS; a near-instant tap still fires immediately at the
   // tap multiplier rather than waiting.
+  // Disabled by gameplayConfig.kickEnabled (e.g. 'bounce' profile).
 
-  if (input.kick) {
+  if (gameplayConfig.kickEnabled && input.kick) {
     state.kickHeldSeconds = state.kickWasDown ? state.kickHeldSeconds + dt : 0;
     state.kickWasDown = true;
   } else {

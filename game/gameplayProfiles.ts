@@ -10,6 +10,7 @@ export type GameplayProfile = 'classic' | 'v2' | 'bounce';
 export interface GameplayProfileConfig {
   profile: GameplayProfile;
   wallRestitution: number;
+  kickEnabled: boolean;
   ballControlEnabled: boolean;
   ballRetentionEnabled: boolean;
   teammateReceiveEnabled: boolean;
@@ -19,6 +20,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
   classic: {
     profile: 'classic',
     wallRestitution: BALL_WALL_RESTITUTION,
+    kickEnabled: true,
     ballControlEnabled: true,
     ballRetentionEnabled: true,
     teammateReceiveEnabled: true,
@@ -29,15 +31,17 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
   v2: {
     profile: 'v2',
     wallRestitution: BALL_WALL_RESTITUTION,
+    kickEnabled: true,
     ballControlEnabled: true,
     ballRetentionEnabled: true,
     teammateReceiveEnabled: true,
   },
-  // Pongier/pinball-ier: near-elastic wall bounces, no soft ball-control trap,
-  // no stop/turn retention, no teammate ball-receive — the ball just bounces.
+  // Pongier/pinball-ier: near-elastic wall bounces, no kick, no soft
+  // ball-control trap, no retention, no teammate receive — ball just bounces.
   bounce: {
     profile: 'bounce',
     wallRestitution: 1.05,
+    kickEnabled: false,
     ballControlEnabled: false,
     ballRetentionEnabled: false,
     teammateReceiveEnabled: false,
