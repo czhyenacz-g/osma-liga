@@ -40,7 +40,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
   // ball-control trap, no retention, no teammate receive — ball just bounces.
   bounce: {
     profile: 'bounce',
-    wallRestitution: 1.05,
+    wallRestitution: 1.15,
     kickEnabled: false,
     ballControlEnabled: false,
     ballRetentionEnabled: false,
