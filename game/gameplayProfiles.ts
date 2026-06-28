@@ -10,6 +10,10 @@ export type GameplayProfile = 'classic' | 'v2' | 'bounce';
 export interface GameplayProfileConfig {
   profile: GameplayProfile;
   wallRestitution: number;
+  // Elastic restitution for player-ball collisions. 0 = current behaviour
+  // (fixed BUMP_FORCE impulse only). >0 also reflects the ball's incoming
+  // velocity component along the collision normal, scaled by this factor.
+  playerBallRestitution: number;
   kickEnabled: boolean;
   ballControlEnabled: boolean;
   ballRetentionEnabled: boolean;
@@ -20,6 +24,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
   classic: {
     profile: 'classic',
     wallRestitution: BALL_WALL_RESTITUTION,
+    playerBallRestitution: 0,
     kickEnabled: true,
     ballControlEnabled: true,
     ballRetentionEnabled: true,
@@ -31,6 +36,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
   v2: {
     profile: 'v2',
     wallRestitution: BALL_WALL_RESTITUTION,
+    playerBallRestitution: 0,
     kickEnabled: true,
     ballControlEnabled: true,
     ballRetentionEnabled: true,
@@ -41,6 +47,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
   bounce: {
     profile: 'bounce',
     wallRestitution: 1.60,
+    playerBallRestitution: 1.60,
     kickEnabled: false,
     ballControlEnabled: false,
     ballRetentionEnabled: false,

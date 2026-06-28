@@ -453,7 +453,7 @@ export function updateGame(
 
   // ── Physics ───────────────────────────────────────────────────────────────
 
-  resolvePlayerBallCollisions(state);
+  resolvePlayerBallCollisions(state, gameplayConfig.playerBallRestitution);
 
   // Teammate ball receive — a slow/catchable ball contact on a non-active
   // home teammate makes them the new active player (short lock) instead of

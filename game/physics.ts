@@ -155,7 +155,9 @@ export function checkGoal(state: GameState): 'home' | 'away' | null {
 // Gentle push: separate overlapping players from ball and add small impulse.
 // Players currently leaving/on the bench/returning (temporaryRemoval.ts)
 // don't physically interact with the ball.
-export function resolvePlayerBallCollisions(state: GameState): void {
+// playerRestitution > 0: also elastically reflects the ball's incoming
+// velocity component along the collision normal (bounce profile).
+export function resolvePlayerBallCollisions(state: GameState, playerRestitution = 0): void {
   const { ball, players } = state;
   const minDist = PLAYER_RADIUS + BALL_RADIUS;
   const removedIds = new Set(state.temporaryRemovals.map((r) => r.playerId));
@@ -169,6 +171,14 @@ export function resolvePlayerBallCollisions(state: GameState): void {
       const overlap = minDist - d;
       ball.pos.x += dir.x * (overlap + 1);
       ball.pos.y += dir.y * (overlap + 1);
+      // Elastic reflection: flip and scale the incoming normal component
+      if (playerRestitution > 0) {
+        const vNormal = ball.vel.x * dir.x + ball.vel.y * dir.y;
+        if (vNormal < 0) {
+          ball.vel.x -= (1 + playerRestitution) * vNormal * dir.x;
+          ball.vel.y -= (1 + playerRestitution) * vNormal * dir.y;
+        }
+      }
       // Gentle impulse in push direction
       ball.vel.x += dir.x * BUMP_FORCE;
       ball.vel.y += dir.y * BUMP_FORCE;
