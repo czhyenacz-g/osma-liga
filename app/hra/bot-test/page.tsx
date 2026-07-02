@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import GameNavLink from '@/components/ui/GameNavLink';
 import { CLUBS } from '@/data/clubs';
-import BotTestClient, { resolveMode } from './BotTestClient';
+import BotTestClient from './BotTestClient';
+import { resolveMode } from './botTestModes';
 
 export const metadata: Metadata = {
   title: 'Bot test',
