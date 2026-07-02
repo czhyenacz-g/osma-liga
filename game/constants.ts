@@ -28,7 +28,7 @@ export const KICK_COOLDOWN = 0.25;
 // KICK_MAX_CHARGE_MS, after which holding longer has no further effect.
 export const KICK_TAP_FORCE_MULTIPLIER = 0.9;
 export const KICK_MAX_CHARGE_FORCE_MULTIPLIER = 1.5;
-export const KICK_MAX_CHARGE_MS = 1500;
+export const KICK_MAX_CHARGE_MS = 500;
 export const BUMP_FORCE = 110;
 export const RETURN_SPEED = 115;
 
