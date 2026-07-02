@@ -45,8 +45,8 @@ const BANK: Record<string, SoundDefinition> = {
   'goal-tone': {
     key: 'goal-tone', number: 2, baseId: 'restart', engine: 'tone',
     name: 'Gólové písknutí',
-    notes: [{ freq: TJ_H + 300, dur: 1.05 }],
-    volDb: -3,
+    notes: [{ freq: 3690, dur: 1.21 }],
+    volDb: -3.5,
   },
 
   // ── #03 Běžný faul ────────────────────────────────────────────────────────
