@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { playFullTimeWhistle, playKickoffWhistle, unlockAudio } from '@/lib/audio/whistleEngine';
+import { inMatchAudio } from '@/game/audio/inMatchAudio';
 import GameCanvas from './GameCanvas';
 import MatchCommentaryToast from './MatchCommentaryToast';
 import MobileTouchControls from './MobileTouchControls';
@@ -143,6 +144,9 @@ export default function MatchPageClient({
 
   const startCountdown = () => {
     void unlockAudio(); // pre-warm Tone.js AudioContext in user gesture handler
+    inMatchAudio.unlock(); // same user gesture also unlocks the in-match SFX/ambient layer
+    inMatchAudio.startLoop('ambientBase', 0.14);
+    inMatchAudio.startLoop('crowdPressure', 0); // volume ramps up per-tick in GameCanvas as the ball nears a goal
     setCountdownNum(3);
     setGamePhase('countdown');
     setMatchScore(null);
@@ -154,6 +158,8 @@ export default function MatchPageClient({
     setSaveState('idle');
     setFullTimeMessage(pickRandomMessage(fullTimeMessages));
     playFullTimeWhistle();
+    inMatchAudio.stopLoop('ambientBase', 800);
+    inMatchAudio.stopLoop('crowdPressure', 500);
   }, []);
 
   const handleRestart = useCallback(() => {
@@ -168,6 +174,15 @@ export default function MatchPageClient({
     setSubstitutionMessage(null);
     setFullTimeMessage(null);
     setBounceTimeActive(false);
+    inMatchAudio.stopAll();
+  }, []);
+
+  // Safety net: stop all in-match audio if this component unmounts mid-match
+  // (e.g. navigating away) so a loop never keeps playing in the background.
+  useEffect(() => {
+    return () => {
+      inMatchAudio.stopAll();
+    };
   }, []);
 
   const handleFirstGoal = useCallback(() => {
