@@ -13,9 +13,9 @@ import { inMatchAudio } from '@/game/audio/inMatchAudio';
 import {
   PRESSURE_DISTANCE, CROWD_PRESSURE_MAX_VOLUME,
   NEAR_GOAL_OOH_PRESSURE_THRESHOLD, NEAR_GOAL_OOH_MIN_BALL_SPEED,
-  NEAR_GOAL_PRESSURE_THRESHOLD, NEAR_GOAL_PRESSURE_FADE_IN_MS, NEAR_GOAL_PRESSURE_FADE_OUT_MS,
-  NEAR_GOAL_PRESSURE_MIN_VOLUME, NEAR_GOAL_PRESSURE_MAX_VOLUME, NEAR_GOAL_PRESSURE_VOLUME_RANGE,
-  NEAR_GOAL_PRESSURE_COOLDOWN_MIN_MS, NEAR_GOAL_PRESSURE_COOLDOWN_MAX_MS,
+  NEAR_GOAL_PRESSURE_THRESHOLD, NEAR_GOAL_PRESSURE_BED_STOP_THRESHOLD,
+  NEAR_GOAL_PRESSURE_FADE_IN_MS, NEAR_GOAL_PRESSURE_FADE_OUT_MS,
+  NEAR_GOAL_PRESSURE_BED_VOLUME_BASE, NEAR_GOAL_PRESSURE_BED_VOLUME_MAX, NEAR_GOAL_PRESSURE_BED_VOLUME_RANGE,
 } from '@/game/audio/inMatchSoundConfig';
 import type { GameState, InputState, TouchInput } from '@/game/types';
 import type { GameplayProfile } from '@/game/gameplayProfiles';
@@ -104,10 +104,14 @@ export default function GameCanvas({
     let prevSwitchKeyDown = false;
     let prevKickWasDown = gameState.kickWasDown;
     let prevKickHeldSeconds = gameState.kickHeldSeconds;
-    // Near-goal crowd pressure sting — smoothed 0..1, fades in/out over ~2s
+    // Near-goal crowd pressure bed — smoothed 0..1, fades in/out over ~2s
     // (see NEAR_GOAL_PRESSURE_FADE_IN_MS/OUT_MS) so it never snaps abruptly.
     // Symmetric: fires near either goal, regardless of which team is attacking.
     let smoothedNearGoalPressure = 0;
+    // Tracks whether the long pressure-bed audio is currently started, so we
+    // only call startRandomBedFromPool/stopBed once per transition instead of
+    // every frame (stopBed restarts its own fade-out animation on each call).
+    let nearGoalBedActive = false;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -141,6 +145,8 @@ export default function GameCanvas({
       if (wasRestart) {
         playKickoffWhistle();
         smoothedNearGoalPressure = 0;
+        inMatchAudio.stopBed('nearGoalPressureBed');
+        nearGoalBedActive = false;
       } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
         playGoalSound();
         // Crowd reaction after any goal (either team) — doesn't overpower the
@@ -201,11 +207,14 @@ export default function GameCanvas({
           inMatchAudio.play('nearGoalOoh'); // internally cooldown-gated (NEAR_GOAL_OOH_COOLDOWN_MS)
         }
 
-        // ── Near-goal crowd pressure sting (symmetric) ───────────────────────
+        // ── Near-goal crowd pressure bed (symmetric, long dynamic bed) ───────
         // Reuses the same "pressure" as the ambient crowdPressure loop above
         // (closeness to whichever goal the ball is nearest) — fires for
         // pressure near EITHER goal, whether the human or the bot is
-        // attacking/defending.
+        // attacking/defending. Instead of repeated long one-shots, a single
+        // long file plays continuously while pressure is elevated, with its
+        // volume tracking smoothedNearGoalPressure (which already ramps over
+        // ~2s), so it fades in/out smoothly instead of cutting abruptly.
         const targetNearGoalPressure = pressure;
 
         // Linear ramp toward the target over NEAR_GOAL_PRESSURE_FADE_IN/OUT_MS —
@@ -217,19 +226,38 @@ export default function GameCanvas({
         const diff = targetNearGoalPressure - smoothedNearGoalPressure;
         smoothedNearGoalPressure += Math.max(-maxDelta, Math.min(maxDelta, diff));
 
+        const bedVolume = Math.max(
+          0,
+          Math.min(NEAR_GOAL_PRESSURE_BED_VOLUME_MAX, NEAR_GOAL_PRESSURE_BED_VOLUME_BASE + smoothedNearGoalPressure * NEAR_GOAL_PRESSURE_BED_VOLUME_RANGE),
+        );
+
         if (smoothedNearGoalPressure > NEAR_GOAL_PRESSURE_THRESHOLD) {
-          const volume = Math.max(
-            NEAR_GOAL_PRESSURE_MIN_VOLUME,
-            Math.min(NEAR_GOAL_PRESSURE_MAX_VOLUME, NEAR_GOAL_PRESSURE_MIN_VOLUME + smoothedNearGoalPressure * NEAR_GOAL_PRESSURE_VOLUME_RANGE),
-          );
-          const cooldownMs = NEAR_GOAL_PRESSURE_COOLDOWN_MIN_MS
-            + Math.random() * (NEAR_GOAL_PRESSURE_COOLDOWN_MAX_MS - NEAR_GOAL_PRESSURE_COOLDOWN_MIN_MS);
-          inMatchAudio.playRandomFromPool('nearGoalPressureCrowd', { volume, cooldownMs });
+          if (!nearGoalBedActive) {
+            // Picks a random file from the pool (avoiding an immediate repeat)
+            // — a no-op if a bed is somehow already playing, so this can never
+            // start a second long file in parallel.
+            inMatchAudio.startRandomBedFromPool('nearGoalPressureBed', { volume: bedVolume, loop: true });
+            nearGoalBedActive = true;
+          } else {
+            inMatchAudio.setBedVolume('nearGoalPressureBed', bedVolume);
+          }
+        } else if (nearGoalBedActive) {
+          if (smoothedNearGoalPressure < NEAR_GOAL_PRESSURE_BED_STOP_THRESHOLD) {
+            // Pressure faded almost to zero — stop for good (own short fade-out).
+            inMatchAudio.stopBed('nearGoalPressureBed', { fadeMs: NEAR_GOAL_PRESSURE_FADE_OUT_MS });
+            nearGoalBedActive = false;
+          } else {
+            // Between the stop and start thresholds: still winding down, keep
+            // tracking the (already-decreasing) smoothed pressure.
+            inMatchAudio.setBedVolume('nearGoalPressureBed', bedVolume);
+          }
         }
       } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
         // Ball just went in — hush the crowd pressure loop during the reset.
         inMatchAudio.setLoopVolume('crowdPressure', 0);
         smoothedNearGoalPressure = 0;
+        inMatchAudio.stopBed('nearGoalPressureBed');
+        nearGoalBedActive = false;
       }
 
       prevSwitchKeyDown = merged.switchPlayer;
