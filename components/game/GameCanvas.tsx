@@ -13,6 +13,9 @@ import { inMatchAudio } from '@/game/audio/inMatchAudio';
 import {
   PRESSURE_DISTANCE, CROWD_PRESSURE_MAX_VOLUME,
   NEAR_GOAL_OOH_PRESSURE_THRESHOLD, NEAR_GOAL_OOH_MIN_BALL_SPEED,
+  ENEMY_NEAR_GOAL_PRESSURE_THRESHOLD, ENEMY_NEAR_GOAL_FADE_IN_MS, ENEMY_NEAR_GOAL_FADE_OUT_MS,
+  ENEMY_NEAR_GOAL_MIN_VOLUME, ENEMY_NEAR_GOAL_MAX_VOLUME, ENEMY_NEAR_GOAL_VOLUME_RANGE,
+  ENEMY_NEAR_GOAL_COOLDOWN_MIN_MS, ENEMY_NEAR_GOAL_COOLDOWN_MAX_MS,
 } from '@/game/audio/inMatchSoundConfig';
 import type { GameState, InputState, TouchInput } from '@/game/types';
 import type { GameplayProfile } from '@/game/gameplayProfiles';
@@ -101,6 +104,9 @@ export default function GameCanvas({
     let prevSwitchKeyDown = false;
     let prevKickWasDown = gameState.kickWasDown;
     let prevKickHeldSeconds = gameState.kickHeldSeconds;
+    // Enemy-near-our-goal crowd pressure — smoothed 0..1, fades in/out over
+    // ~2s (see ENEMY_NEAR_GOAL_FADE_IN_MS/OUT_MS) so it never snaps abruptly.
+    let smoothedEnemyPressure = 0;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -133,8 +139,12 @@ export default function GameCanvas({
       // Kickoff on manual restart; goal sound on goal entry; pum on restart
       if (wasRestart) {
         playKickoffWhistle();
+        smoothedEnemyPressure = 0;
       } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
         playGoalSound();
+        // Crowd reaction after any goal (either team) — doesn't overpower the
+        // whistle, edge-triggered exactly once per goal via the phase change.
+        inMatchAudio.playRandomFromPool('afterGoalCrowd');
       } else if (prevPhase === 'goal' && gameState.phase === 'playing') {
         playRestartSound();
       }
@@ -189,9 +199,39 @@ export default function GameCanvas({
         if (pressure > NEAR_GOAL_OOH_PRESSURE_THRESHOLD && ballSpeed > NEAR_GOAL_OOH_MIN_BALL_SPEED) {
           inMatchAudio.play('nearGoalOoh'); // internally cooldown-gated (NEAR_GOAL_OOH_COOLDOWN_MS)
         }
+
+        // ── Enemy near-our-goal crowd pressure (danger reactions) ────────────
+        // Home always defends the FIELD_L goal (see physics.ts checkGoal:
+        // away scores by putting the ball in at FIELD_L). "Enemy controls the
+        // ball" is approximated from the existing last-touch tracking
+        // (state.lastTouchTeam) rather than a new possession system.
+        const distToOwnGoal = Math.hypot(ball.pos.x - FIELD_L, ball.pos.y - FIELD_CY);
+        const rawOwnGoalPressure = 1 - Math.max(0, Math.min(1, distToOwnGoal / PRESSURE_DISTANCE));
+        const enemyControlsBall = gameState.lastTouchTeam === 'away';
+        const targetEnemyPressure = enemyControlsBall ? rawOwnGoalPressure : 0;
+
+        // Linear ramp toward the target over ENEMY_NEAR_GOAL_FADE_IN/OUT_MS —
+        // same rate both ways since both constants are currently equal.
+        const fadeMs = targetEnemyPressure > smoothedEnemyPressure
+          ? ENEMY_NEAR_GOAL_FADE_IN_MS
+          : ENEMY_NEAR_GOAL_FADE_OUT_MS;
+        const maxDelta = (dt * 1000) / fadeMs;
+        const diff = targetEnemyPressure - smoothedEnemyPressure;
+        smoothedEnemyPressure += Math.max(-maxDelta, Math.min(maxDelta, diff));
+
+        if (enemyControlsBall && smoothedEnemyPressure > ENEMY_NEAR_GOAL_PRESSURE_THRESHOLD) {
+          const volume = Math.max(
+            ENEMY_NEAR_GOAL_MIN_VOLUME,
+            Math.min(ENEMY_NEAR_GOAL_MAX_VOLUME, ENEMY_NEAR_GOAL_MIN_VOLUME + smoothedEnemyPressure * ENEMY_NEAR_GOAL_VOLUME_RANGE),
+          );
+          const cooldownMs = ENEMY_NEAR_GOAL_COOLDOWN_MIN_MS
+            + Math.random() * (ENEMY_NEAR_GOAL_COOLDOWN_MAX_MS - ENEMY_NEAR_GOAL_COOLDOWN_MIN_MS);
+          inMatchAudio.playRandomFromPool('enemyNearGoalPressure', { volume, cooldownMs });
+        }
       } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
         // Ball just went in — hush the crowd pressure loop during the reset.
         inMatchAudio.setLoopVolume('crowdPressure', 0);
+        smoothedEnemyPressure = 0;
       }
 
       prevSwitchKeyDown = merged.switchPlayer;

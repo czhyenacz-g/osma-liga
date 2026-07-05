@@ -1,5 +1,5 @@
-import { IN_MATCH_SOUNDS, IN_MATCH_LOOPS } from './inMatchSoundConfig';
-import type { InMatchSoundKey, InMatchLoopKey } from './inMatchSoundConfig';
+import { IN_MATCH_SOUNDS, IN_MATCH_LOOPS, IN_MATCH_POOLS } from './inMatchSoundConfig';
+import type { InMatchSoundKey, InMatchLoopKey, InMatchPoolKey } from './inMatchSoundConfig';
 
 // Malý audio helper pro zvuky BĚHEM zápasu (kop, bounce, přepnutí hráče, crowd
 // pressure, ...) — oddělený od lib/audio/whistleEngine.ts, který řeší
@@ -13,6 +13,13 @@ export interface InMatchAudio {
   unlock: () => void;
   isUnlocked: () => boolean;
   play: (key: InMatchSoundKey) => void;
+  /**
+   * Plays a random variant from a sound pool (e.g. crowd reactions) — picks a
+   * random file, avoids repeating the previous pick back-to-back when the
+   * pool has more than one variant, and is gated by a (per-call overridable)
+   * cooldown. Missing/empty pool or unplayable file never throws.
+   */
+  playRandomFromPool: (key: InMatchPoolKey, options?: { volume?: number; cooldownMs?: number }) => void;
   startLoop: (key: InMatchLoopKey, volume?: number) => void;
   stopLoop: (key: InMatchLoopKey, fadeMs?: number) => void;
   setLoopVolume: (key: InMatchLoopKey, volume: number) => void;
@@ -25,6 +32,8 @@ export function createInMatchAudio(): InMatchAudio {
   const loopElements = new Map<InMatchLoopKey, HTMLAudioElement>();
   const fadeFrames = new Map<InMatchLoopKey, number>();
   const warnedKeys = new Set<string>();
+  const poolCooldownUntil = new Map<InMatchPoolKey, number>();
+  const poolLastIndex = new Map<InMatchPoolKey, number>();
 
   function warnOnce(key: string, err: unknown): void {
     if (process.env.NODE_ENV === 'production') return;
@@ -75,6 +84,35 @@ export function createInMatchAudio(): InMatchAudio {
       try {
         const el = new Audio(config.src);
         el.volume = config.volume;
+        void el.play().catch((err) => warnOnce(key, err));
+      } catch (err) {
+        warnOnce(key, err);
+      }
+    },
+
+    playRandomFromPool(key, options) {
+      if (!unlocked || typeof window === 'undefined') return;
+      const config = IN_MATCH_POOLS[key];
+      if (!config || config.files.length === 0) return;
+
+      const now = performance.now();
+      const cooldownMs = options?.cooldownMs ?? config.cooldownMs;
+      if (now < (poolCooldownUntil.get(key) ?? 0)) return;
+      poolCooldownUntil.set(key, now + cooldownMs);
+
+      const lastIndex = poolLastIndex.get(key);
+      let index = Math.floor(Math.random() * config.files.length);
+      if (config.files.length > 1 && index === lastIndex) {
+        index = (index + 1) % config.files.length;
+      }
+      poolLastIndex.set(key, index);
+
+      const src = config.files[index];
+      const volume = options?.volume ?? config.volume;
+
+      try {
+        const el = new Audio(src);
+        el.volume = Math.max(0, Math.min(1, volume));
         void el.play().catch((err) => warnOnce(key, err));
       } catch (err) {
         warnOnce(key, err);
