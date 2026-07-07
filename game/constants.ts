@@ -72,7 +72,7 @@ export const TEAMMATE_SEPARATION_RADIUS = 42;
 export const TEAMMATE_SEPARATION_STRENGTH = 0.5;
 
 // Ball control (soft trap for active home player)
-export const BALL_CONTROL_RADIUS = 44;
+export const BALL_CONTROL_RADIUS = 57; // +30% stickiness
 export const BALL_CONTROL_DAMPING = 0.86;
 export const BALL_CONTROL_FORCE = 130;        // without input direction
 export const BALL_CONTROL_INPUT_FORCE = 210;  // with input direction — pulls ball in front faster
@@ -83,7 +83,7 @@ export const BALL_CONTROL_OFFSET = 34;
 // direction, no opponent is closing in, and the ball isn't moving fast
 // (i.e. not a ball that was just struck). Makes stopping/cutting feel less
 // like the ball "slides away" without turning dribbling into a hard lock.
-export const BALL_RETENTION_RADIUS = 42;
+export const BALL_RETENTION_RADIUS = 55; // +30% stickiness
 export const BALL_RETENTION_NO_OPPONENT_RADIUS = 70;
 export const BALL_RETENTION_MAX_BALL_SPEED = 180;
 export const BALL_RETENTION_STRENGTH = 0.14;
