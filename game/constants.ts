@@ -63,6 +63,12 @@ export const ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE = 300;
 // unaffected — this only throttles the automatic algorithm.
 export const AUTO_PLAYER_SWITCH_COOLDOWN_MS = 1000;
 
+// While the player is holding movement input (and for this long afterward),
+// the automatic distance-based pick must not steal the active role — the
+// player clearly intends to keep controlling whichever figure they're
+// currently moving. Manual switching (Q / PŘEP.) is unaffected.
+export const AUTO_SWITCH_INPUT_LOCK_MS = 200;
+
 // Manual active-player switch (Q / PŘEP.) — how long a manual pick overrides
 // automatic ball-distance selection before automatic picking resumes.
 export const MANUAL_SWITCH_LOCK_DURATION = 2;

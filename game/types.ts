@@ -56,6 +56,11 @@ export interface GameState {
   // Cooldown (seconds) before the automatic pick is allowed to switch again —
   // see AUTO_PLAYER_SWITCH_COOLDOWN_MS.
   autoSwitchCooldownRemaining: number;
+  // Counts down from AUTO_SWITCH_INPUT_LOCK_MS/1000 (seconds) whenever the
+  // player holds movement input, refreshed every tick input is held. While
+  // > 0, the automatic distance-based pick may not switch — see
+  // AUTO_SWITCH_INPUT_LOCK_MS.
+  autoSwitchInputLockRemaining: number;
   // Manual active-player override (Q / PŘEP.) — see MANUAL_SWITCH_LOCK_DURATION.
   manualActivePlayerId: string | null;
   manualLockRemaining: number;

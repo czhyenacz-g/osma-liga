@@ -52,6 +52,7 @@ export function createInitialState(
     activePlayerId: 'n1',
     autoActivePlayerId: 'n1',
     autoSwitchCooldownRemaining: 0,
+    autoSwitchInputLockRemaining: 0,
     manualActivePlayerId: null,
     manualLockRemaining: 0,
     switchKeyWasDown: false,

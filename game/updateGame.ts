@@ -15,7 +15,7 @@ import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, GOAL_PAUSE,
   ACTIVE_PLAYER_SWITCH_MARGIN, ACTIVE_PLAYER_SWITCH_MARGIN_FADE_DISTANCE,
-  AUTO_PLAYER_SWITCH_COOLDOWN_MS,
+  AUTO_PLAYER_SWITCH_COOLDOWN_MS, AUTO_SWITCH_INPUT_LOCK_MS,
   MANUAL_SWITCH_LOCK_DURATION,
   CORNER_ZONE_MARGIN, CORNER_CLEAR_DELAY, CORNER_CLEAR_SPEED,
   CORNER_CLEAR_REPOSITION, CORNER_CLEAR_COOLDOWN,
@@ -218,11 +218,25 @@ export function updateGame(
     state.autoSwitchCooldownRemaining = Math.max(0, state.autoSwitchCooldownRemaining - dt);
   }
 
+  // While the player is holding movement input, they clearly intend to keep
+  // controlling the figure they're currently moving — the automatic
+  // distance-based pick must not steal the role out from under them. The
+  // lock stays engaged for AUTO_SWITCH_INPUT_LOCK_MS after input is released
+  // too, so releasing a key right next to another player doesn't immediately
+  // hand control away. Manual switching (Q / PŘEP.) below is unaffected.
+  const hasMovementInput = input.up || input.down || input.left || input.right;
+  if (hasMovementInput) {
+    state.autoSwitchInputLockRemaining = AUTO_SWITCH_INPUT_LOCK_MS / 1000;
+  } else if (state.autoSwitchInputLockRemaining > 0) {
+    state.autoSwitchInputLockRemaining = Math.max(0, state.autoSwitchInputLockRemaining - dt);
+  }
+  const canAutoSwitch = state.autoSwitchInputLockRemaining <= 0;
+
   const autoCurrent = homePlayers.find(p => p.id === state.autoActivePlayerId);
   let auto: typeof nearest;
   if (!autoCurrent) {
     auto = nearest;
-  } else if (state.autoSwitchCooldownRemaining > 0) {
+  } else if (state.autoSwitchCooldownRemaining > 0 || !canAutoSwitch) {
     auto = autoCurrent;
   } else {
     const currentDist = dist(autoCurrent.pos, state.ball.pos);
