@@ -9,6 +9,7 @@ export async function GET() {
       username:   session.username,
       globalName: session.globalName,
       avatarUrl:  session.avatarUrl,
+      osmaUserId: session.osmaUserId,
     },
   });
 }

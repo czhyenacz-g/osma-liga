@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getTournamentFormat, getFormatLabel, getFormatDescription } from '@/lib/tournaments/format';
 
-type CreatedTournament = {
-  publicCode: string;
+type CreateTournamentResponse = {
+  ok: true;
+  tournament: { publicCode: string };
 };
 
 export default function CreateTournamentForm() {
@@ -35,8 +36,8 @@ export default function CreateTournamentForm() {
         setError('Nepodařilo se založit turnaj. Zkus to znovu.');
         return;
       }
-      const data = await res.json() as CreatedTournament;
-      router.push(`/turnaj/${data.publicCode}`);
+      const data = await res.json() as CreateTournamentResponse;
+      router.push(`/turnaj/${data.tournament.publicCode}`);
     } catch {
       setError('Nepodařilo se založit turnaj. Zkus to znovu.');
     } finally {
