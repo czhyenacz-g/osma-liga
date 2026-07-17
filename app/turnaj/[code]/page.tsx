@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import GameNavLink from '@/components/ui/GameNavLink';
 import { getFormatLabel, type TournamentFormat } from '@/lib/tournaments/format';
 
@@ -46,6 +47,15 @@ type Tournament = {
 
 type TournamentResponse = { ok: true; tournament: Tournament };
 
+type PlayMatchResponse = {
+  ok: true;
+  onlineMatchId: string;
+  joinUrlPath: string;
+  playerToken?: string;
+  match: TournamentMatch;
+  tournament: Tournament;
+};
+
 type CurrentUser = { osmaUserId: string | null } | null;
 
 const cardBase: React.CSSProperties = {
@@ -60,6 +70,7 @@ export default function TurnajDetailPage({
   params: Promise<{ code: string }>;
 }) {
   const { code } = use(params);
+  const router = useRouter();
 
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,6 +81,8 @@ export default function TurnajDetailPage({
   const [claimError, setClaimError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
+  const [playingMatchId, setPlayingMatchId] = useState<string | null>(null);
+  const [playError, setPlayError] = useState<string | null>(null);
 
   const fetchTournament = useCallback(async () => {
     try {
@@ -161,6 +174,45 @@ export default function TurnajDetailPage({
     }
   }
 
+  async function handlePlay(matchId: string) {
+    setPlayingMatchId(matchId);
+    setPlayError(null);
+    try {
+      const res = await fetch(`/api/tournaments/${code}/matches/${matchId}/play`, { method: 'POST' });
+      if (res.status === 401) {
+        setPlayError('Přihlas se, abys mohl hrát turnajový zápas.');
+        return;
+      }
+      if (res.status === 403) {
+        setPlayError('Tento zápas můžou spustit jen hráči přihlášení k daným týmům.');
+        return;
+      }
+      if (res.status === 409) {
+        setPlayError('Zápas teď nejde spustit. Obnov stránku a zkontroluj stav turnaje.');
+        return;
+      }
+      if (!res.ok) {
+        setPlayError('Zápas se nepodařilo připravit. Zkus to znovu.');
+        return;
+      }
+      const data = await res.json() as PlayMatchResponse;
+      setTournament(data.tournament);
+      // Mirrors the regular online-games lobby flow (see
+      // components/online/OnlineLobbyPage.tsx) — only present when this call
+      // just created the room (we're the first player in); the existing
+      // /hra/online/[code] page handles the no-token case with its own
+      // "connect as guest" button.
+      if (data.playerToken && typeof window !== 'undefined') {
+        sessionStorage.setItem(`osma-lobby-host-token-${data.onlineMatchId}`, data.playerToken);
+      }
+      router.push(data.joinUrlPath);
+    } catch {
+      setPlayError('Zápas se nepodařilo připravit. Zkus to znovu.');
+    } finally {
+      setPlayingMatchId(null);
+    }
+  }
+
   async function handleCopy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -208,6 +260,14 @@ export default function TurnajDetailPage({
     : tournament.status;
 
   const teamName = (teamId: string): string => tournament.teams.find((t) => t.id === teamId)?.name ?? 'Neznámý tým';
+
+  const matchStatusLabels: Record<string, string> = {
+    scheduled: 'Naplánováno',
+    in_progress: 'Rozehráno',
+    finished: 'Dohráno',
+    void: 'Zrušeno',
+    replay_required: 'Opakovat',
+  };
 
   const matchesByRound = new Map<number, TournamentMatch[]>();
   for (const match of tournament.matches) {
@@ -324,21 +384,51 @@ export default function TurnajDetailPage({
                   <p className="text-xs font-semibold" style={{ color: 'rgba(209,250,229,0.55)' }}>
                     Kolo {roundNumber}
                   </p>
-                  {matchesByRound.get(roundNumber)!.map((match) => (
-                    <div
-                      key={match.id}
-                      className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm text-white"
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
-                    >
-                      <span>{teamName(match.homeTeamId)} vs {teamName(match.awayTeamId)}</span>
-                      <span className="text-xs shrink-0" style={{ color: 'rgba(209,250,229,0.4)' }}>
-                        {match.status === 'scheduled' ? 'Naplánováno' : match.status}
-                      </span>
-                    </div>
-                  ))}
+                  {matchesByRound.get(roundNumber)!.map((match) => {
+                    const homeTeam = tournament.teams.find((t) => t.id === match.homeTeamId);
+                    const awayTeam = tournament.teams.find((t) => t.id === match.awayTeamId);
+                    const isMyMatch = myUserId !== null && (
+                      myUserId === homeTeam?.claimedByUserId || myUserId === awayTeam?.claimedByUserId
+                    );
+                    const canPlay = tournament.status === 'in_progress'
+                      && (match.status === 'scheduled' || match.status === 'in_progress')
+                      && isMyMatch;
+                    const isPlaying = playingMatchId === match.id;
+                    const playLabel = match.status === 'in_progress' && match.onlineMatchId
+                      ? 'Pokračovat v zápase'
+                      : 'Hrát zápas';
+
+                    return (
+                      <div
+                        key={match.id}
+                        className="flex flex-col gap-2 px-3 py-2 rounded-lg text-sm text-white"
+                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span>{teamName(match.homeTeamId)} vs {teamName(match.awayTeamId)}</span>
+                          <span className="text-xs shrink-0" style={{ color: 'rgba(209,250,229,0.4)' }}>
+                            {matchStatusLabels[match.status] ?? match.status}
+                          </span>
+                        </div>
+                        {canPlay && (
+                          <button
+                            onClick={() => { void handlePlay(match.id); }}
+                            disabled={isPlaying}
+                            className="w-full py-2 rounded-lg font-bold text-xs transition disabled:opacity-50"
+                            style={{ background: '#d6a94a', color: '#041f14' }}
+                          >
+                            {isPlaying ? 'Připravuji zápas...' : playLabel}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ))}
             </div>
+          )}
+          {playError && (
+            <p className="text-xs" style={{ color: '#f87171' }}>{playError}</p>
           )}
         </div>
 
