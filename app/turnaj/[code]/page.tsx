@@ -15,6 +15,23 @@ type TournamentTeam = {
   claimedAt: string | null;
 };
 
+type TournamentMatch = {
+  id: string;
+  tournamentId: string;
+  phase: string;
+  roundNumber: number;
+  matchNumber: number;
+  homeTeamId: string;
+  awayTeamId: string;
+  homeScore: number | null;
+  awayScore: number | null;
+  winnerTeamId: string | null;
+  status: string;
+  onlineMatchId: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+};
+
 type Tournament = {
   id: string;
   publicCode: string;
@@ -24,6 +41,7 @@ type Tournament = {
   playerCount: number;
   status: string;
   teams: TournamentTeam[];
+  matches: TournamentMatch[];
 };
 
 type TournamentResponse = { ok: true; tournament: Tournament };
@@ -50,6 +68,8 @@ export default function TurnajDetailPage({
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
   const [claimingTeamId, setClaimingTeamId] = useState<string | null>(null);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
 
   const fetchTournament = useCallback(async () => {
     try {
@@ -111,6 +131,36 @@ export default function TurnajDetailPage({
     }
   }
 
+  async function handleStart() {
+    setStarting(true);
+    setStartError(null);
+    try {
+      const res = await fetch(`/api/tournaments/${code}/start`, { method: 'POST' });
+      if (res.status === 401) {
+        setStartError('Přihlas se, abys mohl spustit turnaj.');
+        return;
+      }
+      if (res.status === 403) {
+        setStartError('Turnaj může spustit jen jeho zakladatel.');
+        return;
+      }
+      if (res.status === 409) {
+        setStartError('Turnaj zatím nejde spustit. Zkontroluj obsazení týmů.');
+        return;
+      }
+      if (!res.ok) {
+        setStartError('Turnaj se nepodařilo spustit. Zkus to znovu.');
+        return;
+      }
+      const data = await res.json() as TournamentResponse;
+      setTournament(data.tournament);
+    } catch {
+      setStartError('Turnaj se nepodařilo spustit. Zkus to znovu.');
+    } finally {
+      setStarting(false);
+    }
+  }
+
   async function handleCopy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -149,6 +199,23 @@ export default function TurnajDetailPage({
   const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/turnaj/${tournament.publicCode}`;
   const myUserId = currentUser?.osmaUserId ?? null;
   const myTeam = myUserId ? tournament.teams.find((t) => t.claimedByUserId === myUserId) ?? null : null;
+  const isCreator = myUserId !== null && myUserId === tournament.createdByUserId;
+  const allTeamsClaimed = tournament.teams.every((t) => t.claimedByUserId !== null);
+  const statusLabel = tournament.status === 'open'
+    ? 'otevřený'
+    : tournament.status === 'in_progress'
+    ? 'probíhá'
+    : tournament.status;
+
+  const teamName = (teamId: string): string => tournament.teams.find((t) => t.id === teamId)?.name ?? 'Neznámý tým';
+
+  const matchesByRound = new Map<number, TournamentMatch[]>();
+  for (const match of tournament.matches) {
+    const existing = matchesByRound.get(match.roundNumber);
+    if (existing) existing.push(match);
+    else matchesByRound.set(match.roundNumber, [match]);
+  }
+  const rounds = [...matchesByRound.keys()].sort((a, b) => a - b);
 
   return (
     <main className="min-h-screen flex flex-col items-center gap-6 px-4 py-10" style={{ background: '#041f14' }}>
@@ -170,9 +237,7 @@ export default function TurnajDetailPage({
         </div>
 
         <p className="text-xs" style={{ color: 'rgba(209,250,229,0.45)' }}>
-          Status: <span className="font-semibold" style={{ color: '#86efac' }}>
-            {tournament.status === 'open' ? 'otevřený' : tournament.status}
-          </span>
+          Status: <span className="font-semibold" style={{ color: '#86efac' }}>{statusLabel}</span>
         </p>
 
         <div className="flex flex-col gap-2">
@@ -221,9 +286,61 @@ export default function TurnajDetailPage({
           )}
         </div>
 
-        <p className="text-xs text-center" style={{ color: 'rgba(209,250,229,0.4)' }}>
-          Rozpis zápasů bude doplněn v dalším kroku.
-        </p>
+        {isCreator && tournament.status === 'open' && (
+          <div className="flex flex-col gap-2">
+            {allTeamsClaimed ? (
+              <button
+                onClick={() => { void handleStart(); }}
+                disabled={starting}
+                className="w-full py-3 rounded-lg font-bold text-sm transition disabled:opacity-50"
+                style={{ background: '#d6a94a', color: '#041f14' }}
+              >
+                {starting ? 'Spouštím...' : 'Spustit turnaj'}
+              </button>
+            ) : (
+              <p
+                className="text-xs text-center py-2.5 rounded-lg"
+                style={{ color: 'rgba(209,250,229,0.4)', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                Turnaj půjde spustit, až budou obsazené všechny týmy.
+              </p>
+            )}
+            {startError && (
+              <p className="text-xs text-center" style={{ color: '#f87171' }}>{startError}</p>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#d6a94a' }}>Rozpis zápasů</p>
+          {tournament.matches.length === 0 ? (
+            <p className="text-xs text-center" style={{ color: 'rgba(209,250,229,0.4)' }}>
+              Rozpis vznikne po spuštění turnaje.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {rounds.map((roundNumber) => (
+                <div key={roundNumber} className="flex flex-col gap-1.5">
+                  <p className="text-xs font-semibold" style={{ color: 'rgba(209,250,229,0.55)' }}>
+                    Kolo {roundNumber}
+                  </p>
+                  {matchesByRound.get(roundNumber)!.map((match) => (
+                    <div
+                      key={match.id}
+                      className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm text-white"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+                    >
+                      <span>{teamName(match.homeTeamId)} vs {teamName(match.awayTeamId)}</span>
+                      <span className="text-xs shrink-0" style={{ color: 'rgba(209,250,229,0.4)' }}>
+                        {match.status === 'scheduled' ? 'Naplánováno' : match.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="flex flex-col gap-2">
           <p className="text-xs" style={{ color: 'rgba(209,250,229,0.45)' }}>Sdílej odkaz s ostatními hráči</p>
