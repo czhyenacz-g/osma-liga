@@ -287,11 +287,17 @@ export function updateGame(
       state.lastTouchPlayerId = previousActive.id;
       state.manualActivePlayerId = passTarget.id;
       state.manualLockRemaining = passAndSwitchConfig.manualLockSeconds;
+      // While movement is held, the background auto-pick must follow the
+      // deliberate switch too — otherwise it silently reverts to whoever it
+      // was tracking before the switch once the manual lock's own timer
+      // expires, even though the player never let go of the movement key.
+      if (!canAutoSwitch) state.autoActivePlayerId = passTarget.id;
     } else {
       const nextActive = findNearestTeammateToBall(homePlayers, state.ball, previousActive.id);
       if (nextActive) {
         state.manualActivePlayerId = nextActive.id;
         state.manualLockRemaining = MANUAL_SWITCH_LOCK_DURATION;
+        if (!canAutoSwitch) state.autoActivePlayerId = nextActive.id;
       }
       // No other teammate available (e.g. everyone else temporarily removed)
       // — keep the current active player, don't touch the manual lock.
@@ -473,7 +479,12 @@ export function updateGame(
   // home teammate makes them the new active player (short lock) instead of
   // just bumping off them like any other physics obstacle. Own team only.
   // Disabled by gameplayConfig.teammateReceiveEnabled (e.g. 'bounce' profile).
-  if (gameplayConfig.teammateReceiveEnabled) {
+  // Also gated by canAutoSwitch — this is an involuntary takeover just like
+  // the distance-based auto-pick above, so it must respect the same
+  // held-movement lock (see AUTO_SWITCH_INPUT_LOCK_MS): a player steering
+  // the ball toward their own repositioning teammate must not have control
+  // silently handed to that teammate mid-dribble.
+  if (gameplayConfig.teammateReceiveEnabled && canAutoSwitch) {
     const receiverId = findTeammateBallReceive(homePlayers, active.id, state.ball);
     if (receiverId) {
       state.manualActivePlayerId = receiverId;
