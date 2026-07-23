@@ -220,6 +220,10 @@ export default function OnlineGameCanvas({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Tracks whether the player overlay is currently shown, so setVisible()
+    // is only called on an actual change rather than every frame.
+    let playersVisible = true;
+
     function frame() {
       const target = targetRef.current;
       let render = renderRef.current;
@@ -275,6 +279,16 @@ export default function OnlineGameCanvas({
         : Math.min(1, (performance.now() - kickHeldSinceRef.current) / CHARGE_RING_MAX_MS);
 
       drawFrame(ctx!, r, target, concededMessageRef.current);
+
+      // Hide the player overlay during the goal celebration — drawFrame()
+      // above dims the canvas and draws "GÓL!" on it, but this SVG is
+      // stacked on top of the canvas, so the still-animating player icons
+      // would otherwise cover that darkened backdrop/text.
+      const shouldShowPlayers = !target.goalMessage;
+      if (shouldShowPlayers !== playersVisible) {
+        playersVisible = shouldShowPlayers;
+        playerRendererRef.current?.setVisible(playersVisible);
+      }
 
       const myTeam: 'home' | 'away' | null = role === 'home' ? 'home' : role === 'guest' ? 'away' : null;
       playerRendererRef.current?.update(

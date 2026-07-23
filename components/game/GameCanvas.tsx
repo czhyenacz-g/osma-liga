@@ -160,13 +160,22 @@ export default function GameCanvas({
         smoothedNearGoalPressure = 0;
         inMatchAudio.stopBed('nearGoalPressureBed');
         nearGoalBedActive = false;
+        // Restart can jump straight from 'goal'/'ended' back to a fresh
+        // match — make sure the player overlay is never left hidden.
+        playerRendererRef.current?.setVisible(true);
       } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
         playGoalSound();
         // Crowd reaction after any goal (either team) — doesn't overpower the
         // whistle, edge-triggered exactly once per goal via the phase change.
         inMatchAudio.playRandomFromPool('afterGoalCrowd');
+        // Hide the player overlay for the goal celebration — it's stacked
+        // above the canvas, so the still-animating icons would otherwise
+        // cover the darkened backdrop and "GÓL!" text drawn on the canvas
+        // beneath (see renderGame.ts "Goal overlay").
+        playerRendererRef.current?.setVisible(false);
       } else if (prevPhase === 'goal' && gameState.phase === 'playing') {
         playRestartSound();
+        playerRendererRef.current?.setVisible(true);
       }
 
       // ── In-match SFX: kick / player switch / wall bounce ──────────────────
@@ -279,6 +288,9 @@ export default function GameCanvas({
 
       // Notify parent when match ends for the first time
       if (prevPhase !== 'ended' && gameState.phase === 'ended') {
+        // Same reasoning as the 'goal' overlay above — drawEndOverlay() dims
+        // the canvas and draws the final-score panel underneath this SVG.
+        playerRendererRef.current?.setVisible(false);
         onMatchEnd?.({ home: gameState.score.home, away: gameState.score.away });
       }
 

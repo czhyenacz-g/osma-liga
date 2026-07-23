@@ -18,7 +18,15 @@ export const GOAL_B = FIELD_CY + GOAL_H / 2;  // 345
 // Players
 export const PLAYER_RADIUS = 18;
 export const PLAYER_SPEED = 210;
-export const KICK_RANGE = PLAYER_RADIUS + 22;  // 40
+// Must stay >= BALL_CONTROL_RADIUS (see "Ball control" below): the shot
+// fires on release using the *pre-tick* player-ball distance (see
+// updateGame.ts#activeDist), and while dribbling at speed that distance can
+// briefly exceed BALL_CONTROL_OFFSET. If KICK_RANGE is smaller than
+// BALL_CONTROL_RADIUS, releasing the kick key while running can silently
+// miss the shot (falls through to the dribble-control code instead), which
+// just keeps pushing the ball instead of firing it — this exact bug
+// happened when BALL_CONTROL_RADIUS was widened to 57 but this stayed at 40.
+export const KICK_RANGE = PLAYER_RADIUS + 39;  // 57 — matches BALL_CONTROL_RADIUS
 export const KICK_FORCE = 486; // -10% from 540
 export const KICK_COOLDOWN = 0.25;
 

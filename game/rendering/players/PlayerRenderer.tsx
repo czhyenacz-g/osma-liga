@@ -10,6 +10,15 @@ export interface PlayerRendererHandle {
   // positions/animation flags straight to each player's DOM refs. No React
   // state update happens here, so this never triggers a re-render.
   update(states: PlayerRenderState[]): void;
+  // Hides/shows the whole overlay via a direct style write (no React state,
+  // same reasoning as update() above). This SVG is stacked on top of the
+  // field canvas, so during full-screen canvas overlays that are drawn
+  // *underneath* it (goal celebration, match-end panel — see
+  // renderGame.ts/OnlineGameCanvas.tsx "Goal overlay"/"End overlay"), the
+  // still-animating player icons would otherwise float above the darkened
+  // backdrop and cover the announcement text. Callers hide this overlay for
+  // the duration of those phases and restore it once play resumes.
+  setVisible(visible: boolean): void;
 }
 
 export interface PlayerRendererProps {
@@ -43,6 +52,7 @@ const PlayerRenderer = forwardRef<PlayerRendererHandle, PlayerRendererProps>(
     // position/animation data never flows through this state.
     const [players, setPlayers] = useState(initialPlayers);
     const containerRefs = useRef(new Map<string, PlayerVisualContainerHandle>());
+    const svgRef = useRef<SVGSVGElement>(null);
 
     useImperativeHandle(ref, () => ({
       update(states: PlayerRenderState[]) {
@@ -62,10 +72,14 @@ const PlayerRenderer = forwardRef<PlayerRendererHandle, PlayerRendererProps>(
           containerRefs.current.get(state.id)?.update(state);
         }
       },
+      setVisible(visible: boolean) {
+        if (svgRef.current) svgRef.current.style.opacity = visible ? '1' : '0';
+      },
     }));
 
     return (
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
         style={OVERLAY_STYLE}
         className={className}
