@@ -1,16 +1,11 @@
-import type { GameState, Ball, Player } from './types';
+import type { GameState, Ball } from './types';
 import {
   CANVAS_W, CANVAS_H,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   GOAL_T, GOAL_B, GOAL_DEPTH,
-  PLAYER_RADIUS, BALL_RADIUS,
+  BALL_RADIUS,
   CORNER_WARNING_DELAY, CORNER_CLEAR_DELAY,
-  KICK_MAX_CHARGE_MS,
 } from './constants';
-
-// Visual-only kick charge feedback — how much the active player's ring
-// grows while the shoot button is held. Does not affect kick force/physics.
-const CHARGE_RING_MAX_GROWTH = 14;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -92,43 +87,6 @@ function drawBall(ctx: CanvasRenderingContext2D, ball: Ball): void {
   ctx.arc(ball.pos.x - 3, ball.pos.y - 3, 2.5, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,255,255,0.65)';
   ctx.fill();
-}
-
-// ── Active player indicator ───────────────────────────────────────────────────
-
-function drawActivePlayerIndicator(ctx: CanvasRenderingContext2D, player: Player, chargeProgress: number): void {
-  const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 300);
-
-  // Pulsing outer ring — grows smoothly while the shoot button is held
-  // (chargeProgress 0..1), purely as charge feedback; kick force/physics
-  // are unaffected.
-  ctx.beginPath();
-  ctx.arc(player.pos.x, player.pos.y, PLAYER_RADIUS + 5 + pulse * 3 + chargeProgress * CHARGE_RING_MAX_GROWTH, 0, Math.PI * 2);
-  ctx.strokeStyle = `rgba(251,191,36,${0.5 + pulse * 0.45})`;
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-
-  // Arrow: only when moving, points in velocity direction
-  const speed = Math.sqrt(player.vel.x ** 2 + player.vel.y ** 2);
-  if (speed > 20) {
-    const nx = player.vel.x / speed;
-    const ny = player.vel.y / speed;
-    const ARROW_DIST = PLAYER_RADIUS + 10;
-    const tipX  = player.pos.x + nx * ARROW_DIST;
-    const tipY  = player.pos.y + ny * ARROW_DIST;
-    const baseX = player.pos.x + nx * (ARROW_DIST - 8);
-    const baseY = player.pos.y + ny * (ARROW_DIST - 8);
-    const px = -ny;   // perpendicular
-    const py =  nx;
-
-    ctx.beginPath();
-    ctx.moveTo(tipX, tipY);
-    ctx.lineTo(baseX + px * 5, baseY + py * 5);
-    ctx.lineTo(baseX - px * 5, baseY - py * 5);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(251,191,36,${0.65 + pulse * 0.35})`;
-    ctx.fill();
-  }
 }
 
 // ── End overlay ───────────────────────────────────────────────────────────────
@@ -280,38 +238,9 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, home
   ctx.fillRect(FIELD_R, GOAL_T, GOAL_DEPTH, GOAL_B - GOAL_T);
 
   // ── Players ───────────────────────────────────────────────────────────────
-
-  // Draw indicators behind players so they don't cover labels
-  const chargeProgress = state.kickWasDown
-    ? Math.min(1, (state.kickHeldSeconds * 1000) / KICK_MAX_CHARGE_MS)
-    : 0;
-  for (const p of state.players) {
-    if (p.id === state.activePlayerId && p.team === 'home') {
-      drawActivePlayerIndicator(ctx, p, chargeProgress);
-    }
-  }
-
-  for (const p of state.players) {
-    const isActive = p.id === state.activePlayerId && p.team === 'home';
-    const isHome   = p.team === 'home';
-
-    ctx.beginPath();
-    ctx.arc(p.pos.x, p.pos.y, PLAYER_RADIUS, 0, Math.PI * 2);
-    ctx.fillStyle = isHome
-      ? (isActive ? '#22c55e' : '#15803d')
-      : '#2563eb';
-    ctx.fill();
-
-    ctx.strokeStyle = isActive ? '#fbbf24' : 'rgba(255,255,255,0.65)';
-    ctx.lineWidth = isActive ? 2.5 : 1.5;
-    ctx.stroke();
-
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 10px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(p.label, p.pos.x, p.pos.y);
-  }
+  // Rendered by the shared DOM/SVG overlay (game/rendering/players/) on top
+  // of this canvas — see GameCanvas.tsx, which calls PlayerRenderer.update()
+  // right after this function each frame. Not drawn here any more.
 
   // ── Ball ──────────────────────────────────────────────────────────────────
 

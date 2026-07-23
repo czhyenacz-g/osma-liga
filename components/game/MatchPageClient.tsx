@@ -9,6 +9,7 @@ import MatchCommentaryToast from './MatchCommentaryToast';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
 import SoundToggleButton from './SoundToggleButton';
+import PlayerVisualTemplateSwitcher from '@/components/PlayerVisualTemplateSwitcher';
 import BounceTimeOverlay from './BounceTimeOverlay';
 import { MATCH_DURATION } from '@/game/constants';
 import type { TouchInput } from '@/game/types';
@@ -233,6 +234,7 @@ export default function MatchPageClient({
   return (
     <>
       <SoundToggleButton />
+      <PlayerVisualTemplateSwitcher />
       <MobileOrientationOverlay show={isMobile && isPortrait} />
 
       <div ref={gameWrapperRef} style={{ width: '100%', maxWidth: 960 }}>

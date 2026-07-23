@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MutableRefObject } from 'react';
-import { CANVAS_W, CANVAS_H, FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CY, BALL_RADIUS, KICK_MAX_CHARGE_MS } from '@/game/constants';
+import { CANVAS_W, CANVAS_H, FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CY, BALL_RADIUS, KICK_MAX_CHARGE_MS, PLAYER_RADIUS } from '@/game/constants';
 import { createInitialState } from '@/game/createInitialState';
 import { createInputState, attachInputListeners } from '@/game/input';
 import { updateGame } from '@/game/updateGame';
 import { renderGame } from '@/game/renderGame';
 import { resumeAudio } from '@/game/audio';
+import PlayerRenderer, { type PlayerRendererHandle } from '@/game/rendering/players/PlayerRenderer';
+import { resolveBotPlayerRenderStates, createFacingDirectionTracker } from '@/game/rendering/players/resolvePlayerRenderState';
+import { getPlayerVisualTemplate, onPlayerVisualTemplateChange } from '@/game/presentation/playerVisualSettings';
 import { playKickoffWhistle, playGoalSound, playRestartSound } from '@/lib/audio/whistleEngine';
 import { inMatchAudio } from '@/game/audio/inMatchAudio';
 import {
@@ -45,6 +48,7 @@ export default function GameCanvas({
   disableOpponentAI, matchDurationSeconds, gameplayProfile, enableBounceTimeDebug,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const playerRendererRef = useRef<PlayerRendererHandle>(null);
 
   // These refs allow the RAF loop to read the latest prop values each tick
   // without the effect restarting (and resetting the match) on every change.
@@ -52,6 +56,14 @@ export default function GameCanvas({
   gameModeConfigRef.current = { disableOpponentAI, matchDurationSeconds, gameplayProfile };
   const enableBounceTimeDebugRef = useRef(enableBounceTimeDebug);
   enableBounceTimeDebugRef.current = enableBounceTimeDebug;
+
+  // Player visual template — a purely local, cosmetic preference (see
+  // game/presentation/playerVisualSettings.ts). Re-rendering PlayerRenderer
+  // when the user switches it is the ONLY thing this state is for; it is
+  // never read by updateGame()/the RAF loop below and switching it never
+  // touches gameState.
+  const [visualTemplate, setVisualTemplate] = useState(getPlayerVisualTemplate);
+  useEffect(() => onPlayerVisualTemplateChange(setVisualTemplate), []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -66,6 +78,7 @@ export default function GameCanvas({
       gameModeConfigRef.current.gameplayProfile,
     );
     const input: InputState = createInputState();
+    const facingTracker = createFacingDirectionTracker();
 
     const removeInput = attachInputListeners(input);
 
@@ -304,6 +317,7 @@ export default function GameCanvas({
       prevPhase = gameState.phase;
 
       renderGame(ctx, gameState, homeTeamName);
+      playerRendererRef.current?.update(resolveBotPlayerRenderStates(gameState, facingTracker));
 
       rafId = requestAnimationFrame(loop);
     };
@@ -325,21 +339,31 @@ export default function GameCanvas({
   }, [onMatchEnd, onRestart, onFirstGoal, onSubstitution, onBounceTimeChange, touchInputRef, homeTeamName]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={CANVAS_W}
-      height={CANVAS_H}
-      style={{
-        display: 'block',
-        width: '100%',
-        height: 'auto',
-        maxWidth: CANVAS_W,
-        borderRadius: '6px',
-        outline: '1px solid rgba(255,255,255,0.1)',
-        touchAction: 'none',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-      }}
-    />
+    <div style={{ position: 'relative', width: '100%', maxWidth: CANVAS_W }}>
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_W}
+        height={CANVAS_H}
+        style={{
+          display: 'block',
+          width: '100%',
+          height: 'auto',
+          maxWidth: CANVAS_W,
+          borderRadius: '6px',
+          outline: '1px solid rgba(255,255,255,0.1)',
+          touchAction: 'none',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+        }}
+      />
+      <PlayerRenderer
+        ref={playerRendererRef}
+        template={visualTemplate}
+        viewBoxWidth={CANVAS_W}
+        viewBoxHeight={CANVAS_H}
+        hitboxRadiusPx={PLAYER_RADIUS}
+        initialPlayers={[]}
+      />
+    </div>
   );
 }

@@ -1,7 +1,10 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { OnlineSnapshot, OnlinePlayer } from './useOnlineGame';
 import { concededGoalMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
+import PlayerRenderer, { type PlayerRendererHandle } from '@/game/rendering/players/PlayerRenderer';
+import { resolveOnlinePlayerRenderStates, createFacingDirectionTracker } from '@/game/rendering/players/resolvePlayerRenderState';
+import { getPlayerVisualTemplate, onPlayerVisualTemplateChange } from '@/game/presentation/playerVisualSettings';
 
 // Constants mirroring server
 const CANVAS_W = 960;
@@ -47,46 +50,16 @@ function formatTime(s: number): string {
 // Visual-only kick charge feedback — how much the active player's ring
 // grows while the local player holds the shoot button. Purely client-side
 // (own input, own screen); doesn't touch the server-authoritative kick force.
-const CHARGE_RING_MAX_GROWTH = 14;
+// Still used below to compute kickChargeProgress, now fed into
+// resolveOnlinePlayerRenderStates() for the shared player renderer instead
+// of a canvas-drawn ring.
 const CHARGE_RING_MAX_MS = 1500; // mirrors KICK_MAX_CHARGE_MS server-side
-
-function drawActiveIndicator(ctx: CanvasRenderingContext2D, rp: RenderPlayer, chargeProgress: number): void {
-  const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 300);
-  // Pulsing outer ring — matches bot game, grows with chargeProgress (0..1)
-  ctx.beginPath();
-  ctx.arc(rp.rx, rp.ry, PLAYER_RADIUS + 5 + pulse * 3 + chargeProgress * CHARGE_RING_MAX_GROWTH, 0, Math.PI * 2);
-  ctx.strokeStyle = `rgba(251,191,36,${0.5 + pulse * 0.45})`;
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-  // Arrow: based on accumulated velocity from position delta
-  const speed = Math.sqrt(rp.pvx ** 2 + rp.pvy ** 2);
-  if (speed > 0.5) {
-    const nx = rp.pvx / speed;
-    const ny = rp.pvy / speed;
-    const ARROW_DIST = PLAYER_RADIUS + 10;
-    const tipX  = rp.rx + nx * ARROW_DIST;
-    const tipY  = rp.ry + ny * ARROW_DIST;
-    const baseX = rp.rx + nx * (ARROW_DIST - 8);
-    const baseY = rp.ry + ny * (ARROW_DIST - 8);
-    const px = -ny;
-    const py =  nx;
-    ctx.beginPath();
-    ctx.moveTo(tipX, tipY);
-    ctx.lineTo(baseX + px * 5, baseY + py * 5);
-    ctx.lineTo(baseX - px * 5, baseY - py * 5);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(251,191,36,${0.65 + pulse * 0.35})`;
-    ctx.fill();
-  }
-}
 
 function drawFrame(
   ctx: CanvasRenderingContext2D,
   render: RenderState,
   snap: OnlineSnapshot,
-  role: 'home' | 'guest' | null,
   concededMessage: string,
-  kickChargeProgress: number,
 ) {
   // Clear
   ctx.fillStyle = '#030e08';
@@ -135,35 +108,9 @@ function drawFrame(
   ctx.lineTo(FIELD_R, GOAL_B);
   ctx.stroke();
 
-  // Active indicator rings — drawn behind players
-  for (const rp of render.players) {
-    const isHome = rp.team === 'home';
-    const isMyTeam = (role === 'home' && isHome) || (role === 'guest' && !isHome);
-    if (isMyTeam && rp.active) {
-      drawActiveIndicator(ctx, rp, kickChargeProgress);
-    }
-  }
-
-  // Players (from interpolated render state)
-  for (const rp of render.players) {
-    const isHome = rp.team === 'home';
-    ctx.globalAlpha = rp.removed ? 0.45 : 1;
-    ctx.beginPath();
-    ctx.arc(rp.rx, rp.ry, PLAYER_RADIUS, 0, Math.PI * 2);
-    ctx.fillStyle = isHome
-      ? rp.active ? '#22c55e' : '#15803d'
-      : rp.active ? '#3b82f6' : '#1d4ed8';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 10px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(rp.label, rp.rx, rp.ry);
-    ctx.globalAlpha = 1;
-  }
+  // Players — rendered by the shared DOM/SVG overlay (game/rendering/players/)
+  // on top of this canvas, see the component below (playerRendererRef.update()
+  // right after this drawFrame() call each frame). Not drawn here any more.
 
   // Ball (from interpolated render state)
   ctx.beginPath();
@@ -226,11 +173,18 @@ export default function OnlineGameCanvas({
   touchRef?: { current: { kick: boolean } };
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const playerRendererRef = useRef<PlayerRendererHandle>(null);
+  const facingTrackerRef = useRef(createFacingDirectionTracker());
   const targetRef = useRef<OnlineSnapshot>(snapshot);
   const renderRef = useRef<RenderState | null>(null);
   const rafRef = useRef<number>(0);
   const concededMessageRef = useRef<string>('');
   const prevGoalMessageRef = useRef<string>('');
+  // Purely local, cosmetic preference (game/presentation/playerVisualSettings.ts)
+  // — never read by the socket/game logic below, switching it can't affect
+  // the server-authoritative match in any way.
+  const [visualTemplate, setVisualTemplate] = useState(getPlayerVisualTemplate);
+  useEffect(() => onPlayerVisualTemplateChange(setVisualTemplate), []);
   const kickHeldSinceRef = useRef<number | null>(null);
 
   // Update target whenever a new snapshot arrives
@@ -320,7 +274,19 @@ export default function OnlineGameCanvas({
         ? 0
         : Math.min(1, (performance.now() - kickHeldSinceRef.current) / CHARGE_RING_MAX_MS);
 
-      drawFrame(ctx!, r, target, role, concededMessageRef.current, kickChargeProgress);
+      drawFrame(ctx!, r, target, concededMessageRef.current);
+
+      const myTeam: 'home' | 'away' | null = role === 'home' ? 'home' : role === 'guest' ? 'away' : null;
+      playerRendererRef.current?.update(
+        resolveOnlinePlayerRenderStates(
+          r.players,
+          { x: r.ball.rx, y: r.ball.ry },
+          myTeam,
+          kickChargeProgress,
+          facingTrackerRef.current,
+        ),
+      );
+
       rafRef.current = requestAnimationFrame(frame);
     }
 
@@ -329,21 +295,31 @@ export default function OnlineGameCanvas({
   }, [role, keysRef, touchRef]); // role is stable after joining; RAF restarts only if role changes
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={CANVAS_W}
-      height={CANVAS_H}
-      style={{
-        display: 'block',
-        width: '100%',
-        height: 'auto',
-        maxWidth: CANVAS_W,
-        borderRadius: '6px',
-        outline: '1px solid rgba(255,255,255,0.1)',
-        touchAction: 'none',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-      }}
-    />
+    <div style={{ position: 'relative', width: '100%', maxWidth: CANVAS_W }}>
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_W}
+        height={CANVAS_H}
+        style={{
+          display: 'block',
+          width: '100%',
+          height: 'auto',
+          maxWidth: CANVAS_W,
+          borderRadius: '6px',
+          outline: '1px solid rgba(255,255,255,0.1)',
+          touchAction: 'none',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+        }}
+      />
+      <PlayerRenderer
+        ref={playerRendererRef}
+        template={visualTemplate}
+        viewBoxWidth={CANVAS_W}
+        viewBoxHeight={CANVAS_H}
+        hitboxRadiusPx={PLAYER_RADIUS}
+        initialPlayers={[]}
+      />
+    </div>
   );
 }

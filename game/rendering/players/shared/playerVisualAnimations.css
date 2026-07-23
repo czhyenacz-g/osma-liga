@@ -1,0 +1,87 @@
+/*
+ * Player visual animations — driven entirely by boolean CSS classes toggled
+ * imperatively once per frame on each player's wrapper <g> (see
+ * PlayerVisualContainer.tsx). The stepping/hop/charge-vibrate motion itself
+ * is pure CSS (steps()/keyframes), NOT recomputed in JS every frame — only
+ * position/direction/continuous charge-scale are written directly via
+ * transform each frame, which is intentionally cheap (a handful of
+ * setAttribute/style writes per player, no React re-render, no VDOM diff).
+ */
+
+.player-visual-anim {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ── Pixel characters ──────────────────────────────────────────────────── */
+
+.pixel-player .pixel-leg {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+.pixel-player.is-moving .pixel-leg-left {
+  animation: pixelStep var(--step-duration, 190ms) steps(2, jump-none) infinite;
+}
+
+.pixel-player.is-moving .pixel-leg-right {
+  animation: pixelStep var(--step-duration, 190ms) steps(2, jump-none) infinite;
+  animation-delay: calc(var(--step-duration, 190ms) / 2);
+}
+
+@keyframes pixelStep {
+  0%   { transform: translateY(0) scaleY(1); }
+  50%  { transform: translateY(-1.5px) scaleY(0.88); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+.pixel-player.is-moving .pixel-hop {
+  animation: pixelHop var(--step-duration, 190ms) steps(2, jump-none) infinite;
+}
+
+@keyframes pixelHop {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.5px); }
+}
+
+/* Slower cupitání while charging + moving at once. */
+.pixel-player.is-charging.is-moving .pixel-leg-left,
+.pixel-player.is-charging.is-moving .pixel-leg-right,
+.pixel-player.is-charging.is-moving .pixel-hop {
+  animation-duration: calc(var(--step-duration, 190ms) * 1.6);
+}
+
+/* Gentle idle shuffle while charging but standing still. */
+.pixel-player.is-charging:not(.is-moving) .pixel-hop {
+  animation: pixelIdleShuffle 900ms ease-in-out infinite;
+}
+
+@keyframes pixelIdleShuffle {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1px); }
+}
+
+.pixel-player.is-almost-charged .pixel-body-group {
+  animation: pixelChargeVibrate 90ms linear infinite;
+}
+
+@keyframes pixelChargeVibrate {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(0.6px); }
+}
+
+.pixel-player.is-kicking .pixel-kick-leg {
+  animation: pixelKick 150ms ease-out 1;
+}
+
+@keyframes pixelKick {
+  0%   { transform: translateX(0) rotate(0deg); }
+  40%  { transform: translateX(5px) rotate(-18deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* ── Minimal circles ───────────────────────────────────────────────────── */
+
+.minimal-circle-player {
+  transition: none;
+}

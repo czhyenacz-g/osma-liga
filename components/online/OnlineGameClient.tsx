@@ -7,6 +7,7 @@ import MobileTouchControls from '@/components/game/MobileTouchControls';
 import MobileOrientationOverlay from '@/components/game/MobileOrientationOverlay';
 import MatchCommentaryToast from '@/components/game/MatchCommentaryToast';
 import SoundToggleButton from '@/components/game/SoundToggleButton';
+import PlayerVisualTemplateSwitcher from '@/components/PlayerVisualTemplateSwitcher';
 import { playGoalSound } from '@/lib/audio/whistleEngine';
 import type { TouchInput } from '@/game/types';
 import { firstGoalMessages, fullTimeMessages, substitutionMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
@@ -290,6 +291,7 @@ export default function OnlineGameClient({
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-2 py-4" style={bg}>
       <SoundToggleButton />
+      <PlayerVisualTemplateSwitcher />
       <MobileOrientationOverlay show={isMobile && isPortrait} />
       <div
         className="w-full"
