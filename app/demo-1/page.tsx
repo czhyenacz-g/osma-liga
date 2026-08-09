@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import LeagueHeader from "@/components/league/LeagueHeader";
-import GameHeroCompact from "@/components/league/GameHeroCompact";
+import GameHero from "@/components/league/GameHero";
 import AdSlot from "@/components/ads/AdSlot";
 import MatchHero from "@/components/league/MatchHero";
 import { getActiveHomepageChallenge } from "@/lib/game/activeChallenge";
@@ -16,23 +16,15 @@ const TITLE = "Osmá liga — vyber si tým a vlez na hřiště";
 const DESCRIPTION =
   "Osmá liga je online fotbalová hra inspirovaná okresním fotbalem. Vyber si klub a hraj proti počítači nebo proti ostatním hráčům.";
 
-const DEMO_NAV = [
-  { label: "Hrát",      href: "/satna" },
-  { label: "Liga",      href: "#uvod" },
-  { label: "Kluby",     href: "#kluby" },
-  { label: "Turnaje",   href: "/turnaj" },
-  { label: "Aktuality", href: "#aktuality" },
-];
-
-// Pracovní verze budoucí homepage. Veřejná "/" zůstává coming-soon teaser,
-// dokud tahle verze neprojde schválením a nenahradí ji.
+// Zachovaná referenční varianta předchozí iterace homepage (viz "/demo" pro aktuální iteraci).
+// Veřejná "/" zůstává coming-soon teaser, dokud jedna z těchto verzí neprojde schválením.
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   robots: { index: false, follow: false },
 };
 
-export default async function DemoHomePage() {
+export default async function DemoHomePageV1() {
   const challenge = await getActiveHomepageChallenge();
 
   const jsonLd = {
@@ -58,18 +50,17 @@ export default async function DemoHomePage() {
           backgroundPosition: "top center",
         }}
       >
-        <LeagueHeader navItems={DEMO_NAV} />
-        <GameHeroCompact />
+        <LeagueHeader />
+        <GameHero />
       </div>
 
       <div className="px-4 py-6" style={{ background: "#041f14" }}>
         <AdSlot id="home_after_hero" />
       </div>
 
-      {/* Vertikální reklamní slot — jen na extra-wide desktopu, nemění šířku hlavního obsahu.
-          Vizuálně potlačený, aby nesoutěžil s team selectorem v hero. */}
+      {/* Vertikální reklamní slot — jen na extra-wide desktopu, nemění šířku hlavního obsahu */}
       <div className="pointer-events-none fixed inset-y-0 right-0 z-10 hidden 2xl:block">
-        <div className="pointer-events-auto sticky top-28 mr-6 w-[280px] opacity-60">
+        <div className="pointer-events-auto sticky top-28 mr-6 w-[280px]">
           <AdSlot id="home_sidebar" orientation="vertical" />
         </div>
       </div>

@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import AuthStatus from "@/components/auth/AuthStatus";
 
-const NAV = [
+interface NavItem {
+  label: string;
+  href: string;
+  active?: boolean;
+}
+
+const NAV: NavItem[] = [
   { label: "Šatna",    href: "/satna",     active: false },
   { label: "Výsledky", href: "#vysledky",  active: false },
   { label: "Kluby",    href: "#kluby",     active: false },
@@ -10,7 +16,13 @@ const NAV = [
   { label: "Partneři", href: "#partneri",  active: false },
 ];
 
-export default function LeagueHeader({ compact = false }: { compact?: boolean }) {
+export default function LeagueHeader({
+  compact = false,
+  navItems = NAV,
+}: {
+  compact?: boolean;
+  navItems?: NavItem[];
+}) {
   return (
     <header
       className="relative text-white shadow-xl"
@@ -59,7 +71,7 @@ export default function LeagueHeader({ compact = false }: { compact?: boolean })
 
             {/* Navigace — desktop */}
             <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
-              {NAV.map((item) => (
+              {navItems.map((item) => (
                 <a
                   key={item.href}
                   href={item.href}
