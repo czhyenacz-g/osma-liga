@@ -126,3 +126,19 @@
 .footballer-player.is-kicking .footballer-kick-leg {
   animation: pixelKick 150ms ease-out 1;
 }
+
+/* ── SVG footballers v3 — directional pose switching ─────────────────────── */
+/* SvgFootballerPlayerV3 renders all three poses (front/back/side) at once;
+   PlayerVisualContainer writes one "orientation-*" class per frame onto the
+   same ancestor <g> that already carries is-moving/is-charging/etc (see
+   above) — a pure CSS display toggle, no re-render, no extra DOM writes
+   beyond the one class name. */
+.footballer-orientation-view {
+  display: none;
+}
+
+.orientation-front .footballer-orientation-view-front,
+.orientation-back .footballer-orientation-view-back,
+.orientation-side .footballer-orientation-view-side {
+  display: block;
+}

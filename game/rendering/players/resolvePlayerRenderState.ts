@@ -2,22 +2,39 @@ import type { GameState } from '../../types';
 import { KICK_RANGE, KICK_COOLDOWN, KICK_MAX_CHARGE_MS } from '../../constants';
 import { dist } from '../../physics';
 import { TEAM_COLORS, FACING_DEADZONE_VX, MOVING_SPEED_THRESHOLD } from './playerVisualConfig';
-import type { PlayerRenderState, PlayerTeam } from './playerVisualTypes';
+import type { PlayerRenderState, PlayerTeam, FacingOrientation } from './playerVisualTypes';
 
-// Facing direction needs one frame of memory per player (see
+export interface FacingResolution {
+  direction: 1 | -1;
+  orientation: FacingOrientation;
+}
+
+// Facing direction + orientation need one frame of memory per player (see
 // FACING_DEADZONE_VX) — kept here, entirely outside GameState/OnlineSnapshot,
 // and discarded whenever the caller discards it (e.g. on unmount). This is
 // the only piece of "animation state" this module keeps, and it's never
 // read by physics or sent anywhere.
+//
+// Coordinate convention (see game/constants.ts FIELD_T < FIELD_B): y grows
+// downward, same as any HTML canvas — so a positive vy means the player is
+// moving down the pitch, towards the viewer ('front'); negative vy means up,
+// away from the viewer ('back'). Whichever axis has the bigger magnitude
+// wins ('side' when horizontal movement dominates); ties go to front/back.
+// Below the dead zone (near-stationary), the last resolved value is held
+// instead of snapping back to a default — a player who stops keeps showing
+// whichever way they were last actually facing.
 export function createFacingDirectionTracker() {
-  const facing = new Map<string, 1 | -1>();
-  return function resolveFacing(id: string, vx: number): 1 | -1 {
-    if (Math.abs(vx) > FACING_DEADZONE_VX) {
-      const dir: 1 | -1 = vx > 0 ? 1 : -1;
-      facing.set(id, dir);
-      return dir;
+  const facing = new Map<string, FacingResolution>();
+  return function resolveFacing(id: string, vx: number, vy: number): FacingResolution {
+    if (Math.hypot(vx, vy) > FACING_DEADZONE_VX) {
+      const resolved: FacingResolution =
+        Math.abs(vx) > Math.abs(vy)
+          ? { direction: vx > 0 ? 1 : -1, orientation: 'side' }
+          : { direction: facing.get(id)?.direction ?? 1, orientation: vy >= 0 ? 'front' : 'back' };
+      facing.set(id, resolved);
+      return resolved;
     }
-    return facing.get(id) ?? 1;
+    return facing.get(id) ?? { direction: 1, orientation: 'front' };
   };
 }
 
@@ -46,6 +63,7 @@ export function resolveBotPlayerRenderStates(
     // same read-only heuristic already used for kick SFX in GameCanvas.tsx
     // (kicker.kickCooldown > 0.2s window after a KICK_COOLDOWN=0.25s reset).
     const isKicking = p.kickCooldown > KICK_COOLDOWN * 0.6;
+    const facing = facingTracker(p.id, p.vel.x, p.vel.y);
 
     return {
       id: p.id,
@@ -60,7 +78,8 @@ export function resolveBotPlayerRenderStates(
       isActive,
       isMine: p.team === 'home',
       isMoving: moving,
-      facingDirection: facingTracker(p.id, p.vel.x),
+      facingDirection: facing.direction,
+      orientation: facing.orientation,
       isCharging: isActive && state.kickWasDown,
       chargeProgress: isActive ? chargeProgress : 0,
       isKicking,
@@ -99,6 +118,7 @@ export function resolveOnlinePlayerRenderStates(
   return players.map((p): PlayerRenderState => {
     const colors = TEAM_COLORS[p.team];
     const isMyActivePlayer = p.active && myTeam !== null && p.team === myTeam;
+    const facing = facingTracker(p.id, p.pvx, p.pvy);
 
     return {
       id: p.id,
@@ -113,7 +133,8 @@ export function resolveOnlinePlayerRenderStates(
       isActive: p.active,
       isMine: myTeam !== null && p.team === myTeam,
       isMoving: isMovingFromVelocity(p.pvx, p.pvy),
-      facingDirection: facingTracker(p.id, p.pvx),
+      facingDirection: facing.direction,
+      orientation: facing.orientation,
       isCharging: isMyActivePlayer && kickChargeProgress > 0,
       chargeProgress: isMyActivePlayer ? kickChargeProgress : 0,
       // No per-player kick-cooldown is transmitted over the socket protocol

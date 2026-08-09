@@ -19,6 +19,7 @@ function makeState(overrides: Partial<PlayerRenderState> = {}): PlayerRenderStat
     isMine: true,
     isMoving: false,
     facingDirection: 1,
+    orientation: 'front',
     isCharging: false,
     chargeProgress: 0,
     isKicking: false,
@@ -36,6 +37,7 @@ describe('PlayerRenderer', () => {
       'legacy',
       'svg-footballers-v1',
       'svg-footballers-v2',
+      'svg-footballers-v3',
     ] as const) {
       const { container, unmount } = render(
         <PlayerRenderer

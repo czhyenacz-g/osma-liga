@@ -110,6 +110,10 @@ export default function GameCanvas({
     let firstGoalFired = false;
     let prevBounceTimeActive = gameState.activeGameplayModifier !== 'none';
     let prevRemovalIds = new Set(gameState.temporaryRemovals.map((r) => r.playerId));
+    // Purely cosmetic rolling rotation for the SVG-style football (see
+    // drawFootball.ts) — an arc-length/radius approximation, never read by
+    // physics/collision, discarded on unmount like every other RAF-local var.
+    let ballRotation = 0;
 
     // ── In-match audio tracking (game/audio/inMatchAudio.ts) ──────────────────
     // Read-only diffing of gameState between ticks — no changes to updateGame/
@@ -328,7 +332,10 @@ export default function GameCanvas({
 
       prevPhase = gameState.phase;
 
-      renderGame(ctx, gameState, homeTeamName);
+      const ballSpeed = Math.hypot(gameState.ball.vel.x, gameState.ball.vel.y);
+      ballRotation += (ballSpeed / BALL_RADIUS) * dt;
+
+      renderGame(ctx, gameState, homeTeamName, ballRotation);
       playerRendererRef.current?.update(resolveBotPlayerRenderStates(gameState, facingTracker));
 
       rafId = requestAnimationFrame(loop);

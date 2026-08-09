@@ -5,6 +5,7 @@ import { concededGoalMessages, pickRandomMessage } from '@/lib/game/matchComment
 import PlayerRenderer, { type PlayerRendererHandle } from '@/game/rendering/players/PlayerRenderer';
 import { resolveOnlinePlayerRenderStates, createFacingDirectionTracker } from '@/game/rendering/players/resolvePlayerRenderState';
 import { getPlayerVisualTemplate, onPlayerVisualTemplateChange } from '@/game/presentation/playerVisualSettings';
+import { drawFootball, BALL_VISUAL_RADIUS_SCALE } from '@/game/rendering/ball/drawFootball';
 
 // Constants mirroring server
 const CANVAS_W = 960;
@@ -60,6 +61,7 @@ function drawFrame(
   render: RenderState,
   snap: OnlineSnapshot,
   concededMessage: string,
+  ballRotation: number,
 ) {
   // Clear
   ctx.fillStyle = '#030e08';
@@ -112,14 +114,10 @@ function drawFrame(
   // on top of this canvas, see the component below (playerRendererRef.update()
   // right after this drawFrame() call each frame). Not drawn here any more.
 
-  // Ball (from interpolated render state)
-  ctx.beginPath();
-  ctx.arc(render.ball.rx, render.ball.ry, BALL_RADIUS, 0, Math.PI * 2);
-  ctx.fillStyle = 'white';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  // Ball (from interpolated render state) — presentation-only football look/
+  // size (BALL_VISUAL_RADIUS_SCALE); BALL_RADIUS itself (real collision size
+  // mirrored from the server) is untouched.
+  drawFootball(ctx, render.ball.rx, render.ball.ry, BALL_RADIUS * BALL_VISUAL_RADIUS_SCALE, ballRotation);
 
   // HUD — always from latest snapshot (no lerp needed for UI)
   const hm = FIELD_T / 2;
@@ -223,6 +221,11 @@ export default function OnlineGameCanvas({
     // Tracks whether the player overlay is currently shown, so setVisible()
     // is only called on an actual change rather than every frame.
     let playersVisible = true;
+    // Purely cosmetic rolling rotation for the SVG-style football (see
+    // drawFootball.ts), derived from the interpolated render position delta
+    // (no server-side ball velocity is transmitted) — never read by
+    // gameplay, discarded on unmount like every other RAF-local var here.
+    let ballRotation = 0;
 
     function frame() {
       const target = targetRef.current;
@@ -240,8 +243,12 @@ export default function OnlineGameCanvas({
       const r = render;
 
       // Interpolate ball toward target
+      const prevBallRx = r.ball.rx;
+      const prevBallRy = r.ball.ry;
       r.ball.rx = lerp(r.ball.rx, target.ball.x, LERP);
       r.ball.ry = lerp(r.ball.ry, target.ball.y, LERP);
+      const ballMoved = Math.hypot(r.ball.rx - prevBallRx, r.ball.ry - prevBallRy);
+      ballRotation += ballMoved / BALL_RADIUS;
 
       // Interpolate players toward target; sync non-positional state directly
       for (let i = 0; i < target.players.length; i++) {
@@ -278,7 +285,7 @@ export default function OnlineGameCanvas({
         ? 0
         : Math.min(1, (performance.now() - kickHeldSinceRef.current) / CHARGE_RING_MAX_MS);
 
-      drawFrame(ctx!, r, target, concededMessageRef.current);
+      drawFrame(ctx!, r, target, concededMessageRef.current, ballRotation);
 
       // Hide the player overlay during the goal celebration — drawFrame()
       // above dims the canvas and draws "GÓL!" on it, but this SVG is

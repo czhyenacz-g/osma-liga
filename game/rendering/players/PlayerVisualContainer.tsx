@@ -70,7 +70,18 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
 
           const classes = ['player-visual-anim'];
           if (template === 'pixel-characters') classes.push('pixel-player');
-          if (template === 'svg-footballers-v1' || template === 'svg-footballers-v2') classes.push('footballer-player');
+          if (
+            template === 'svg-footballers-v1' ||
+            template === 'svg-footballers-v2' ||
+            template === 'svg-footballers-v3'
+          ) {
+            classes.push('footballer-player');
+          }
+          // v3 is the only template with more than one drawn pose — this class
+          // just selects which of its front/back/side sub-groups is visible
+          // (see playerVisualAnimations.css); harmless no-op for every other
+          // template, which has no matching CSS rule for it.
+          if (template === 'svg-footballers-v3') classes.push(`orientation-${state.orientation}`);
           if (state.isMoving) classes.push('is-moving');
           if (state.isCharging) classes.push('is-charging');
           if (state.isCharging && state.chargeProgress >= ALMOST_CHARGED_THRESHOLD) classes.push('is-almost-charged');

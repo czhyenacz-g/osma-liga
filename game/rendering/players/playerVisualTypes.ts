@@ -1,5 +1,14 @@
 export type PlayerTeam = 'home' | 'away';
 
+// Coarse visual orientation for directional templates (see
+// SvgFootballerPlayerV3.tsx) — 'front' = moving down the pitch (towards the
+// viewer), 'back' = moving up (away from the viewer), 'side' = moving
+// mostly horizontally (drawn facing right; mirrored via facingDirection for
+// left, same mechanism every template already uses). Purely a presentation
+// concern, derived in resolvePlayerRenderState.ts — never read by
+// physics/AI, never stored in GameState/OnlineSnapshot.
+export type FacingOrientation = 'front' | 'back' | 'side';
+
 // The shared presentation contract — every game mode (single-player bot
 // engine, online multiplayer) adapts its own data into this shape (see
 // resolvePlayerRenderState.ts) so a single PlayerRenderer/template set can
@@ -29,8 +38,15 @@ export interface PlayerRenderState {
   isMoving: boolean;
   // 1 = facing right (the templates' base drawing direction), -1 = facing
   // left (mirrored). Derived from vx with a dead-zone — see
-  // resolvePlayerRenderState.ts.
+  // resolvePlayerRenderState.ts. Only meaningful while orientation is
+  // 'side' — templates draw 'front'/'back' symmetrically, so mirroring
+  // them is a harmless no-op.
   facingDirection: 1 | -1;
+  // Coarse front/back/side pose — see FacingOrientation above. Derived
+  // together with facingDirection, from the same dead-zoned tracker, so a
+  // stationary player keeps their last real orientation instead of
+  // snapping to a default.
+  orientation: FacingOrientation;
   isCharging: boolean;
   // 0..1 — charge progress toward a full-power shot. Purely visual feedback;
   // never affects actual kick force.

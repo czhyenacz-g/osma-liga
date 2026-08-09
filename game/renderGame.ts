@@ -6,6 +6,7 @@ import {
   BALL_RADIUS,
   CORNER_WARNING_DELAY, CORNER_CLEAR_DELAY,
 } from './constants';
+import { drawFootball, BALL_VISUAL_RADIUS_SCALE } from './rendering/ball/drawFootball';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ function roundRect(
 
 // ── Ball ──────────────────────────────────────────────────────────────────────
 
-function drawBall(ctx: CanvasRenderingContext2D, ball: Ball): void {
+function drawBall(ctx: CanvasRenderingContext2D, ball: Ball, rotation: number): void {
   const speed = Math.sqrt(ball.vel.x ** 2 + ball.vel.y ** 2);
 
   // Motion trail: 3 fading circles behind ball when moving fast
@@ -71,22 +72,9 @@ function drawBall(ctx: CanvasRenderingContext2D, ball: Ball): void {
   ctx.fillStyle = 'rgba(0,0,0,0.32)';
   ctx.fill();
 
-  // Ball fill
-  ctx.beginPath();
-  ctx.arc(ball.pos.x, ball.pos.y, BALL_RADIUS, 0, Math.PI * 2);
-  ctx.fillStyle = 'white';
-  ctx.fill();
-
-  // Outline — dark for contrast on grass
-  ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Small specular highlight
-  ctx.beginPath();
-  ctx.arc(ball.pos.x - 3, ball.pos.y - 3, 2.5, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.65)';
-  ctx.fill();
+  // Ball — presentation-only football look/size (BALL_VISUAL_RADIUS_SCALE);
+  // BALL_RADIUS itself (the real collision size) is untouched.
+  drawFootball(ctx, ball.pos.x, ball.pos.y, BALL_RADIUS * BALL_VISUAL_RADIUS_SCALE, rotation);
 }
 
 // ── End overlay ───────────────────────────────────────────────────────────────
@@ -176,7 +164,12 @@ function drawEndOverlay(
 
 // ── Main render function ──────────────────────────────────────────────────────
 
-export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, homeTeamName = 'Náhoda FC'): void {
+export function renderGame(
+  ctx: CanvasRenderingContext2D,
+  state: GameState,
+  homeTeamName = 'Náhoda FC',
+  ballRotation = 0,
+): void {
   // ── Background ────────────────────────────────────────────────────────────
 
   ctx.fillStyle = 'rgba(3,18,10,0.92)';
@@ -244,7 +237,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, home
 
   // ── Ball ──────────────────────────────────────────────────────────────────
 
-  drawBall(ctx, state.ball);
+  drawBall(ctx, state.ball, ballRotation);
 
   // ── HUD ───────────────────────────────────────────────────────────────────
 

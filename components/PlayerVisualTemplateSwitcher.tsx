@@ -13,6 +13,7 @@ const OPTIONS: { value: PlayerVisualTemplate; label: string }[] = [
   { value: 'minimal-circles', label: 'Minimalistické kruhy' },
   { value: 'svg-footballers-v1', label: 'SVG fotbalisté v1' },
   { value: 'svg-footballers-v2', label: 'SVG fotbalisté v2' },
+  { value: 'svg-footballers-v3', label: 'SVG fotbalisté v3 (směrové)' },
   { value: 'legacy', label: 'Původní symboly' },
 ];
 
@@ -21,6 +22,7 @@ const SHORT_LABELS: Record<PlayerVisualTemplate, string> = {
   'minimal-circles': 'Kruhy',
   'svg-footballers-v1': 'Fotbal. v1',
   'svg-footballers-v2': 'Fotbal. v2',
+  'svg-footballers-v3': 'Fotbal. v3',
   legacy: 'Původní',
 };
 

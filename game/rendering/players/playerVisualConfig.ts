@@ -48,6 +48,13 @@ export const PLAYER_VISUAL_CONFIG: Record<PlayerVisualTemplate, PlayerVisualTemp
     stepDurationMs: 210,
     hopHeightPx: 2,
   },
+  'svg-footballers-v3': {
+    // Biggest head ratio of the three — same family sizing progression as v1 -> v2.
+    visualRadiusScale: 1.22,
+    maxChargeScale: 1.22,
+    stepDurationMs: 210,
+    hopHeightPx: 2,
+  },
 };
 
 export const TEAM_COLORS: Record<PlayerTeam, { primary: string; secondary: string }> = {
@@ -55,8 +62,10 @@ export const TEAM_COLORS: Record<PlayerTeam, { primary: string; secondary: strin
   away: { primary: '#3b82f6', secondary: '#1d4ed8' },
 };
 
-// Below this |vx| (px/s) we keep the last known facing direction instead of
-// flipping — avoids a jittery mirror-flicker while nearly stationary.
+// Below this speed magnitude (px/s, hypot of vx/vy) we keep the last known
+// facing direction/orientation instead of re-deriving it — avoids a jittery
+// mirror-flicker (and directional templates snapping to a default pose)
+// while nearly stationary.
 export const FACING_DEADZONE_VX = 6;
 
 // Above this speed (px/s) a player counts as "moving" for animation

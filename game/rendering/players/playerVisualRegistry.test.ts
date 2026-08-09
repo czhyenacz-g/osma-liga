@@ -5,6 +5,7 @@ import MinimalCirclePlayer from './templates/MinimalCirclePlayer';
 import LegacyPlayerVisual from './templates/LegacyPlayerVisual';
 import SvgFootballerPlayerV1 from './templates/SvgFootballerPlayerV1';
 import SvgFootballerPlayerV2 from './templates/SvgFootballerPlayerV2';
+import SvgFootballerPlayerV3 from './templates/SvgFootballerPlayerV3';
 import type { PlayerVisualTemplate } from '../../presentation/playerVisualTemplate';
 
 describe('playerVisualRegistry', () => {
@@ -14,6 +15,7 @@ describe('playerVisualRegistry', () => {
     expect(playerVisualRegistry.legacy).toBe(LegacyPlayerVisual);
     expect(playerVisualRegistry['svg-footballers-v1']).toBe(SvgFootballerPlayerV1);
     expect(playerVisualRegistry['svg-footballers-v2']).toBe(SvgFootballerPlayerV2);
+    expect(playerVisualRegistry['svg-footballers-v3']).toBe(SvgFootballerPlayerV3);
   });
 
   it('resolvePlayerVisualComponent returns the matching component for a valid template', () => {
@@ -22,6 +24,7 @@ describe('playerVisualRegistry', () => {
     expect(resolvePlayerVisualComponent('legacy')).toBe(LegacyPlayerVisual);
     expect(resolvePlayerVisualComponent('svg-footballers-v1')).toBe(SvgFootballerPlayerV1);
     expect(resolvePlayerVisualComponent('svg-footballers-v2')).toBe(SvgFootballerPlayerV2);
+    expect(resolvePlayerVisualComponent('svg-footballers-v3')).toBe(SvgFootballerPlayerV3);
   });
 
   it('falls back to pixel-characters for a missing/unknown template key', () => {
@@ -34,6 +37,7 @@ describe('playerVisualRegistry', () => {
     expect(usesSharedActiveIndicator('minimal-circles')).toBe(true);
     expect(usesSharedActiveIndicator('svg-footballers-v1')).toBe(true);
     expect(usesSharedActiveIndicator('svg-footballers-v2')).toBe(true);
+    expect(usesSharedActiveIndicator('svg-footballers-v3')).toBe(true);
     expect(usesSharedActiveIndicator('legacy')).toBe(false);
   });
 });

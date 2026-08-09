@@ -7,7 +7,8 @@ export type PlayerVisualTemplate =
   | 'minimal-circles'
   | 'legacy'
   | 'svg-footballers-v1'
-  | 'svg-footballers-v2';
+  | 'svg-footballers-v2'
+  | 'svg-footballers-v3';
 
 // New installs and unreadable/legacy-invalid stored values both fall back
 // here — pixel-characters is the product default per spec.
@@ -19,6 +20,7 @@ const VALID_TEMPLATES: readonly PlayerVisualTemplate[] = [
   'legacy',
   'svg-footballers-v1',
   'svg-footballers-v2',
+  'svg-footballers-v3',
 ];
 
 // A short-lived build's stored value from before the v1/v2 split — mapped

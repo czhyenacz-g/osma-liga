@@ -96,6 +96,63 @@ describe('resolveBotPlayerRenderStates', () => {
   });
 });
 
+describe('createFacingDirectionTracker — orientation (front/back/side)', () => {
+  it('resolves down movement (positive vy) to front', () => {
+    const tracker = createFacingDirectionTracker();
+    expect(tracker('p1', 0, 200).orientation).toBe('front');
+  });
+
+  it('resolves up movement (negative vy) to back', () => {
+    const tracker = createFacingDirectionTracker();
+    expect(tracker('p1', 0, -200).orientation).toBe('back');
+  });
+
+  it('resolves horizontal-dominant movement to side, with direction from the sign of vx', () => {
+    const tracker = createFacingDirectionTracker();
+    expect(tracker('p1', 200, 10)).toEqual({ direction: 1, orientation: 'side' });
+    expect(tracker('p2', -200, -10)).toEqual({ direction: -1, orientation: 'side' });
+  });
+
+  it('holds the last resolved orientation/direction once velocity drops inside the dead zone', () => {
+    const tracker = createFacingDirectionTracker();
+    tracker('p1', -200, 0); // side, facing left
+    expect(tracker('p1', 0, 0)).toEqual({ direction: -1, orientation: 'side' });
+
+    const tracker2 = createFacingDirectionTracker();
+    tracker2('p2', 0, -200); // back
+    expect(tracker2('p2', 1, 1).orientation).toBe('back'); // still inside dead zone (hypot < 6)
+  });
+
+  it('defaults to front for a player that has never moved', () => {
+    const tracker = createFacingDirectionTracker();
+    expect(tracker('never-moved', 0, 0)).toEqual({ direction: 1, orientation: 'front' });
+  });
+
+  it('tracks each player id independently', () => {
+    const tracker = createFacingDirectionTracker();
+    tracker('a', 0, -200); // back
+    tracker('b', 0, 200); // front
+    expect(tracker('a', 0, 0).orientation).toBe('back');
+    expect(tracker('b', 0, 0).orientation).toBe('front');
+  });
+});
+
+describe('resolveBotPlayerRenderStates — orientation is independent of isActive', () => {
+  it('every player gets an orientation derived from their own velocity, not whether they are the active player', () => {
+    const state = createInitialState();
+    const tracker = createFacingDirectionTracker();
+    const n1 = state.players.find((p) => p.id === 'n1')!;
+    const n2 = state.players.find((p) => p.id === 'n2')!;
+    n1.vel.x = 0; n1.vel.y = -200; // n1 moves up (back)
+    n2.vel.x = 0; n2.vel.y = 200; // n2 moves down (front)
+    state.activePlayerId = 'n1'; // n1 is active, n2 is not
+
+    const result = resolveBotPlayerRenderStates(state, tracker);
+    expect(result.find((p) => p.id === 'n1')!.orientation).toBe('back');
+    expect(result.find((p) => p.id === 'n2')!.orientation).toBe('front');
+  });
+});
+
 describe('resolveOnlinePlayerRenderStates', () => {
   const basePlayers = [
     { id: 'h1', team: 'home' as const, label: 'H1', rx: 400, ry: 280, pvx: 0, pvy: 0, active: true, removed: false },

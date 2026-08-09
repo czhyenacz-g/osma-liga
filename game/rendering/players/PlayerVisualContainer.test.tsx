@@ -19,6 +19,7 @@ function makeState(overrides: Partial<PlayerRenderState> = {}): PlayerRenderStat
     isMine: true,
     isMoving: false,
     facingDirection: 1,
+    orientation: 'front',
     isCharging: false,
     chargeProgress: 0,
     isKicking: false,
@@ -82,7 +83,7 @@ describe('PlayerVisualContainer — pixel-characters / minimal-circles (shared a
     expect(uiGroup.getAttribute('opacity')).toBe('1');
   });
 
-  it.each(['svg-footballers-v1', 'svg-footballers-v2'] as const)(
+  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3'] as const)(
     '%s also uses the shared ring + charge-scale (not a self-contained template like legacy)',
     (template) => {
       const ref = createRef<PlayerVisualContainerHandle>();
