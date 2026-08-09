@@ -85,6 +85,7 @@ export default function TeamGameSelector({ variant = 'default' }: TeamGameSelect
                 type="button"
                 onClick={() => selectClub(club.slug)}
                 aria-pressed={active}
+                title={`${club.name} — ${club.note}`}
                 className={
                   isCompact
                     ? 'relative flex shrink-0 snap-start flex-col items-center gap-1.5 rounded-lg px-3 py-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d6a94a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#052e1a]'

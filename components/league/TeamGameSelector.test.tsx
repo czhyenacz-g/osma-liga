@@ -67,4 +67,14 @@ describe('TeamGameSelector', () => {
     render(<TeamGameSelector />);
     expect(screen.queryByRole('link', { name: /Další kluby/ })).not.toBeInTheDocument();
   });
+
+  it('club crests show a hover tooltip with name and note', () => {
+    render(<TeamGameSelector />);
+    const firstClub = CLUBS[0];
+
+    expect(screen.getByRole('button', { name: new RegExp(firstClub.name) })).toHaveAttribute(
+      'title',
+      `${firstClub.name} — ${firstClub.note}`,
+    );
+  });
 });
