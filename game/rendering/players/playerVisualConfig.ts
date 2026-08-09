@@ -35,9 +35,16 @@ export const PLAYER_VISUAL_CONFIG: Record<PlayerVisualTemplate, PlayerVisualTemp
     stepDurationMs: 0,
     hopHeightPx: 0,
   },
-  'svg-footballers': {
+  'svg-footballers-v1': {
     visualRadiusScale: 1.15,
     maxChargeScale: 1.2,
+    stepDurationMs: 210,
+    hopHeightPx: 2,
+  },
+  'svg-footballers-v2': {
+    // Slightly bigger than v1 to match its more pronounced chibi head.
+    visualRadiusScale: 1.2,
+    maxChargeScale: 1.22,
     stepDurationMs: 210,
     hopHeightPx: 2,
   },

@@ -3,7 +3,8 @@ import { DEFAULT_PLAYER_VISUAL_TEMPLATE } from '../../presentation/playerVisualT
 import PixelCharacterPlayer from './templates/PixelCharacterPlayer';
 import MinimalCirclePlayer from './templates/MinimalCirclePlayer';
 import LegacyPlayerVisual from './templates/LegacyPlayerVisual';
-import SvgFootballerPlayer from './templates/SvgFootballerPlayer';
+import SvgFootballerPlayerV1 from './templates/SvgFootballerPlayerV1';
+import SvgFootballerPlayerV2 from './templates/SvgFootballerPlayerV2';
 import type { PlayerVisualComponentProps } from './playerVisualTypes';
 
 // Central template lookup — the only place that maps a PlayerVisualTemplate
@@ -13,7 +14,8 @@ export const playerVisualRegistry: Record<PlayerVisualTemplate, React.ComponentT
   'pixel-characters': PixelCharacterPlayer,
   'minimal-circles': MinimalCirclePlayer,
   legacy: LegacyPlayerVisual,
-  'svg-footballers': SvgFootballerPlayer,
+  'svg-footballers-v1': SvgFootballerPlayerV1,
+  'svg-footballers-v2': SvgFootballerPlayerV2,
 };
 
 // Looks up a template, falling back to the default (pixel-characters) for

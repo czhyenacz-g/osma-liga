@@ -11,14 +11,16 @@ import { DEFAULT_PLAYER_VISUAL_TEMPLATE, type PlayerVisualTemplate } from '@/gam
 const OPTIONS: { value: PlayerVisualTemplate; label: string }[] = [
   { value: 'pixel-characters', label: 'Pixel postavičky' },
   { value: 'minimal-circles', label: 'Minimalistické kruhy' },
-  { value: 'svg-footballers', label: 'SVG fotbalisté' },
+  { value: 'svg-footballers-v1', label: 'SVG fotbalisté v1' },
+  { value: 'svg-footballers-v2', label: 'SVG fotbalisté v2' },
   { value: 'legacy', label: 'Původní symboly' },
 ];
 
 const SHORT_LABELS: Record<PlayerVisualTemplate, string> = {
   'pixel-characters': 'Pixel',
   'minimal-circles': 'Kruhy',
-  'svg-footballers': 'Fotbalisté',
+  'svg-footballers-v1': 'Fotbal. v1',
+  'svg-footballers-v2': 'Fotbal. v2',
   legacy: 'Původní',
 };
 

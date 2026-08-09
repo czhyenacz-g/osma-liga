@@ -1,20 +1,25 @@
 import type { PlayerVisualComponentProps } from '../playerVisualTypes';
-import { getFootballerVariant, type HairStyle } from './footballerVariants';
+import { getFootballerVariantV1, type HairStyle } from './footballerVariantsV1';
 
-// New "living" template — a small stylized/chibi footballer: big readable
+// "svg-footballers-v1" — a small stylized/chibi footballer: big readable
 // head, compact jersey body, short arms/legs, simple face. Front-facing (not
 // a direction-aware sprite set — see PlayerVisualContainer, which mirrors
 // this whole group via scaleX for left-facing movement, same as every other
 // template) and drawn as a handful of plain shapes, not detailed paths, so
 // it stays cheap to render and legible at in-game size.
 //
+// See SvgFootballerPlayerV2.tsx for the newer, more chibi/rounded sibling
+// template — this v1 component is kept byte-for-byte unchanged in look
+// (only renamed/re-exported) so the existing "svg-footballers-v1" choice
+// keeps rendering exactly as before.
+//
 // Mounted once per player and never re-rendered for per-frame data — exactly
 // like PixelCharacterPlayer, the stepping/hop/charge-vibrate/kick animations
-// are pure CSS (playerVisualAnimations.css ".footballer-player" rules)
-// reacting to boolean classes toggled on the ancestor <g> by
+// are pure CSS (playerVisualAnimations.css ".footballer-player" rules,
+// shared with v2) reacting to boolean classes toggled on the ancestor <g> by
 // PlayerVisualContainer every frame.
-export default function SvgFootballerPlayer({ label, primaryColor, secondaryColor }: PlayerVisualComponentProps) {
-  const { hairStyle, skinTone, hairColor } = getFootballerVariant(label);
+export default function SvgFootballerPlayerV1({ label, primaryColor, secondaryColor }: PlayerVisualComponentProps) {
+  const { hairStyle, skinTone, hairColor } = getFootballerVariantV1(label);
 
   return (
     <g>
