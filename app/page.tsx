@@ -36,10 +36,10 @@ export default function HomePage() {
         backgroundPosition: "top center",
       }}
     >
-      {/* Tmavý overlay pro čitelnost textu nad stadionovým pozadím */}
+      {/* Jemný ztmavující overlay pro čitelnost textu nad stadionovým pozadím */}
       <div
         className="absolute inset-0"
-        style={{ background: "linear-gradient(to bottom, rgba(3,22,10,0.88) 0%, rgba(5,46,26,0.82) 100%)" }}
+        style={{ background: "linear-gradient(to bottom, rgba(3,22,10,0.55) 0%, rgba(5,46,26,0.4) 45%, rgba(3,22,10,0.65) 100%)" }}
       />
 
       <header className="relative shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -78,18 +78,30 @@ export default function HomePage() {
 
       <main className="relative flex flex-1 flex-col items-center justify-center px-4 py-16 text-center">
         <h1
-          className="font-extrabold uppercase drop-shadow-lg"
-          style={{ fontSize: "clamp(32px, 7vw, 72px)", letterSpacing: "-0.01em", lineHeight: 1.1 }}
+          className="font-extrabold uppercase"
+          style={{
+            fontSize: "clamp(32px, 7vw, 72px)",
+            letterSpacing: "-0.01em",
+            lineHeight: 1.1,
+            textShadow: "0 2px 24px rgba(0,0,0,0.65), 0 1px 4px rgba(0,0,0,0.5)",
+          }}
         >
           Osmá liga se připravuje
         </h1>
         <p
           className="mt-6 font-semibold uppercase tracking-[0.15em]"
-          style={{ fontSize: "clamp(15px, 2.2vw, 22px)", color: "#d6a94a" }}
+          style={{
+            fontSize: "clamp(15px, 2.2vw, 22px)",
+            color: "#d6a94a",
+            textShadow: "0 2px 12px rgba(0,0,0,0.6)",
+          }}
         >
           Nová sezóna začíná 1. září 2026
         </p>
-        <p className="mt-4 text-white/70" style={{ fontSize: "clamp(14px, 1.6vw, 18px)" }}>
+        <p
+          className="mt-4 text-white/90"
+          style={{ fontSize: "clamp(14px, 1.6vw, 18px)", textShadow: "0 2px 10px rgba(0,0,0,0.6)" }}
+        >
           Vyber si klub. Vlez na hřiště.
         </p>
       </main>
