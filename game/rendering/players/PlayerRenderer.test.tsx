@@ -38,6 +38,7 @@ describe('PlayerRenderer', () => {
       'svg-footballers-v1',
       'svg-footballers-v2',
       'svg-footballers-v3',
+      'svg-footballers-v4',
     ] as const) {
       const { container, unmount } = render(
         <PlayerRenderer

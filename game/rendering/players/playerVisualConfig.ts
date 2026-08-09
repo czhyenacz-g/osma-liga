@@ -55,6 +55,15 @@ export const PLAYER_VISUAL_CONFIG: Record<PlayerVisualTemplate, PlayerVisualTemp
     stepDurationMs: 210,
     hopHeightPx: 2,
   },
+  'svg-footballers-v4': {
+    // ~12% bigger than v3 (within the requested 10-15% range) — presentation
+    // only, see PlayerVisualTemplateConfig doc above; hitboxRadiusPx (the
+    // real collision radius) never changes because of this number.
+    visualRadiusScale: 1.37,
+    maxChargeScale: 1.2,
+    stepDurationMs: 210,
+    hopHeightPx: 2,
+  },
 };
 
 export const TEAM_COLORS: Record<PlayerTeam, { primary: string; secondary: string }> = {

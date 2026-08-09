@@ -83,7 +83,7 @@ describe('PlayerVisualContainer — pixel-characters / minimal-circles (shared a
     expect(uiGroup.getAttribute('opacity')).toBe('1');
   });
 
-  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3'] as const)(
+  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4'] as const)(
     '%s also uses the shared ring + charge-scale (not a self-contained template like legacy)',
     (template) => {
       const ref = createRef<PlayerVisualContainerHandle>();
