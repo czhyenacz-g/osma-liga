@@ -62,15 +62,15 @@ export default async function DemoHomePage() {
         <GameHeroCompact />
       </div>
 
-      <div className="px-4 py-6" style={{ background: "#041f14" }}>
+      <div id="after-hero" className="px-4 py-6" style={{ background: "#041f14" }}>
         <AdSlot id="home_after_hero" />
       </div>
 
       {/* Vertikální reklamní slot — jen na extra-wide desktopu, nemění šířku hlavního obsahu.
-          Vizuálně potlačený, aby nesoutěžil s team selectorem v hero. */}
+          Vizuálně potlačený a zmenšený (compact promo box), aby nesoutěžil s team selectorem v hero. */}
       <div className="pointer-events-none fixed inset-y-0 right-0 z-10 hidden 2xl:block">
-        <div className="pointer-events-auto sticky top-28 mr-6 w-[280px] opacity-60">
-          <AdSlot id="home_sidebar" orientation="vertical" />
+        <div className="pointer-events-auto sticky top-28 mr-6 w-[260px] opacity-60">
+          <AdSlot id="home_sidebar" orientation="vertical" className="ad-slot-compact" />
         </div>
       </div>
 

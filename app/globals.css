@@ -17,3 +17,15 @@ html {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Zmenšený vertikální AdSlot (sidebar promo box na /demo) — přebíjí výchozí min-h utility AdSlotu,
+   bez zásahu do jeho API. Vidět jen na 2xl+, viz app/demo/page.tsx. */
+.ad-slot-compact {
+  min-height: 260px;
+}
+
+@media (min-width: 640px) {
+  .ad-slot-compact {
+    min-height: 360px;
+  }
+}

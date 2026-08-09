@@ -51,4 +51,20 @@ describe('TeamGameSelector', () => {
       `/hra/multiplayer?club=${thirdClub.slug}`,
     );
   });
+
+  it('expanded variant renders without scroll arrows (multi-row wrap layout instead)', () => {
+    render(<TeamGameSelector variant="expanded" />);
+    expect(screen.queryByLabelText('Posunout kluby vlevo')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Posunout kluby vpravo')).not.toBeInTheDocument();
+  });
+
+  it('expanded variant renders a "Další kluby" card linking to /kluby', () => {
+    render(<TeamGameSelector variant="expanded" />);
+    expect(screen.getByRole('link', { name: /Další kluby/ })).toHaveAttribute('href', '/kluby');
+  });
+
+  it('default and compact variants do not render the "Další kluby" card', () => {
+    render(<TeamGameSelector />);
+    expect(screen.queryByRole('link', { name: /Další kluby/ })).not.toBeInTheDocument();
+  });
 });
