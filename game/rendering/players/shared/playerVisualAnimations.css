@@ -85,3 +85,44 @@
 .minimal-circle-player {
   transition: none;
 }
+
+/* ── SVG footballers ───────────────────────────────────────────────────── */
+/* Reuses the exact same keyframes as pixel-characters above (pixelStep/
+   pixelHop/pixelKick/pixelChargeVibrate are generic, not pixel-art-specific)
+   for a light, consistent "living" idle/step feel — no new animation system. */
+
+.footballer-player .footballer-leg {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+.footballer-player.is-moving .footballer-leg-left {
+  animation: pixelStep var(--step-duration, 210ms) steps(2, jump-none) infinite;
+}
+
+.footballer-player.is-moving .footballer-leg-right {
+  animation: pixelStep var(--step-duration, 210ms) steps(2, jump-none) infinite;
+  animation-delay: calc(var(--step-duration, 210ms) / 2);
+}
+
+.footballer-player.is-moving .footballer-hop {
+  animation: pixelHop var(--step-duration, 210ms) steps(2, jump-none) infinite;
+}
+
+.footballer-player.is-charging.is-moving .footballer-leg-left,
+.footballer-player.is-charging.is-moving .footballer-leg-right,
+.footballer-player.is-charging.is-moving .footballer-hop {
+  animation-duration: calc(var(--step-duration, 210ms) * 1.6);
+}
+
+.footballer-player.is-charging:not(.is-moving) .footballer-hop {
+  animation: pixelIdleShuffle 900ms ease-in-out infinite;
+}
+
+.footballer-player.is-almost-charged .footballer-body-group {
+  animation: pixelChargeVibrate 90ms linear infinite;
+}
+
+.footballer-player.is-kicking .footballer-kick-leg {
+  animation: pixelKick 150ms ease-out 1;
+}

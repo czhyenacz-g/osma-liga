@@ -70,6 +70,7 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
 
           const classes = ['player-visual-anim'];
           if (template === 'pixel-characters') classes.push('pixel-player');
+          if (template === 'svg-footballers') classes.push('footballer-player');
           if (state.isMoving) classes.push('is-moving');
           if (state.isCharging) classes.push('is-charging');
           if (state.isCharging && state.chargeProgress >= ALMOST_CHARGED_THRESHOLD) classes.push('is-almost-charged');

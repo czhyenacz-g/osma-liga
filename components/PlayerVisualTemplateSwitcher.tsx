@@ -11,8 +11,16 @@ import { DEFAULT_PLAYER_VISUAL_TEMPLATE, type PlayerVisualTemplate } from '@/gam
 const OPTIONS: { value: PlayerVisualTemplate; label: string }[] = [
   { value: 'pixel-characters', label: 'Pixel postavičky' },
   { value: 'minimal-circles', label: 'Minimalistické kruhy' },
+  { value: 'svg-footballers', label: 'SVG fotbalisté' },
   { value: 'legacy', label: 'Původní symboly' },
 ];
+
+const SHORT_LABELS: Record<PlayerVisualTemplate, string> = {
+  'pixel-characters': 'Pixel',
+  'minimal-circles': 'Kruhy',
+  'svg-footballers': 'Fotbalisté',
+  legacy: 'Původní',
+};
 
 // Visible on every game page (training, bot, bot-team, bounce, bot-test,
 // multiplayer) — a fixed corner control, opposite SoundToggleButton, so it
@@ -77,7 +85,7 @@ export default function PlayerVisualTemplateSwitcher() {
                 color: active ? '#041f14' : 'rgba(255,255,255,0.65)',
               }}
             >
-              {opt.value === 'pixel-characters' ? 'Pixel' : opt.value === 'minimal-circles' ? 'Kruhy' : 'Původní'}
+              {SHORT_LABELS[opt.value]}
             </button>
           );
         })}

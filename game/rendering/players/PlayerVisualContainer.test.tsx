@@ -82,6 +82,31 @@ describe('PlayerVisualContainer — pixel-characters / minimal-circles (shared a
     expect(uiGroup.getAttribute('opacity')).toBe('1');
   });
 
+  it('svg-footballers also uses the shared ring + charge-scale (not a self-contained template like legacy)', () => {
+    const ref = createRef<PlayerVisualContainerHandle>();
+    const { container } = render(
+      <svg>
+        <PlayerVisualContainer
+          ref={ref}
+          template="svg-footballers"
+          team="home"
+          label="N1"
+          primaryColor="#22c55e"
+          secondaryColor="#15803d"
+          hitboxRadiusPx={18}
+        />
+      </svg>,
+    );
+
+    ref.current!.update(makeState({ isActive: true, isCharging: true, chargeProgress: 1 }));
+    const animGroup = container.querySelector('.player-visual-anim.footballer-player')!;
+    expect(animGroup).not.toBeNull();
+    expect(animGroup.getAttribute('transform')).not.toBe('scale(1)');
+
+    const uiGroup = container.querySelector('ellipse')!.parentElement!;
+    expect(uiGroup.getAttribute('opacity')).toBe('1');
+  });
+
   it('mirrors only the direction wrapper (character), never the UI wrapper (ring)', () => {
     const ref = createRef<PlayerVisualContainerHandle>();
     const { container } = render(

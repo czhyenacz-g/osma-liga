@@ -35,6 +35,12 @@ export const PLAYER_VISUAL_CONFIG: Record<PlayerVisualTemplate, PlayerVisualTemp
     stepDurationMs: 0,
     hopHeightPx: 0,
   },
+  'svg-footballers': {
+    visualRadiusScale: 1.15,
+    maxChargeScale: 1.2,
+    stepDurationMs: 210,
+    hopHeightPx: 2,
+  },
 };
 
 export const TEAM_COLORS: Record<PlayerTeam, { primary: string; secondary: string }> = {

@@ -30,7 +30,7 @@ function makeState(overrides: Partial<PlayerRenderState> = {}): PlayerRenderStat
 
 describe('PlayerRenderer', () => {
   it('renders the shared SVG overlay for any template without crashing', () => {
-    for (const template of ['pixel-characters', 'minimal-circles', 'legacy'] as const) {
+    for (const template of ['pixel-characters', 'minimal-circles', 'legacy', 'svg-footballers'] as const) {
       const { container, unmount } = render(
         <PlayerRenderer
           template={template}

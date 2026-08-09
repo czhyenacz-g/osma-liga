@@ -9,10 +9,11 @@ describe('playerVisualTemplate', () => {
     expect(DEFAULT_PLAYER_VISUAL_TEMPLATE).toBe('pixel-characters');
   });
 
-  it('accepts all three valid templates unchanged', () => {
+  it('accepts all four valid templates unchanged', () => {
     expect(normalizePlayerVisualTemplate('pixel-characters')).toBe('pixel-characters');
     expect(normalizePlayerVisualTemplate('minimal-circles')).toBe('minimal-circles');
     expect(normalizePlayerVisualTemplate('legacy')).toBe('legacy');
+    expect(normalizePlayerVisualTemplate('svg-footballers')).toBe('svg-footballers');
   });
 
   it('falls back to pixel-characters for an unknown string', () => {
