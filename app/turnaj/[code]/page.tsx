@@ -405,7 +405,36 @@ export default function TurnajDetailPage({
                         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span>{teamName(match.homeTeamId)} vs {teamName(match.awayTeamId)}</span>
+                          {match.status === 'finished' ? (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span
+                                style={{
+                                  color: match.winnerTeamId === match.homeTeamId ? '#d6a94a' : 'rgba(255,255,255,0.85)',
+                                  fontWeight: match.winnerTeamId === match.homeTeamId ? 700 : 400,
+                                }}
+                              >
+                                {teamName(match.homeTeamId)}
+                              </span>
+                              <span className="font-black" style={{ color: '#d6a94a' }}>
+                                {match.homeScore} : {match.awayScore}
+                              </span>
+                              <span
+                                style={{
+                                  color: match.winnerTeamId === match.awayTeamId ? '#d6a94a' : 'rgba(255,255,255,0.85)',
+                                  fontWeight: match.winnerTeamId === match.awayTeamId ? 700 : 400,
+                                }}
+                              >
+                                {teamName(match.awayTeamId)}
+                              </span>
+                              {match.winnerTeamId === null && (
+                                <span className="text-[10px]" style={{ color: 'rgba(209,250,229,0.45)' }}>
+                                  (remíza)
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span>{teamName(match.homeTeamId)} vs {teamName(match.awayTeamId)}</span>
+                          )}
                           <span className="text-xs shrink-0" style={{ color: 'rgba(209,250,229,0.4)' }}>
                             {matchStatusLabels[match.status] ?? match.status}
                           </span>
