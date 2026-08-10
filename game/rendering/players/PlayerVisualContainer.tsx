@@ -78,12 +78,13 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
           ) {
             classes.push('footballer-player');
           }
-          // All four svg-footballers templates draw more than one pose (see
-          // each template's own front/back/side sub-groups) — this class
-          // just selects which one is visible (playerVisualAnimations.css);
-          // harmless no-op for every other template, which has no matching
-          // CSS rule for it.
+          // All four svg-footballers templates plus pixel-characters draw
+          // more than one pose (see each template's own front/back/side
+          // sub-groups) — this class just selects which one is visible
+          // (playerVisualAnimations.css); harmless no-op for every other
+          // template, which has no matching CSS rule for it.
           if (
+            template === 'pixel-characters' ||
             template === 'svg-footballers-v1' ||
             template === 'svg-footballers-v2' ||
             template === 'svg-footballers-v3' ||

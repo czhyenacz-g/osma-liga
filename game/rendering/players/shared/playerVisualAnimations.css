@@ -142,3 +142,16 @@
 .orientation-side .footballer-orientation-view-side {
   display: block;
 }
+
+/* ── Pixel characters — directional pose switching ────────────────────────
+   Same mechanism/ancestor classes as the footballers above, just under the
+   "pixel-" prefix to match this template's own class naming. */
+.pixel-orientation-view {
+  display: none;
+}
+
+.orientation-front .pixel-orientation-view-front,
+.orientation-back .pixel-orientation-view-back,
+.orientation-side .pixel-orientation-view-side {
+  display: block;
+}

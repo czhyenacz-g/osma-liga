@@ -231,3 +231,49 @@ describe('all four svg-footballers templates draw a front/back/side pose (not ju
     },
   );
 });
+
+describe('pixel-characters also draws a front/back/side pose', () => {
+  it('renders exactly one front, one back, and one side sub-group', () => {
+    const { container } = render(
+      <svg>
+        <PlayerVisualContainer
+          template="pixel-characters"
+          team="home"
+          label="N1"
+          primaryColor="#22c55e"
+          secondaryColor="#15803d"
+          hitboxRadiusPx={18}
+        />
+      </svg>,
+    );
+
+    expect(container.querySelectorAll('.pixel-orientation-view-front')).toHaveLength(1);
+    expect(container.querySelectorAll('.pixel-orientation-view-back')).toHaveLength(1);
+    expect(container.querySelectorAll('.pixel-orientation-view-side')).toHaveLength(1);
+  });
+
+  it('switches its orientation-* class with facing', () => {
+    const ref = createRef<PlayerVisualContainerHandle>();
+    const { container } = render(
+      <svg>
+        <PlayerVisualContainer
+          ref={ref}
+          template="pixel-characters"
+          team="home"
+          label="N1"
+          primaryColor="#22c55e"
+          secondaryColor="#15803d"
+          hitboxRadiusPx={18}
+        />
+      </svg>,
+    );
+
+    ref.current!.update(makeState({ orientation: 'back' }));
+    const animGroup = container.querySelector('.player-visual-anim.pixel-player')!;
+    expect(animGroup.classList.contains('orientation-back')).toBe(true);
+
+    ref.current!.update(makeState({ orientation: 'side' }));
+    expect(animGroup.classList.contains('orientation-side')).toBe(true);
+    expect(animGroup.classList.contains('orientation-back')).toBe(false);
+  });
+});
