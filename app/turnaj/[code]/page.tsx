@@ -33,6 +33,20 @@ type TournamentMatch = {
   finishedAt: string | null;
 };
 
+type TournamentStanding = {
+  teamId: string;
+  slotNumber: number;
+  name: string;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+};
+
 type Tournament = {
   id: string;
   publicCode: string;
@@ -41,8 +55,11 @@ type Tournament = {
   format: TournamentFormat;
   playerCount: number;
   status: string;
+  winnerTeamId: string | null;
+  finishedAt: string | null;
   teams: TournamentTeam[];
   matches: TournamentMatch[];
+  standings: TournamentStanding[];
 };
 
 type TournamentResponse = { ok: true; tournament: Tournament };
@@ -254,12 +271,19 @@ export default function TurnajDetailPage({
   const isCreator = myUserId !== null && myUserId === tournament.createdByUserId;
   const allTeamsClaimed = tournament.teams.every((t) => t.claimedByUserId !== null);
   const statusLabel = tournament.status === 'open'
-    ? 'otevřený'
+    ? 'Přihlašování týmů'
     : tournament.status === 'in_progress'
-    ? 'probíhá'
+    ? 'Turnaj probíhá'
+    : tournament.status === 'finished'
+    ? 'Turnaj skončil'
     : tournament.status;
 
   const teamName = (teamId: string): string => tournament.teams.find((t) => t.id === teamId)?.name ?? 'Neznámý tým';
+
+  const isFinished = tournament.status === 'finished';
+  const winnerTeam = tournament.winnerTeamId
+    ? tournament.teams.find((t) => t.id === tournament.winnerTeamId) ?? null
+    : null;
 
   const matchStatusLabels: Record<string, string> = {
     scheduled: 'Naplánováno',
@@ -287,6 +311,25 @@ export default function TurnajDetailPage({
           {tournament.publicCode}
         </span>
       </div>
+
+      {isFinished && (
+        <div
+          className="w-full max-w-md p-5 flex flex-col items-center gap-1 text-center"
+          style={{ background: 'rgba(214,169,74,0.12)', border: '1px solid rgba(214,169,74,0.45)', borderRadius: 16 }}
+        >
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#d6a94a' }}>
+            🏆 Vítěz turnaje
+          </p>
+          <p className="text-xl font-black text-white">
+            {tournament.winnerTeamId
+              ? (winnerTeam ? winnerTeam.name : 'Vítěz turnaje je určen, ale tým se nepodařilo načíst.')
+              : 'Vítěz turnaje nebyl určen.'}
+          </p>
+          <p className="text-xs" style={{ color: 'rgba(209,250,229,0.5)' }}>
+            Turnaj skončil. Výsledky zůstávají uložené.
+          </p>
+        </div>
+      )}
 
       <div className="w-full max-w-md p-6 flex flex-col gap-4" style={cardBase}>
         <div>
@@ -370,6 +413,70 @@ export default function TurnajDetailPage({
             )}
           </div>
         )}
+
+        <div className="flex flex-col gap-2">
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#d6a94a' }}>Tabulka</p>
+          {!tournament.standings || tournament.standings.length === 0 ? (
+            <p className="text-xs text-center" style={{ color: 'rgba(209,250,229,0.4)' }}>
+              Tabulka se zobrazí po odehrání prvních zápasů.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-white" style={{ borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ color: 'rgba(209,250,229,0.5)' }}>
+                    <th className="text-left py-1 pr-2 font-semibold">#</th>
+                    <th className="text-left py-1 pr-2 font-semibold">Tým</th>
+                    <th className="text-center py-1 px-1 font-semibold">Z</th>
+                    <th className="text-center py-1 px-1 font-semibold">V</th>
+                    <th className="text-center py-1 px-1 font-semibold">R</th>
+                    <th className="text-center py-1 px-1 font-semibold">P</th>
+                    <th className="text-center py-1 px-1 font-semibold">Skóre</th>
+                    <th className="text-center py-1 px-1 font-semibold">Rozdíl</th>
+                    <th className="text-center py-1 pl-1 font-semibold">Body</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tournament.standings.map((row, index) => {
+                    const isWinnerRow = isFinished && index === 0;
+                    return (
+                      <tr
+                        key={row.teamId}
+                        style={{
+                          background: isWinnerRow ? 'rgba(214,169,74,0.12)' : undefined,
+                          borderTop: '1px solid rgba(255,255,255,0.06)',
+                        }}
+                      >
+                        <td className="py-1.5 pr-2" style={{ color: isWinnerRow ? '#d6a94a' : 'rgba(209,250,229,0.6)' }}>
+                          {index + 1}
+                        </td>
+                        <td
+                          className="py-1.5 pr-2 font-semibold whitespace-nowrap"
+                          style={{ color: isWinnerRow ? '#d6a94a' : 'white' }}
+                        >
+                          {row.name}
+                        </td>
+                        <td className="text-center py-1.5 px-1">{row.played}</td>
+                        <td className="text-center py-1.5 px-1">{row.wins}</td>
+                        <td className="text-center py-1.5 px-1">{row.draws}</td>
+                        <td className="text-center py-1.5 px-1">{row.losses}</td>
+                        <td className="text-center py-1.5 px-1 whitespace-nowrap">
+                          {row.goalsFor}:{row.goalsAgainst}
+                        </td>
+                        <td className="text-center py-1.5 px-1">
+                          {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
+                        </td>
+                        <td className="text-center py-1.5 pl-1 font-black" style={{ color: '#d6a94a' }}>
+                          {row.points}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
         <div className="flex flex-col gap-2">
           <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#d6a94a' }}>Rozpis zápasů</p>
