@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { use } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import GameNavLink from '@/components/ui/GameNavLink';
@@ -73,7 +74,12 @@ type PlayMatchResponse = {
   tournament: Tournament;
 };
 
-type CurrentUser = { osmaUserId: string | null } | null;
+type CurrentUser = {
+  osmaUserId: string | null;
+  username: string;
+  globalName: string | null;
+  avatarUrl: string | null;
+} | null;
 
 const cardBase: React.CSSProperties = {
   background: 'rgba(255,255,255,0.04)',
@@ -303,7 +309,14 @@ export default function TurnajDetailPage({
 
   return (
     <main className="min-h-screen flex flex-col items-center gap-6 px-4 py-10" style={{ background: '#041f14' }}>
-      <GameNavLink />
+      <div className="w-full max-w-lg flex items-center justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <GameNavLink />
+        </div>
+        <div className="shrink-0">
+          <TournamentAuthControl currentUser={currentUser} />
+        </div>
+      </div>
 
       <div className="text-center">
         <p className="text-xs mb-1" style={{ color: 'rgba(209,250,229,0.4)' }}>Kód turnaje</p>
@@ -592,5 +605,58 @@ export default function TurnajDetailPage({
         ← Založit další turnaj
       </Link>
     </main>
+  );
+}
+
+// Same look/behavior as components/auth/AuthStatus.tsx, but as a plain
+// client component driven by the `currentUser` state this page already
+// fetches from /api/auth/me — AuthStatus itself is a Server Component
+// (reads the session cookie directly via getSession()) and can't be
+// imported into this 'use client' page. Claiming a team requires being
+// logged in, but this page previously never rendered any way to actually
+// log in — this fixes that gap.
+function TournamentAuthControl({ currentUser }: { currentUser: CurrentUser }) {
+  if (currentUser) {
+    return (
+      <div className="flex items-center gap-2">
+        {currentUser.avatarUrl && (
+          <Image
+            src={currentUser.avatarUrl}
+            alt={currentUser.globalName ?? currentUser.username}
+            width={24}
+            height={24}
+            className="rounded-full"
+            unoptimized
+          />
+        )}
+        <span className="hidden sm:block text-xs text-white/70 max-w-[96px] truncate">
+          {currentUser.globalName ?? currentUser.username}
+        </span>
+        <form method="POST" action="/api/auth/logout">
+          <button type="submit" className="text-xs text-white/40 hover:text-white/70 transition">
+            Odhlásit
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href="/api/auth/login"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition hover:opacity-90 shrink-0"
+      style={{ background: '#d6a94a', color: '#041f14' }}
+    >
+      <DiscordIcon />
+      Přihlásit
+    </a>
+  );
+}
+
+function DiscordIcon() {
+  return (
+    <svg width="12" height="10" viewBox="0 0 71 55" fill="currentColor" aria-hidden="true">
+      <path d="M60.1 4.9A58.6 58.6 0 0 0 45.5.5a40.4 40.4 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.2 0A39.4 39.4 0 0 0 25.7.5 58.4 58.4 0 0 0 11.1 4.9C1.6 19.4-.9 33.4.3 47.2a58.8 58.8 0 0 0 17.9 9.1 43.4 43.4 0 0 0 3.8-6.2 38.4 38.4 0 0 1-6-2.9l1.5-1.1a42 42 0 0 0 36 0l1.5 1.1a38.6 38.6 0 0 1-6 2.9 43.3 43.3 0 0 0 3.8 6.2 58.6 58.6 0 0 0 17.9-9.1c1.5-15.4-2.4-29.3-10.5-41.2ZM23.8 37.9a6.7 6.7 0 0 1-6.3-7 6.7 6.7 0 0 1 6.3-7 6.7 6.7 0 0 1 6.3 7 6.7 6.7 0 0 1-6.3 7Zm23.3 0a6.7 6.7 0 0 1-6.3-7 6.7 6.7 0 0 1 6.3-7 6.7 6.7 0 0 1 6.3 7 6.7 6.7 0 0 1-6.3 7Z" />
+    </svg>
   );
 }
