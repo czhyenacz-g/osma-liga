@@ -111,6 +111,34 @@ describe('PlayerVisualContainer — pixel-characters / minimal-circles (shared a
     },
   );
 
+  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4'] as const)(
+    '%s switches its orientation-* class with facing (all four footballer templates draw front/back/side)',
+    (template) => {
+      const ref = createRef<PlayerVisualContainerHandle>();
+      const { container } = render(
+        <svg>
+          <PlayerVisualContainer
+            ref={ref}
+            template={template}
+            team="home"
+            label="N1"
+            primaryColor="#22c55e"
+            secondaryColor="#15803d"
+            hitboxRadiusPx={18}
+          />
+        </svg>,
+      );
+
+      ref.current!.update(makeState({ orientation: 'back' }));
+      const animGroup = container.querySelector('.player-visual-anim.footballer-player')!;
+      expect(animGroup.classList.contains('orientation-back')).toBe(true);
+
+      ref.current!.update(makeState({ orientation: 'side' }));
+      expect(animGroup.classList.contains('orientation-side')).toBe(true);
+      expect(animGroup.classList.contains('orientation-back')).toBe(false);
+    },
+  );
+
   it('mirrors only the direction wrapper (character), never the UI wrapper (ring)', () => {
     const ref = createRef<PlayerVisualContainerHandle>();
     const { container } = render(
@@ -178,4 +206,28 @@ describe('PlayerVisualContainer — legacy (self-contained, no shared charge-sca
     // not the shared <ellipse>-based ActivePlayerRing.
     expect(container.querySelector('ellipse')).toBeNull();
   });
+});
+
+describe('all four svg-footballers templates draw a front/back/side pose (not just v3/v4)', () => {
+  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4'] as const)(
+    '%s renders exactly one front, one back, and one side sub-group',
+    (template) => {
+      const { container } = render(
+        <svg>
+          <PlayerVisualContainer
+            template={template}
+            team="home"
+            label="N1"
+            primaryColor="#22c55e"
+            secondaryColor="#15803d"
+            hitboxRadiusPx={18}
+          />
+        </svg>,
+      );
+
+      expect(container.querySelectorAll('.footballer-orientation-view-front')).toHaveLength(1);
+      expect(container.querySelectorAll('.footballer-orientation-view-back')).toHaveLength(1);
+      expect(container.querySelectorAll('.footballer-orientation-view-side')).toHaveLength(1);
+    },
+  );
 });
