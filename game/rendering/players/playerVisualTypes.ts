@@ -54,6 +54,10 @@ export interface PlayerRenderState {
   isKicking: boolean;
   hasBall: boolean;
   isRemoved: boolean;
+  // True for the one goalkeeper per team — drives the colour/size overrides
+  // in PlayerVisualContainer.tsx + resolvePlayerRenderState.ts so every
+  // template renders it distinctly without per-template special-casing.
+  isGoalkeeper: boolean;
 }
 
 // Template components are mounted ONCE per player and never re-rendered for
@@ -73,4 +77,5 @@ export interface PlayerVisualComponentProps {
   primaryColor: string;
   secondaryColor: string;
   hitboxRadiusPx: number;
+  isGoalkeeper: boolean;
 }

@@ -1,6 +1,7 @@
 import type { GameState, InputState, Vec2 } from './types';
 import { createInitialState } from './createInitialState';
 import { updateAI } from './ai';
+import { updateGoalkeepers } from './goalkeeperAI';
 import { applySupportPositioning } from './supportPositioning';
 import {
   updateBallPhysics,
@@ -195,7 +196,7 @@ export function updateGame(
   // closer by ACTIVE_PLAYER_SWITCH_MARGIN, preventing jitter when two players
   // are at similar distances from the ball.
 
-  const homePlayers = state.players.filter(p => p.team === 'home' && !removedIds.has(p.id));
+  const homePlayers = state.players.filter(p => p.team === 'home' && p.role !== 'goalkeeper' && !removedIds.has(p.id));
   if (homePlayers.length === 0) return state; // never happens in MVP — pickPlayerToRemove keeps at least one
 
   let nearest = homePlayers[0];
@@ -470,6 +471,12 @@ export function updateGame(
   if (!gameModeConfig.disableOpponentAI) {
     updateAI(state, dt);
   }
+
+  // ── Goalkeepers ───────────────────────────────────────────────────────────
+  // Fully automatic for both teams — see goalkeeperAI.ts. Never part of the
+  // active-player pool above, never part of the bot-chase AI.
+
+  updateGoalkeepers(state, dt);
 
   // ── Physics ───────────────────────────────────────────────────────────────
 

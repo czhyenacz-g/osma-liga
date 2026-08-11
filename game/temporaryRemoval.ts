@@ -67,7 +67,7 @@ function moveToward(player: Player, target: Vec2, dt: number): void {
 
 function pickPlayerToRemove(state: GameState, team: Team): Player | null {
   const removedIds = getRemovedPlayerIds(state);
-  const eligible = state.players.filter((p) => p.team === team && !removedIds.has(p.id));
+  const eligible = state.players.filter((p) => p.team === team && p.role !== 'goalkeeper' && !removedIds.has(p.id));
   // Never remove the team's last controllable player.
   if (eligible.length <= 1) return null;
   return eligible[Math.floor(Math.random() * eligible.length)];

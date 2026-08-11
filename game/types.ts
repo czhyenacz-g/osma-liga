@@ -3,6 +3,12 @@ import type { GameplayProfile, GameplayModifier } from './gameplayProfiles';
 export type Team = 'home' | 'away';
 export type GamePhase = 'playing' | 'goal' | 'ended';
 
+// General player role — kept intentionally minimal (KISS) but reserved as
+// the extension point for future roles/stats (varying goalkeeper stats,
+// substitutes, bench, temporary reinforcements) instead of scattering
+// role-specific booleans/ifs across the engine.
+export type PlayerRole = 'field_player' | 'goalkeeper';
+
 export interface Vec2 {
   x: number;
   y: number;
@@ -16,6 +22,11 @@ export interface Player {
   basePos: Vec2;
   label: string;
   kickCooldown: number;
+  // Defaults to 'field_player' semantics wherever unset is impossible (all
+  // player-creation goes through createInitialState.ts, which always sets
+  // this explicitly). See goalkeeperAI.ts + PLAYER_RADIUS-adjacent constants
+  // in constants.ts for role-driven behavior.
+  role: PlayerRole;
 }
 
 export interface Ball {

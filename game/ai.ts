@@ -62,7 +62,7 @@ export function updateAI(state: GameState, dt: number): void {
   // Players currently leaving/on the bench/returning (temporaryRemoval.ts)
   // are handled entirely there — exclude them from chasing and formation.
   const removedIds = new Set(state.temporaryRemovals.map(r => r.playerId));
-  const botPlayers = players.filter(p => p.team === 'away' && !removedIds.has(p.id));
+  const botPlayers = players.filter(p => p.team === 'away' && p.role !== 'goalkeeper' && !removedIds.has(p.id));
   if (botPlayers.length === 0) return;
 
   // Identify bot player closest to ball

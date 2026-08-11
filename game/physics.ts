@@ -6,6 +6,7 @@ import {
   PLAYER_RADIUS, BUMP_FORCE, KICK_SNAP_CLEARANCE,
   TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
   TEAMMATE_BALL_RECEIVE_MAX_SPEED, TEAMMATE_BALL_RECEIVE_EXTRA_RADIUS,
+  GOALKEEPER_BALL_DAMPING, GOALKEEPER_BUMP_FORCE,
 } from './constants';
 
 // ── Vec2 helpers ──────────────────────────────────────────────────────────────
@@ -171,17 +172,31 @@ export function resolvePlayerBallCollisions(state: GameState, playerRestitution 
       const overlap = minDist - d;
       ball.pos.x += dir.x * (overlap + 1);
       ball.pos.y += dir.y * (overlap + 1);
-      // Elastic reflection: flip and scale the incoming normal component
-      if (playerRestitution > 0) {
-        const vNormal = ball.vel.x * dir.x + ball.vel.y * dir.y;
-        if (vNormal < 0) {
-          ball.vel.x -= (1 + playerRestitution) * vNormal * dir.x;
-          ball.vel.y -= (1 + playerRestitution) * vNormal * dir.y;
+      if (p.role === 'goalkeeper') {
+        // Goalkeepers are a much better obstacle than a field player: heavy
+        // damping kills most of the incoming speed (stops hard shots) rather
+        // than reflecting it, plus a modest bump — strong enough to be a
+        // real save, not so strong that a well-placed shot can never squeeze
+        // through. Deliberately ignores playerRestitution (the "bounce"
+        // gameplay profile) so goalkeeper stopping power stays consistent
+        // regardless of which profile is active.
+        ball.vel.x *= GOALKEEPER_BALL_DAMPING;
+        ball.vel.y *= GOALKEEPER_BALL_DAMPING;
+        ball.vel.x += dir.x * GOALKEEPER_BUMP_FORCE;
+        ball.vel.y += dir.y * GOALKEEPER_BUMP_FORCE;
+      } else {
+        // Elastic reflection: flip and scale the incoming normal component
+        if (playerRestitution > 0) {
+          const vNormal = ball.vel.x * dir.x + ball.vel.y * dir.y;
+          if (vNormal < 0) {
+            ball.vel.x -= (1 + playerRestitution) * vNormal * dir.x;
+            ball.vel.y -= (1 + playerRestitution) * vNormal * dir.y;
+          }
         }
+        // Gentle impulse in push direction
+        ball.vel.x += dir.x * BUMP_FORCE;
+        ball.vel.y += dir.y * BUMP_FORCE;
       }
-      // Gentle impulse in push direction
-      ball.vel.x += dir.x * BUMP_FORCE;
-      ball.vel.y += dir.y * BUMP_FORCE;
       // Track last touch for own goal detection
       state.lastTouchTeam = p.team;
       state.lastTouchPlayerId = p.id;

@@ -1,5 +1,5 @@
 import type { GameState, Player } from './types';
-import { FIELD_CX, FIELD_CY, MATCH_DURATION } from './constants';
+import { FIELD_CX, FIELD_CY, FIELD_L, FIELD_R, GOALKEEPER_DEFAULT_DEPTH, MATCH_DURATION } from './constants';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, TemporaryRemovalConfig, pickRandomTriggerSecond } from './temporaryRemoval';
 import { DEFAULT_GAMEPLAY_PROFILE, GameplayProfile } from './gameplayProfiles';
 
@@ -18,6 +18,26 @@ function makePlayer(
     basePos: { x, y },
     label,
     kickCooldown: 0,
+    role: 'field_player',
+  };
+}
+
+function makeGoalkeeper(
+  id: string,
+  team: 'home' | 'away',
+  y: number,
+  label: string,
+): Player {
+  const x = team === 'home' ? FIELD_L + GOALKEEPER_DEFAULT_DEPTH : FIELD_R - GOALKEEPER_DEFAULT_DEPTH;
+  return {
+    id,
+    team,
+    pos: { x, y },
+    vel: { x: 0, y: 0 },
+    basePos: { x, y },
+    label,
+    kickCooldown: 0,
+    role: 'goalkeeper',
   };
 }
 
@@ -39,6 +59,9 @@ export function createInitialState(
       makePlayer('p1', 'away', cx + 150, cy,       'P1'),
       makePlayer('p2', 'away', cx + 300, cy - 110, 'P2'),
       makePlayer('p3', 'away', cx + 300, cy + 110, 'P3'),
+      // Goalkeepers — one per team, not counted among the 3 field players.
+      makeGoalkeeper('n-gk', 'home', cy, 'GK'),
+      makeGoalkeeper('p-gk', 'away', cy, 'GK'),
     ],
     ball: {
       pos: { x: cx, y: cy },

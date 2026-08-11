@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import type { PlayerRenderState, PlayerVisualComponentProps } from '../playerVisualTypes';
+import { GOALKEEPER_VISUAL_SCALE } from '../playerVisualConfig';
 
 export interface LegacyPlayerVisualHandle {
   update(state: PlayerRenderState): void;
@@ -20,11 +21,16 @@ const ARROW_SPEED_THRESHOLD = 20;
 // this directly and skips its own shared UI/charge-scale wrappers for the
 // 'legacy' template).
 const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComponentProps>(
-  function LegacyPlayerVisual({ team, label, hitboxRadiusPx }, ref) {
+  function LegacyPlayerVisual({ team, label, primaryColor, secondaryColor, hitboxRadiusPx, isGoalkeeper }, ref) {
     const groupRef = useRef<SVGGElement>(null);
     const bodyRef = useRef<SVGCircleElement>(null);
     const ringRef = useRef<SVGCircleElement>(null);
     const arrowRef = useRef<SVGPathElement>(null);
+    // Legacy is forced to scale(1) by PlayerVisualContainer.tsx (its charge
+    // feedback is the ring, not the body), so unlike every other template it
+    // needs its own drawn-radius bump for goalkeepers rather than picking up
+    // the shared container scale.
+    const drawRadius = isGoalkeeper ? hitboxRadiusPx * GOALKEEPER_VISUAL_SCALE : hitboxRadiusPx;
 
     useImperativeHandle(ref, () => ({
       update(state: PlayerRenderState) {
@@ -40,7 +46,9 @@ const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComp
         const isHome = team === 'home';
         body.setAttribute(
           'fill',
-          isHome ? (state.isActive ? '#22c55e' : '#15803d') : (state.isActive ? '#3b82f6' : '#1d4ed8'),
+          isGoalkeeper
+            ? (state.isActive ? primaryColor : secondaryColor)
+            : isHome ? (state.isActive ? '#22c55e' : '#15803d') : (state.isActive ? '#3b82f6' : '#1d4ed8'),
         );
         body.setAttribute('stroke', state.isActive ? '#fbbf24' : 'rgba(255,255,255,0.65)');
         body.setAttribute('stroke-width', state.isActive ? '2.5' : '1.5');
@@ -57,7 +65,7 @@ const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComp
         }
 
         const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 300);
-        const ringRadius = hitboxRadiusPx + 5 + pulse * 3 + state.chargeProgress * CHARGE_RING_MAX_GROWTH;
+        const ringRadius = drawRadius + 5 + pulse * 3 + state.chargeProgress * CHARGE_RING_MAX_GROWTH;
         ring.setAttribute('r', String(ringRadius));
         ring.setAttribute('opacity', '1');
         ring.setAttribute('stroke', `rgba(251,191,36,${0.5 + pulse * 0.45})`);
@@ -66,7 +74,7 @@ const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComp
         if (speed > ARROW_SPEED_THRESHOLD) {
           const nx = state.vx / speed;
           const ny = state.vy / speed;
-          const dist = hitboxRadiusPx + 10;
+          const dist = drawRadius + 10;
           const tipX = nx * dist;
           const tipY = ny * dist;
           const baseX = nx * (dist - 8);
@@ -87,9 +95,9 @@ const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComp
 
     return (
       <g ref={groupRef}>
-        <circle ref={ringRef} cx={0} cy={0} r={hitboxRadiusPx + 5} fill="none" strokeWidth={2.5} opacity={0} />
+        <circle ref={ringRef} cx={0} cy={0} r={drawRadius + 5} fill="none" strokeWidth={2.5} opacity={0} />
         <path ref={arrowRef} opacity={0} />
-        <circle ref={bodyRef} cx={0} cy={0} r={hitboxRadiusPx} fill="#15803d" stroke="rgba(255,255,255,0.65)" strokeWidth={1.5} />
+        <circle ref={bodyRef} cx={0} cy={0} r={drawRadius} fill="#15803d" stroke="rgba(255,255,255,0.65)" strokeWidth={1.5} />
         <text
           x={0}
           y={0}

@@ -13,6 +13,10 @@ export interface OnlinePlayer {
   // Temporarily removed (random substitution, see project-hub-api's
   // gameEngine/temporaryRemoval.ts) — not eligible as active or support.
   removed?: boolean;
+  // Mirrors project-hub-api's gameEngine OnlinePlayer.role === 'goalkeeper' —
+  // see onlineGames.ts buildSnapshot(). Drives goalkeeper visual distinction
+  // (resolvePlayerRenderState.ts) on the client.
+  isGoalkeeper?: boolean;
 }
 
 export interface OnlineSnapshot {

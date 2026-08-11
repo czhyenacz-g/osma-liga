@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useRef } from 'react';
 import type { PlayerRenderState, PlayerTeam } from './playerVisualTypes';
 import type { PlayerVisualTemplate } from '../../presentation/playerVisualTemplate';
 import { resolvePlayerVisualComponent, usesSharedActiveIndicator } from './playerVisualRegistry';
-import { PLAYER_VISUAL_CONFIG } from './playerVisualConfig';
+import { PLAYER_VISUAL_CONFIG, GOALKEEPER_VISUAL_SCALE } from './playerVisualConfig';
 import ActivePlayerRing from './shared/ActivePlayerRing';
 import LegacyPlayerVisual, { type LegacyPlayerVisualHandle } from './templates/LegacyPlayerVisual';
 
@@ -17,6 +17,7 @@ export interface PlayerVisualContainerProps {
   primaryColor: string;
   secondaryColor: string;
   hitboxRadiusPx: number;
+  isGoalkeeper?: boolean;
 }
 
 // A charge past this fraction gets the extra "almost fully charged" vibrate
@@ -37,7 +38,7 @@ const ALMOST_CHARGED_THRESHOLD = 0.85;
 // frame. React only re-renders this component if `template` changes (the
 // user picked a different visual style), which is rare and cheap.
 const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisualContainerProps>(
-  function PlayerVisualContainer({ template, team, label, primaryColor, secondaryColor, hitboxRadiusPx }, ref) {
+  function PlayerVisualContainer({ template, team, label, primaryColor, secondaryColor, hitboxRadiusPx, isGoalkeeper = false }, ref) {
     const outerRef = useRef<SVGGElement>(null);
     const directionRef = useRef<SVGGElement>(null);
     const animationRef = useRef<SVGGElement>(null);
@@ -52,6 +53,7 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
     // LegacyPlayerVisual.tsx. Every other template shares this container's
     // ActivePlayerRing + charge-scale mechanism instead.
     const sharedActive = usesSharedActiveIndicator(template);
+    const goalkeeperScale = isGoalkeeper ? GOALKEEPER_VISUAL_SCALE : 1;
 
     useImperativeHandle(ref, () => ({
       update(state: PlayerRenderState) {
@@ -65,7 +67,7 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
 
         if (sharedActive) {
           const chargeGrowth = 1 + state.chargeProgress * (config.maxChargeScale - 1);
-          animation.setAttribute('transform', `scale(${config.visualRadiusScale * chargeGrowth})`);
+          animation.setAttribute('transform', `scale(${config.visualRadiusScale * chargeGrowth * goalkeeperScale})`);
           animation.style.setProperty('--step-duration', `${config.stepDurationMs}ms`);
 
           const classes = ['player-visual-anim'];
@@ -136,6 +138,7 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
                 hitboxRadiusPx={hitboxRadiusPx}
+                isGoalkeeper={isGoalkeeper}
               />
             ) : (
               <TemplateComponent
@@ -144,6 +147,7 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
                 hitboxRadiusPx={hitboxRadiusPx}
+                isGoalkeeper={isGoalkeeper}
               />
             )}
           </g>

@@ -98,6 +98,7 @@ const PlayerRenderer = forwardRef<PlayerRendererHandle, PlayerRendererProps>(
             primaryColor={p.primaryColor}
             secondaryColor={p.secondaryColor}
             hitboxRadiusPx={hitboxRadiusPx}
+            isGoalkeeper={p.isGoalkeeper}
           />
         ))}
       </svg>

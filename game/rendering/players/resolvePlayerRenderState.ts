@@ -1,7 +1,7 @@
 import type { GameState } from '../../types';
 import { KICK_RANGE, KICK_COOLDOWN, KICK_MAX_CHARGE_MS } from '../../constants';
 import { dist } from '../../physics';
-import { TEAM_COLORS, FACING_DEADZONE_VX, MOVING_SPEED_THRESHOLD } from './playerVisualConfig';
+import { TEAM_COLORS, GOALKEEPER_COLORS, FACING_DEADZONE_VX, MOVING_SPEED_THRESHOLD } from './playerVisualConfig';
 import type { PlayerRenderState, PlayerTeam, FacingOrientation } from './playerVisualTypes';
 
 export interface FacingResolution {
@@ -57,7 +57,8 @@ export function resolveBotPlayerRenderStates(
 
   return state.players.map((p): PlayerRenderState => {
     const isActive = p.id === state.activePlayerId && p.team === 'home';
-    const colors = TEAM_COLORS[p.team];
+    const isGoalkeeper = p.role === 'goalkeeper';
+    const colors = isGoalkeeper ? GOALKEEPER_COLORS : TEAM_COLORS[p.team];
     const moving = isMovingFromVelocity(p.vel.x, p.vel.y);
     // A kick just fired if this player's cooldown was recently (re)set — the
     // same read-only heuristic already used for kick SFX in GameCanvas.tsx
@@ -85,6 +86,7 @@ export function resolveBotPlayerRenderStates(
       isKicking,
       hasBall: dist(p.pos, state.ball.pos) < KICK_RANGE,
       isRemoved: removedIds.has(p.id),
+      isGoalkeeper,
     };
   });
 }
@@ -106,6 +108,7 @@ export interface OnlineRenderPlayerInput {
   pvy: number;
   active: boolean;
   removed?: boolean;
+  isGoalkeeper?: boolean;
 }
 
 export function resolveOnlinePlayerRenderStates(
@@ -116,7 +119,8 @@ export function resolveOnlinePlayerRenderStates(
   facingTracker: FacingDirectionTracker,
 ): PlayerRenderState[] {
   return players.map((p): PlayerRenderState => {
-    const colors = TEAM_COLORS[p.team];
+    const isGoalkeeper = !!p.isGoalkeeper;
+    const colors = isGoalkeeper ? GOALKEEPER_COLORS : TEAM_COLORS[p.team];
     const isMyActivePlayer = p.active && myTeam !== null && p.team === myTeam;
     const facing = facingTracker(p.id, p.pvx, p.pvy);
 
@@ -144,6 +148,7 @@ export function resolveOnlinePlayerRenderStates(
       isKicking: false,
       hasBall: dist({ x: p.rx, y: p.ry }, ballPos) < KICK_RANGE,
       isRemoved: !!p.removed,
+      isGoalkeeper,
     };
   });
 }

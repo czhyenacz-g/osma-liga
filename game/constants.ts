@@ -135,6 +135,30 @@ export const TEAMMATE_BALL_RECEIVE_LOCK_MS = 1200;
 export const MATCH_DURATION = 90;
 export const GOAL_PAUSE = 2.5;
 
+// Goalkeeper — simple zone-clamped AI (see goalkeeperAI.ts). One per team,
+// not counted among the 3 field players, never enters active-player
+// selection/AI-chase/substitution pools. Zone is a simple rectangle in front
+// of the GK's own goal — kept as a handful of tunable constants here rather
+// than hardcoded across the engine.
+export const GOALKEEPER_RADIUS = PLAYER_RADIUS; // physical hitbox unchanged — see GOALKEEPER_BALL_DAMPING for stopping power
+export const GOALKEEPER_ZONE_DEPTH = 130; // px into the field from the goal line
+export const GOALKEEPER_ZONE_HEIGHT = GOAL_H + 70; // taller than the goal mouth so the GK can cover angled shots
+export const GOALKEEPER_SPEED = 150;
+// Default position (no threat nearby): centered in goal, a little off the
+// line so it doesn't sit glued to the goal line.
+export const GOALKEEPER_DEFAULT_DEPTH = 34;
+// Only actively track the ball within this range — otherwise hold the
+// default position, so the GK doesn't jitter reacting to a ball that's
+// nowhere near its own goal.
+export const GOALKEEPER_REACT_RANGE = GOALKEEPER_ZONE_DEPTH + 260;
+
+// Goalkeeper ball contact — substantially more effective than a regular
+// player's bump (BUMP_FORCE above), without being unbeatable: incoming
+// speed is heavily damped, and only a small bump is added back so a strong
+// enough shot can still squeeze through a mistimed save.
+export const GOALKEEPER_BALL_DAMPING = 0.18; // ball keeps only 18% of its speed on GK contact
+export const GOALKEEPER_BUMP_FORCE = 60;
+
 // Corner zone — ball must be near BOTH horizontal and vertical edge
 export const CORNER_ZONE_MARGIN = 72;
 export const CORNER_WARNING_DELAY = 3;         // seconds before countdown shows
