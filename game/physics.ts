@@ -172,31 +172,31 @@ export function resolvePlayerBallCollisions(state: GameState, playerRestitution 
       const overlap = minDist - d;
       ball.pos.x += dir.x * (overlap + 1);
       ball.pos.y += dir.y * (overlap + 1);
-      if (p.role === 'goalkeeper') {
-        // Goalkeepers are a much better obstacle than a field player: heavy
-        // damping kills most of the incoming speed (stops hard shots) rather
-        // than reflecting it, plus a modest bump — strong enough to be a
-        // real save, not so strong that a well-placed shot can never squeeze
-        // through. Deliberately ignores playerRestitution (the "bounce"
-        // gameplay profile) so goalkeeper stopping power stays consistent
-        // regardless of which profile is active.
-        ball.vel.x *= GOALKEEPER_BALL_DAMPING;
-        ball.vel.y *= GOALKEEPER_BALL_DAMPING;
-        ball.vel.x += dir.x * GOALKEEPER_BUMP_FORCE;
-        ball.vel.y += dir.y * GOALKEEPER_BUMP_FORCE;
-      } else {
-        // Elastic reflection: flip and scale the incoming normal component
-        if (playerRestitution > 0) {
-          const vNormal = ball.vel.x * dir.x + ball.vel.y * dir.y;
-          if (vNormal < 0) {
-            ball.vel.x -= (1 + playerRestitution) * vNormal * dir.x;
-            ball.vel.y -= (1 + playerRestitution) * vNormal * dir.y;
-          }
+      // Elastic reflection (bounce gameplay profile) only applies below
+      // maximum stoppingPower — a player calibrated at the goalkeeper's
+      // stoppingPower=1 baseline skips it entirely (matches the pre-refactor
+      // goalkeeper branch, which always ignored playerRestitution so its
+      // stopping power stayed consistent regardless of gameplay profile).
+      if (playerRestitution > 0 && p.stats.stoppingPower < 1) {
+        const vNormal = ball.vel.x * dir.x + ball.vel.y * dir.y;
+        if (vNormal < 0) {
+          ball.vel.x -= (1 + playerRestitution) * vNormal * dir.x;
+          ball.vel.y -= (1 + playerRestitution) * vNormal * dir.y;
         }
-        // Gentle impulse in push direction
-        ball.vel.x += dir.x * BUMP_FORCE;
-        ball.vel.y += dir.y * BUMP_FORCE;
       }
+      // Stopping power: linearly interpolates/extrapolates between the
+      // field-player baseline (stoppingPower 0 — no damping, standard
+      // BUMP_FORCE) and the goalkeeper baseline (stoppingPower 1 — heavy
+      // damping, reduced bump) from playerStats.ts's default profiles. At
+      // stoppingPower 0 this reduces exactly to the old field-player impulse
+      // (damping factor 1 is a no-op); at 1 it exactly reproduces the old
+      // goalkeeper branch.
+      const damping = 1 - p.stats.stoppingPower * (1 - GOALKEEPER_BALL_DAMPING);
+      const bump = BUMP_FORCE + p.stats.stoppingPower * (GOALKEEPER_BUMP_FORCE - BUMP_FORCE);
+      ball.vel.x *= damping;
+      ball.vel.y *= damping;
+      ball.vel.x += dir.x * bump;
+      ball.vel.y += dir.y * bump;
       // Track last touch for own goal detection
       state.lastTouchTeam = p.team;
       state.lastTouchPlayerId = p.id;

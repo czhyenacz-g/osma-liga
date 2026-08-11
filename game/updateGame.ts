@@ -11,7 +11,7 @@ import {
   snapBallInFrontOfKicker, separateSameTeamPlayers, findTeammateBallReceive,
 } from './physics';
 import {
-  PLAYER_SPEED, KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
+  KICK_RANGE, KICK_FORCE, KICK_COOLDOWN,
   KICK_TAP_FORCE_MULTIPLIER, KICK_MAX_CHARGE_FORCE_MULTIPLIER, KICK_MAX_CHARGE_MS,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
   PLAYER_RADIUS, GOAL_PAUSE,
@@ -332,8 +332,8 @@ export function updateGame(
   // Normalize diagonal movement
   const mvLen = Math.sqrt(mvx * mvx + mvy * mvy);
   if (mvLen > 0) {
-    mvx = (mvx / mvLen) * PLAYER_SPEED;
-    mvy = (mvy / mvLen) * PLAYER_SPEED;
+    mvx = (mvx / mvLen) * active.stats.speed;
+    mvy = (mvy / mvLen) * active.stats.speed;
   }
 
   active.vel.x = mvx;
@@ -361,7 +361,7 @@ export function updateGame(
 
     const hasInput = mvLen > 0.1;
     const targetDir = hasInput
-      ? { x: mvx / PLAYER_SPEED, y: mvy / PLAYER_SPEED }
+      ? { x: mvx / active.stats.speed, y: mvy / active.stats.speed }
       : normalize({ x: FIELD_R - active.pos.x, y: FIELD_CY - active.pos.y });
 
     const targetPoint = {
@@ -412,7 +412,7 @@ export function updateGame(
     if (state.kickWasDown && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
       let kickDir: Vec2;
       if (mvLen > 0.1) {
-        kickDir = { x: mvx / PLAYER_SPEED, y: mvy / PLAYER_SPEED };
+        kickDir = { x: mvx / active.stats.speed, y: mvy / active.stats.speed };
       } else {
         kickDir = normalize({
           x: FIELD_R - state.ball.pos.x,
@@ -444,8 +444,8 @@ export function updateGame(
         forceMultiplier *= KICK_CONTACT_FORCE_MULTIPLIER;
       }
 
-      state.ball.vel.x += kickDir.x * KICK_FORCE * forceMultiplier;
-      state.ball.vel.y += kickDir.y * KICK_FORCE * forceMultiplier;
+      state.ball.vel.x += kickDir.x * KICK_FORCE * forceMultiplier * active.stats.shotPower;
+      state.ball.vel.y += kickDir.y * KICK_FORCE * forceMultiplier * active.stats.shotPower;
       active.kickCooldown = KICK_COOLDOWN;
       state.lastTouchTeam = 'home';
       state.lastTouchPlayerId = active.id;

@@ -1,6 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import type { PlayerRenderState, PlayerVisualComponentProps } from '../playerVisualTypes';
-import { GOALKEEPER_VISUAL_SCALE } from '../playerVisualConfig';
 
 export interface LegacyPlayerVisualHandle {
   update(state: PlayerRenderState): void;
@@ -21,16 +20,17 @@ const ARROW_SPEED_THRESHOLD = 20;
 // this directly and skips its own shared UI/charge-scale wrappers for the
 // 'legacy' template).
 const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComponentProps>(
-  function LegacyPlayerVisual({ team, label, primaryColor, secondaryColor, hitboxRadiusPx, isGoalkeeper }, ref) {
+  function LegacyPlayerVisual({ team, label, primaryColor, secondaryColor, hitboxRadiusPx, isGoalkeeper, sizeScale }, ref) {
     const groupRef = useRef<SVGGElement>(null);
     const bodyRef = useRef<SVGCircleElement>(null);
     const ringRef = useRef<SVGCircleElement>(null);
     const arrowRef = useRef<SVGPathElement>(null);
     // Legacy is forced to scale(1) by PlayerVisualContainer.tsx (its charge
     // feedback is the ring, not the body), so unlike every other template it
-    // needs its own drawn-radius bump for goalkeepers rather than picking up
-    // the shared container scale.
-    const drawRadius = isGoalkeeper ? hitboxRadiusPx * GOALKEEPER_VISUAL_SCALE : hitboxRadiusPx;
+    // needs its own drawn-radius bump rather than picking up the shared
+    // container scale. sizeScale is derived from the player's own
+    // stats.size (playerStats.ts), not a goalkeeper-only special case.
+    const drawRadius = hitboxRadiusPx * sizeScale;
 
     useImperativeHandle(ref, () => ({
       update(state: PlayerRenderState) {

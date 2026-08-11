@@ -1,5 +1,5 @@
 import type { GameState } from '../../types';
-import { KICK_RANGE, KICK_COOLDOWN, KICK_MAX_CHARGE_MS } from '../../constants';
+import { KICK_RANGE, KICK_COOLDOWN, KICK_MAX_CHARGE_MS, PLAYER_RADIUS } from '../../constants';
 import { dist } from '../../physics';
 import { TEAM_COLORS, GOALKEEPER_COLORS, FACING_DEADZONE_VX, MOVING_SPEED_THRESHOLD } from './playerVisualConfig';
 import type { PlayerRenderState, PlayerTeam, FacingOrientation } from './playerVisualTypes';
@@ -87,6 +87,7 @@ export function resolveBotPlayerRenderStates(
       hasBall: dist(p.pos, state.ball.pos) < KICK_RANGE,
       isRemoved: removedIds.has(p.id),
       isGoalkeeper,
+      sizeScale: p.stats.size / PLAYER_RADIUS,
     };
   });
 }
@@ -109,6 +110,10 @@ export interface OnlineRenderPlayerInput {
   active: boolean;
   removed?: boolean;
   isGoalkeeper?: boolean;
+  // Visual size in px (server's OnlinePlayer.stats.size — see the backend's
+  // playerStats.ts) as sent over the socket snapshot. Falls back to
+  // PLAYER_RADIUS (no visual scaling) if a snapshot predates this field.
+  size?: number;
 }
 
 export function resolveOnlinePlayerRenderStates(
@@ -149,6 +154,7 @@ export function resolveOnlinePlayerRenderStates(
       hasBall: dist({ x: p.rx, y: p.ry }, ballPos) < KICK_RANGE,
       isRemoved: !!p.removed,
       isGoalkeeper,
+      sizeScale: (p.size ?? PLAYER_RADIUS) / PLAYER_RADIUS,
     };
   });
 }

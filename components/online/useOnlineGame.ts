@@ -17,6 +17,10 @@ export interface OnlinePlayer {
   // see onlineGames.ts buildSnapshot(). Drives goalkeeper visual distinction
   // (resolvePlayerRenderState.ts) on the client.
   isGoalkeeper?: boolean;
+  // Mirrors project-hub-api's OnlinePlayer.stats.size (playerStats.ts) — the
+  // server's per-player visual size in px. Feeds resolvePlayerRenderState.ts's
+  // sizeScale; never a physical/collision value on the client.
+  size?: number;
 }
 
 export interface OnlineSnapshot {

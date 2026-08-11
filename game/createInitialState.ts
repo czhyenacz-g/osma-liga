@@ -2,6 +2,7 @@ import type { GameState, Player } from './types';
 import { FIELD_CX, FIELD_CY, FIELD_L, FIELD_R, GOALKEEPER_DEFAULT_DEPTH, MATCH_DURATION } from './constants';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, TemporaryRemovalConfig, pickRandomTriggerSecond } from './temporaryRemoval';
 import { DEFAULT_GAMEPLAY_PROFILE, GameplayProfile } from './gameplayProfiles';
+import { DEFAULT_FIELD_PLAYER_STATS, DEFAULT_GOALKEEPER_STATS } from './playerStats';
 
 function makePlayer(
   id: string,
@@ -19,6 +20,8 @@ function makePlayer(
     label,
     kickCooldown: 0,
     role: 'field_player',
+    // Own copy — never shared with other players' stats objects.
+    stats: { ...DEFAULT_FIELD_PLAYER_STATS },
   };
 }
 
@@ -38,6 +41,7 @@ function makeGoalkeeper(
     label,
     kickCooldown: 0,
     role: 'goalkeeper',
+    stats: { ...DEFAULT_GOALKEEPER_STATS },
   };
 }
 

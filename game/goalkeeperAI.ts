@@ -1,7 +1,7 @@
 import type { Ball, GameState, Player } from './types';
 import {
   FIELD_L, FIELD_R, FIELD_CY,
-  GOALKEEPER_ZONE_DEPTH, GOALKEEPER_ZONE_HEIGHT, GOALKEEPER_SPEED,
+  GOALKEEPER_ZONE_DEPTH, GOALKEEPER_ZONE_HEIGHT,
   GOALKEEPER_DEFAULT_DEPTH, GOALKEEPER_REACT_RANGE,
 } from './constants';
 
@@ -47,13 +47,13 @@ function updateGoalkeeper(gk: Player, ball: Ball, dt: number): void {
   const distToTarget = Math.hypot(dx, dy);
 
   if (distToTarget > 1) {
-    const step = Math.min(distToTarget, GOALKEEPER_SPEED * dt);
+    const step = Math.min(distToTarget, gk.stats.speed * dt);
     const nx = dx / distToTarget;
     const ny = dy / distToTarget;
     gk.pos.x += nx * step;
     gk.pos.y += ny * step;
-    gk.vel.x = nx * GOALKEEPER_SPEED;
-    gk.vel.y = ny * GOALKEEPER_SPEED;
+    gk.vel.x = nx * gk.stats.speed;
+    gk.vel.y = ny * gk.stats.speed;
   } else {
     gk.vel.x = 0;
     gk.vel.y = 0;

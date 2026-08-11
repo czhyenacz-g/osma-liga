@@ -1,4 +1,5 @@
 import type { GameplayProfile, GameplayModifier } from './gameplayProfiles';
+import type { PlayerStats } from './playerStats';
 
 export type Team = 'home' | 'away';
 export type GamePhase = 'playing' | 'goal' | 'ended';
@@ -24,9 +25,15 @@ export interface Player {
   kickCooldown: number;
   // Defaults to 'field_player' semantics wherever unset is impossible (all
   // player-creation goes through createInitialState.ts, which always sets
-  // this explicitly). See goalkeeperAI.ts + PLAYER_RADIUS-adjacent constants
-  // in constants.ts for role-driven behavior.
+  // this explicitly). See goalkeeperAI.ts for role-driven behavior (zone,
+  // AI, active-player pool exclusion) — physical capabilities live in
+  // `stats` instead (see playerStats.ts).
   role: PlayerRole;
+  // Parametric capability profile (speed/shotPower/stoppingPower/size) —
+  // see playerStats.ts. Each player owns its own copy (createInitialState.ts
+  // clones from DEFAULT_FIELD_PLAYER_STATS/DEFAULT_GOALKEEPER_STATS), so
+  // future per-player variation never mutates a shared default object.
+  stats: PlayerStats;
 }
 
 export interface Ball {

@@ -78,11 +78,6 @@ export const TEAM_COLORS: Record<PlayerTeam, { primary: string; secondary: strin
 // regardless of which side it's on; team is still conveyed by field position.
 export const GOALKEEPER_COLORS = { primary: '#111827', secondary: '#22d3ee' };
 
-// Bonus multiplier applied on top of each template's own visualRadiusScale
-// (PlayerVisualContainer.tsx) for goalkeepers only — presentation-only, same
-// "never touches the physical hitbox" rule as visualRadiusScale itself.
-export const GOALKEEPER_VISUAL_SCALE = 1.15;
-
 // Below this speed magnitude (px/s, hypot of vx/vy) we keep the last known
 // facing direction/orientation instead of re-deriving it — avoids a jittery
 // mirror-flicker (and directional templates snapping to a default pose)

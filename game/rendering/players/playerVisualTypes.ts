@@ -54,10 +54,16 @@ export interface PlayerRenderState {
   isKicking: boolean;
   hasBall: boolean;
   isRemoved: boolean;
-  // True for the one goalkeeper per team — drives the colour/size overrides
-  // in PlayerVisualContainer.tsx + resolvePlayerRenderState.ts so every
-  // template renders it distinctly without per-template special-casing.
+  // True for the one goalkeeper per team — drives the colour override in
+  // resolvePlayerRenderState.ts so every template renders it distinctly
+  // without per-template special-casing.
   isGoalkeeper: boolean;
+  // Visual size relative to the real collision hitbox (1 = same size as
+  // hitboxRadiusPx) — derived from the player's own stats.size (see
+  // playerStats.ts), NOT a goalkeeper-only special case. Multiplies into
+  // each template's own visualRadiusScale in PlayerVisualContainer.tsx;
+  // never touches the physical collision radius.
+  sizeScale: number;
 }
 
 // Template components are mounted ONCE per player and never re-rendered for
@@ -78,4 +84,5 @@ export interface PlayerVisualComponentProps {
   secondaryColor: string;
   hitboxRadiusPx: number;
   isGoalkeeper: boolean;
+  sizeScale: number;
 }

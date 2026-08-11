@@ -126,8 +126,8 @@ export function updateAI(state: GameState, dt: number): void {
           p.kickCooldown = BOT_KICK_COOLDOWN;
         }
 
-        ball.vel.x += kickDir.x * BOT_KICK_FORCE;
-        ball.vel.y += kickDir.y * BOT_KICK_FORCE;
+        ball.vel.x += kickDir.x * BOT_KICK_FORCE * p.stats.shotPower;
+        ball.vel.y += kickDir.y * BOT_KICK_FORCE * p.stats.shotPower;
         state.lastTouchTeam = 'away';
         state.lastTouchPlayerId = p.id;
       }

@@ -26,6 +26,7 @@ function makeState(overrides: Partial<PlayerRenderState> = {}): PlayerRenderStat
     hasBall: false,
     isRemoved: false,
     isGoalkeeper: false,
+    sizeScale: 1,
     ...overrides,
   };
 }
