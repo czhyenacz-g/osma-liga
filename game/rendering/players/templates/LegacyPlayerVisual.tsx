@@ -20,7 +20,7 @@ const ARROW_SPEED_THRESHOLD = 20;
 // this directly and skips its own shared UI/charge-scale wrappers for the
 // 'legacy' template).
 const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComponentProps>(
-  function LegacyPlayerVisual({ team, label, primaryColor, secondaryColor, hitboxRadiusPx, isGoalkeeper, sizeScale }, ref) {
+  function LegacyPlayerVisual({ team, label, hitboxRadiusPx, sizeScale }, ref) {
     const groupRef = useRef<SVGGElement>(null);
     const bodyRef = useRef<SVGCircleElement>(null);
     const ringRef = useRef<SVGCircleElement>(null);
@@ -46,9 +46,7 @@ const LegacyPlayerVisual = forwardRef<LegacyPlayerVisualHandle, PlayerVisualComp
         const isHome = team === 'home';
         body.setAttribute(
           'fill',
-          isGoalkeeper
-            ? (state.isActive ? primaryColor : secondaryColor)
-            : isHome ? (state.isActive ? '#22c55e' : '#15803d') : (state.isActive ? '#3b82f6' : '#1d4ed8'),
+          isHome ? (state.isActive ? '#22c55e' : '#15803d') : (state.isActive ? '#3b82f6' : '#1d4ed8'),
         );
         body.setAttribute('stroke', state.isActive ? '#fbbf24' : 'rgba(255,255,255,0.65)');
         body.setAttribute('stroke-width', state.isActive ? '2.5' : '1.5');

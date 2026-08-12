@@ -1,7 +1,7 @@
 import type { GameState } from '../../types';
 import { KICK_RANGE, KICK_COOLDOWN, KICK_MAX_CHARGE_MS, PLAYER_RADIUS } from '../../constants';
 import { dist } from '../../physics';
-import { TEAM_COLORS, GOALKEEPER_COLORS, FACING_DEADZONE_VX, MOVING_SPEED_THRESHOLD } from './playerVisualConfig';
+import { TEAM_COLORS, FACING_DEADZONE_VX, MOVING_SPEED_THRESHOLD } from './playerVisualConfig';
 import type { PlayerRenderState, PlayerTeam, FacingOrientation } from './playerVisualTypes';
 
 export interface FacingResolution {
@@ -58,7 +58,10 @@ export function resolveBotPlayerRenderStates(
   return state.players.map((p): PlayerRenderState => {
     const isActive = p.id === state.activePlayerId && p.team === 'home';
     const isGoalkeeper = p.role === 'goalkeeper';
-    const colors = isGoalkeeper ? GOALKEEPER_COLORS : TEAM_COLORS[p.team];
+    // Goalkeeper wears the same team colors as field players — visual
+    // distinction comes from sizeScale (see playerStats.ts) instead of a kit
+    // color swap.
+    const colors = TEAM_COLORS[p.team];
     const moving = isMovingFromVelocity(p.vel.x, p.vel.y);
     // A kick just fired if this player's cooldown was recently (re)set — the
     // same read-only heuristic already used for kick SFX in GameCanvas.tsx
@@ -125,7 +128,7 @@ export function resolveOnlinePlayerRenderStates(
 ): PlayerRenderState[] {
   return players.map((p): PlayerRenderState => {
     const isGoalkeeper = !!p.isGoalkeeper;
-    const colors = isGoalkeeper ? GOALKEEPER_COLORS : TEAM_COLORS[p.team];
+    const colors = TEAM_COLORS[p.team];
     const isMyActivePlayer = p.active && myTeam !== null && p.team === myTeam;
     const facing = facingTracker(p.id, p.pvx, p.pvy);
 
