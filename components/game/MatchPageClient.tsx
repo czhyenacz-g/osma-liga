@@ -349,7 +349,6 @@ export default function MatchPageClient({
 
             <MatchCommentaryToast message={matchScore === null ? (firstGoalMessage ?? substitutionMessage) : null} />
             <BounceTimeOverlay active={matchScore === null && bounceTimeActive} />
-            {matchScore === null && <BenchPanel benchPlayers={benchPlayers} onActivate={handleBenchActivate} />}
 
             {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
             {matchScore !== null && (
@@ -432,6 +431,10 @@ export default function MatchPageClient({
           </div>
         )}
       </div>
+
+      {gamePhase === 'playing' && matchScore === null && (
+        <BenchPanel benchPlayers={benchPlayers} onActivate={handleBenchActivate} />
+      )}
 
       {isMobile && gamePhase === 'playing' && matchScore === null && (
         <MobileTouchControls touchRef={touchRef} />

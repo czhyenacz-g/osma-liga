@@ -25,13 +25,12 @@ export default function BenchPanel({
       role="group"
       aria-label="Střídačka"
       style={{
-        position: 'fixed',
-        top: 12,
-        left: 12,
-        zIndex: 40,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
         gap: 6,
+        marginTop: 10,
         ...NO_SELECT,
       }}
     >
