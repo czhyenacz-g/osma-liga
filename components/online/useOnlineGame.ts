@@ -43,6 +43,7 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
   const [role, setRole] = useState<'home' | 'guest' | null>(null);
   const [gameStatus, setGameStatus] = useState<'connecting' | 'waiting' | 'playing' | 'finished' | 'error'>('connecting');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [rttMs, setRttMs] = useState<number | null>(null);
 
   useEffect(() => {
     const WS_URL = process.env.NEXT_PUBLIC_PROJECT_HUB_WS_URL ?? 'http://localhost:3001';
@@ -51,6 +52,21 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
       transports: ['websocket', 'polling'],
     });
     socketRef.current = socket;
+
+    // Debug-only WS RTT probe — enabled via ?wsdebug=1, see
+    // docs/network/realtime-architecture-audit.md. Measures raw round-trip
+    // network time, independent of game tick/snapshot cadence.
+    const debugEnabled =
+      typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('wsdebug') === '1';
+    let pingInterval: ReturnType<typeof setInterval> | null = null;
+    if (debugEnabled) {
+      socket.on('debug_pong', (clientTimestamp: number) => {
+        setRttMs(Date.now() - clientTimestamp);
+      });
+      pingInterval = setInterval(() => {
+        socket.emit('debug_ping', Date.now());
+      }, 2000);
+    }
 
     socket.on('connect', () => {
       socket.emit('join_game', { gameCode, playerToken });
@@ -81,6 +97,7 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
     });
 
     return () => {
+      if (pingInterval) clearInterval(pingInterval);
       socket.disconnect();
     };
   }, [gameCode, playerToken]);
@@ -93,5 +110,5 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
     socketRef.current?.emit('start_game');
   }, []);
 
-  return { snapshot, role, gameStatus, errorMsg, sendInput, startGame };
+  return { snapshot, role, gameStatus, errorMsg, sendInput, startGame, rttMs };
 }

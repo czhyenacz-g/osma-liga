@@ -28,7 +28,7 @@ export default function OnlineGameClient({
   gameCode: string;
   playerToken: string;
 }) {
-  const { snapshot, role, gameStatus, errorMsg, sendInput, startGame } =
+  const { snapshot, role, gameStatus, errorMsg, sendInput, startGame, rttMs } =
     useOnlineGame(gameCode, playerToken);
 
   const [isPortrait, setIsPortrait] = useState(false);
@@ -292,6 +292,14 @@ export default function OnlineGameClient({
     <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-2 py-4" style={bg}>
       <SoundToggleButton />
       <PlayerVisualTemplateSwitcher />
+      {rttMs !== null && (
+        <p
+          className="text-[10px] font-mono"
+          style={{ position: 'absolute', top: 4, right: 8, color: 'rgba(209,250,229,0.5)', zIndex: 10 }}
+        >
+          WS RTT: {rttMs}ms
+        </p>
+      )}
       <MobileOrientationOverlay show={isMobile && isPortrait} />
       <div
         className="w-full"
