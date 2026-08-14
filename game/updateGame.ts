@@ -32,6 +32,9 @@ import {
   updateTemporaryRemovals, getRemovedPlayerIds,
 } from './temporaryRemoval';
 import {
+  updateBenchDeployments, isSelectableFieldPlayer, getBenchEntryPosition,
+} from './benchDeployment';
+import {
   PassAndSwitchConfig, DEFAULT_PASS_AND_SWITCH_CONFIG,
   hasBallControl, findBestPassTarget, computePassVelocity, findNearestTeammateToBall,
 } from './passAndSwitch';
@@ -110,10 +113,24 @@ function resetPositions(state: GameState): void {
   // back onto the pitch on a goal reset would bypass their bench timer.
   const removedIds = getRemovedPlayerIds(state);
   for (let i = 0; i < state.players.length; i++) {
-    if (removedIds.has(state.players[i].id)) continue;
-    state.players[i].pos = { ...fresh.players[i].pos };
-    state.players[i].vel = { x: 0, y: 0 };
-    state.players[i].kickCooldown = 0;
+    const player = state.players[i];
+    if (removedIds.has(player.id)) continue;
+    // Parked bench players stay put — fresh.players[i] at that index is
+    // itself a freshly-created bench player anyway, so this is skipped
+    // explicitly for clarity/consistency with the removedIds skip above.
+    if (player.matchStatus === 'bench') continue;
+    if (player.matchStatus === 'temporarily_deployed') {
+      // fresh.players[i] at this index holds a default bench-holding
+      // position, not a valid on-pitch reset spot — send them back to the
+      // bench entry point instead, keeping their remaining deploy time.
+      player.pos = getBenchEntryPosition(player.team);
+      player.vel = { x: 0, y: 0 };
+      player.kickCooldown = 0;
+      continue;
+    }
+    player.pos = { ...fresh.players[i].pos };
+    player.vel = { x: 0, y: 0 };
+    player.kickCooldown = 0;
   }
   state.ball.pos = { ...fresh.ball.pos };
   state.ball.vel = { x: 0, y: 0 };
@@ -189,6 +206,7 @@ export function updateGame(
   // Runs before active-player resolution so a freshly removed player is
   // excluded from selection in the same tick it leaves.
   updateTemporaryRemovals(state, dt, temporaryRemovalConfig);
+  updateBenchDeployments(state, dt);
   const removedIds = getRemovedPlayerIds(state);
 
   // ── Active player selection with hysteresis ──────────────────────────────
@@ -196,7 +214,7 @@ export function updateGame(
   // closer by ACTIVE_PLAYER_SWITCH_MARGIN, preventing jitter when two players
   // are at similar distances from the ball.
 
-  const homePlayers = state.players.filter(p => p.team === 'home' && p.role !== 'goalkeeper' && !removedIds.has(p.id));
+  const homePlayers = state.players.filter(p => p.team === 'home' && isSelectableFieldPlayer(p, removedIds));
   if (homePlayers.length === 0) return state; // never happens in MVP — pickPlayerToRemove keeps at least one
 
   let nearest = homePlayers[0];
@@ -275,7 +293,7 @@ export function updateGame(
   const previousActive = previousManualPlayer ?? auto;
 
   if (switchEdge) {
-    const opponents = state.players.filter(p => p.team === 'away' && !removedIds.has(p.id));
+    const opponents = state.players.filter(p => p.team === 'away' && p.matchStatus !== 'bench' && !removedIds.has(p.id));
     const canPass = passAndSwitchConfig.enabled && hasBallControl(previousActive, state.ball, passAndSwitchConfig);
     const passTarget = canPass ? findBestPassTarget(previousActive, homePlayers, opponents) : null;
 

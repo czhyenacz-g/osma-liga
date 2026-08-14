@@ -1,10 +1,16 @@
 import type { GameState, Player, Vec2 } from './types';
 import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
-  PLAYER_RADIUS,
+  PLAYER_RADIUS, MATCH_DURATION,
   BOT_SPEED, BOT_KICK_FORCE, BOT_KICK_RANGE, BOT_KICK_COOLDOWN,
 } from './constants';
 import { dist, normalize, clampPos, separateSameTeamPlayers } from './physics';
+import { isSelectableFieldPlayer, canDeployFromBench, deployBenchPlayer } from './benchDeployment';
+
+// Trivial, deterministic bot bench usage: once the away team has less than
+// half the match left, bring on its bench player (if any, if not already
+// used) — a single fixed condition, no randomness/tactics.
+const BOT_BENCH_DEPLOY_TIME_LEFT_RATIO = 0.5;
 
 const EDGE_MARGIN = 68;
 
@@ -62,7 +68,14 @@ export function updateAI(state: GameState, dt: number): void {
   // Players currently leaving/on the bench/returning (temporaryRemoval.ts)
   // are handled entirely there — exclude them from chasing and formation.
   const removedIds = new Set(state.temporaryRemovals.map(r => r.playerId));
-  const botPlayers = players.filter(p => p.team === 'away' && p.role !== 'goalkeeper' && !removedIds.has(p.id));
+
+  // Simple deterministic bench usage — see BOT_BENCH_DEPLOY_TIME_LEFT_RATIO.
+  if (state.timeLeft <= MATCH_DURATION * BOT_BENCH_DEPLOY_TIME_LEFT_RATIO) {
+    const benchPlayer = players.find((p) => p.team === 'away' && canDeployFromBench(state, p));
+    if (benchPlayer) deployBenchPlayer(state, 'away', benchPlayer.id);
+  }
+
+  const botPlayers = players.filter(p => p.team === 'away' && isSelectableFieldPlayer(p, removedIds));
   if (botPlayers.length === 0) return;
 
   // Identify bot player closest to ball

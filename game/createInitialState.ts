@@ -1,5 +1,8 @@
 import type { GameState, Player } from './types';
-import { FIELD_CX, FIELD_CY, FIELD_L, FIELD_R, GOALKEEPER_DEFAULT_DEPTH, MATCH_DURATION } from './constants';
+import {
+  FIELD_CX, FIELD_CY, FIELD_L, FIELD_R, FIELD_T, GOALKEEPER_DEFAULT_DEPTH, MATCH_DURATION,
+  DEFAULT_BENCH_SIZE,
+} from './constants';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, TemporaryRemovalConfig, pickRandomTriggerSecond } from './temporaryRemoval';
 import { DEFAULT_GAMEPLAY_PROFILE, GameplayProfile } from './gameplayProfiles';
 import { DEFAULT_FIELD_PLAYER_STATS, DEFAULT_GOALKEEPER_STATS } from './playerStats';
@@ -22,6 +25,8 @@ function makePlayer(
     role: 'field_player',
     // Own copy — never shared with other players' stats objects.
     stats: { ...DEFAULT_FIELD_PLAYER_STATS },
+    matchStatus: 'field',
+    benchUsed: false,
   };
 }
 
@@ -42,16 +47,43 @@ function makeGoalkeeper(
     kickCooldown: 0,
     role: 'goalkeeper',
     stats: { ...DEFAULT_GOALKEEPER_STATS },
+    matchStatus: 'field',
+    benchUsed: false,
   };
+}
+
+// Bench holding spot, above the field like temporaryRemoval.ts's bench zone
+// but on the opposite (non-overlapping) side, with extra bench slots offset
+// vertically so DEFAULT_BENCH_SIZE > 1 doesn't stack players exactly on top
+// of each other.
+function makeBenchPlayer(
+  id: string,
+  team: 'home' | 'away',
+  index: number,
+  label: string,
+): Player {
+  const x = team === 'home' ? FIELD_CX - 100 : FIELD_CX + 100;
+  const y = FIELD_T - 25 - index * 20;
+  const player = makePlayer(id, team, x, y, label);
+  player.matchStatus = 'bench';
+  return player;
 }
 
 export function createInitialState(
   temporaryRemovalConfig: TemporaryRemovalConfig = DEFAULT_TEMPORARY_REMOVAL_CONFIG,
   matchDurationSeconds: number = MATCH_DURATION,
   gameplayProfile: GameplayProfile = DEFAULT_GAMEPLAY_PROFILE,
+  benchSize: number = DEFAULT_BENCH_SIZE,
 ): GameState {
   const cx = FIELD_CX;
   const cy = FIELD_CY;
+
+  const homeBench: Player[] = [];
+  const awayBench: Player[] = [];
+  for (let i = 0; i < benchSize; i++) {
+    homeBench.push(makeBenchPlayer(`n-bench-${i}`, 'home', i, `B${i + 1}`));
+    awayBench.push(makeBenchPlayer(`p-bench-${i}`, 'away', i, `B${i + 1}`));
+  }
 
   return {
     players: [
@@ -66,6 +98,9 @@ export function createInitialState(
       // Goalkeepers — one per team, not counted among the 3 field players.
       makeGoalkeeper('n-gk', 'home', cy, 'GK'),
       makeGoalkeeper('p-gk', 'away', cy, 'GK'),
+      // Bench — see benchDeployment.ts. DEFAULT_BENCH_SIZE per team by default.
+      ...homeBench,
+      ...awayBench,
     ],
     ball: {
       pos: { x: cx, y: cy },
@@ -94,6 +129,7 @@ export function createInitialState(
     cornerKickCount: 0,
     cornerClearCooldown: 0,
     temporaryRemovals: [],
+    benchDeployments: [],
     randomSubstitutionTriggerSecond: {
       home: pickRandomTriggerSecond(temporaryRemovalConfig),
       away: pickRandomTriggerSecond(temporaryRemovalConfig),

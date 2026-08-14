@@ -13,17 +13,25 @@ function noInput(): InputState {
 }
 
 describe('goalkeeper — data model', () => {
-  it('each team has exactly one goalkeeper, not counted among the 3 field players', () => {
+  it('each team has exactly one goalkeeper, not counted among the 3 on-pitch field players', () => {
     const state = createInitialState();
     const homeGKs = state.players.filter((p) => p.team === 'home' && p.role === 'goalkeeper');
     const awayGKs = state.players.filter((p) => p.team === 'away' && p.role === 'goalkeeper');
-    const homeFieldPlayers = state.players.filter((p) => p.team === 'home' && p.role === 'field_player');
-    const awayFieldPlayers = state.players.filter((p) => p.team === 'away' && p.role === 'field_player');
+    // On-pitch field players only — role 'field_player' also matches bench
+    // players (see benchDeployment.ts / game/types.ts PlayerMatchStatus),
+    // so this must additionally filter by matchStatus.
+    const homeFieldPlayers = state.players.filter(
+      (p) => p.team === 'home' && p.role === 'field_player' && p.matchStatus === 'field',
+    );
+    const awayFieldPlayers = state.players.filter(
+      (p) => p.team === 'away' && p.role === 'field_player' && p.matchStatus === 'field',
+    );
     expect(homeGKs).toHaveLength(1);
     expect(awayGKs).toHaveLength(1);
     expect(homeFieldPlayers).toHaveLength(3);
     expect(awayFieldPlayers).toHaveLength(3);
-    expect(state.players).toHaveLength(8);
+    // 3 field + 1 GK per team + 1 bench per team (DEFAULT_BENCH_SIZE) = 10.
+    expect(state.players).toHaveLength(10);
   });
 
   it('goalkeepers start inside their own zone, near their own goal', () => {

@@ -165,6 +165,7 @@ export function resolvePlayerBallCollisions(state: GameState, playerRestitution 
 
   for (const p of players) {
     if (removedIds.has(p.id)) continue;
+    if (p.matchStatus === 'bench') continue;
     const d = dist(p.pos, ball.pos);
     if (d < minDist && d > 0.001) {
       const dir = normalize({ x: ball.pos.x - p.pos.x, y: ball.pos.y - p.pos.y });

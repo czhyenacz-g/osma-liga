@@ -159,6 +159,13 @@ export const GOALKEEPER_REACT_RANGE = GOALKEEPER_ZONE_DEPTH + 260;
 export const GOALKEEPER_BALL_DAMPING = 0.18; // ball keeps only 18% of its speed on GK contact
 export const GOALKEEPER_BUMP_FORCE = 60;
 
+// Bench + 30s temporary substitute (see benchDeployment.ts) — one extra
+// field-player slot per team, parked off-pitch until deployed. A deploy is
+// single-use per player and lasts a fixed window before the player
+// automatically returns to the bench.
+export const DEFAULT_BENCH_SIZE = 1;
+export const BENCH_DEPLOY_DURATION_MS = 30_000;
+
 // Corner zone — ball must be near BOTH horizontal and vertical edge
 export const CORNER_ZONE_MARGIN = 72;
 export const CORNER_WARNING_DELAY = 3;         // seconds before countdown shows

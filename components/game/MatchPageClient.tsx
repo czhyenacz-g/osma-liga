@@ -4,11 +4,12 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { playFullTimeWhistle, playKickoffWhistle, unlockAudio } from '@/lib/audio/whistleEngine';
 import { inMatchAudio } from '@/game/audio/inMatchAudio';
-import GameCanvas from './GameCanvas';
+import GameCanvas, { type BenchPlayerUiState } from './GameCanvas';
 import MatchCommentaryToast from './MatchCommentaryToast';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
 import SoundToggleButton from './SoundToggleButton';
+import BenchPanel from './BenchPanel';
 import PlayerVisualTemplateSwitcher from '@/components/PlayerVisualTemplateSwitcher';
 import BounceTimeOverlay from './BounceTimeOverlay';
 import { MATCH_DURATION } from '@/game/constants';
@@ -92,7 +93,9 @@ export default function MatchPageClient({
   const [substitutionMessage, setSubstitutionMessage] = useState<string | null>(null);
   const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
   const [bounceTimeActive, setBounceTimeActive] = useState(false);
+  const [benchPlayers, setBenchPlayers] = useState<BenchPlayerUiState[]>([]);
   const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
+  const benchDeployRequestRef = useRef<string | null>(null);
   const gameWrapperRef = useRef<HTMLDivElement>(null);
   const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const substitutionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -175,7 +178,12 @@ export default function MatchPageClient({
     setSubstitutionMessage(null);
     setFullTimeMessage(null);
     setBounceTimeActive(false);
+    setBenchPlayers([]);
     inMatchAudio.stopAll();
+  }, []);
+
+  const handleBenchActivate = useCallback((id: string) => {
+    benchDeployRequestRef.current = id;
   }, []);
 
   // Safety net: stop all in-match audio if this component unmounts mid-match
@@ -335,10 +343,13 @@ export default function MatchPageClient({
               matchDurationSeconds={matchDurationSeconds}
               gameplayProfile={gameplayProfile}
               enableBounceTimeDebug={enableBounceTimeDebug}
+              benchDeployRequestRef={benchDeployRequestRef}
+              onBenchStateChange={setBenchPlayers}
             />
 
             <MatchCommentaryToast message={matchScore === null ? (firstGoalMessage ?? substitutionMessage) : null} />
             <BounceTimeOverlay active={matchScore === null && bounceTimeActive} />
+            {matchScore === null && <BenchPanel benchPlayers={benchPlayers} onActivate={handleBenchActivate} />}
 
             {/* HTML overlay nad end screen canvasu — klikatelné i na mobilu */}
             {matchScore !== null && (

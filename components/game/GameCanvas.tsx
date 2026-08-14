@@ -20,9 +20,24 @@ import {
   NEAR_GOAL_PRESSURE_FADE_IN_MS, NEAR_GOAL_PRESSURE_FADE_OUT_MS,
   NEAR_GOAL_PRESSURE_BED_VOLUME_BASE, NEAR_GOAL_PRESSURE_BED_VOLUME_MAX, NEAR_GOAL_PRESSURE_BED_VOLUME_RANGE,
 } from '@/game/audio/inMatchSoundConfig';
-import type { GameState, InputState, TouchInput } from '@/game/types';
+import type { GameState, InputState, TouchInput, PlayerMatchStatus } from '@/game/types';
 import type { GameplayProfile } from '@/game/gameplayProfiles';
 import { BOUNCE_TIME_DURATION_SECONDS } from '@/game/gameplayProfiles';
+import { deployBenchPlayer } from '@/game/benchDeployment';
+
+export interface BenchPlayerUiState {
+  id: string;
+  label: string;
+  matchStatus: PlayerMatchStatus;
+  remainingMs: number | null;
+  used: boolean;
+}
+
+// Bench UI state is only pushed to React every this many ms of wall time —
+// it lives inside the RAF-driven GameState, and calling a React state setter
+// 60 times/sec for a rarely-changing bench panel would cause needless
+// re-renders.
+const BENCH_UI_THROTTLE_MS = 200;
 
 interface Props {
   onMatchEnd?: (score: { home: number; away: number }) => void;
@@ -41,11 +56,19 @@ interface Props {
   // Debug-only: lets the 'B' key trigger "Bounce Time!" — only wired up by
   // /hra/bot-dis, never by the regular /hra/bot page.
   enableBounceTimeDebug?: boolean;
+  // One-shot bench-deploy request from the UI (BenchPanel) — set to a home
+  // player's id, consumed (reset to null) on the next tick. See
+  // game/benchDeployment.ts.
+  benchDeployRequestRef?: MutableRefObject<string | null>;
+  // Throttled (~every BENCH_UI_THROTTLE_MS) snapshot of the home team's
+  // bench players, for BenchPanel — see game/benchDeployment.ts.
+  onBenchStateChange?: (bench: BenchPlayerUiState[]) => void;
 }
 
 export default function GameCanvas({
   onMatchEnd, onRestart, onFirstGoal, onSubstitution, onBounceTimeChange, touchInputRef, homeTeamName,
   disableOpponentAI, matchDurationSeconds, gameplayProfile, enableBounceTimeDebug,
+  benchDeployRequestRef, onBenchStateChange,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRendererRef = useRef<PlayerRendererHandle>(null);
@@ -129,6 +152,7 @@ export default function GameCanvas({
     // only call startRandomBedFromPool/stopBed once per transition instead of
     // every frame (stopBed restarts its own fade-out animation on each call).
     let nearGoalBedActive = false;
+    let lastBenchUiUpdate = 0;
 
     const loop = (now: number) => {
       // Cap dt to 50ms to prevent large jumps after tab switch
@@ -154,6 +178,14 @@ export default function GameCanvas({
       // which must NOT play a sound on every change.
       const manualSwitchEdge = merged.switchPlayer && !prevSwitchKeyDown;
       const activePlayerIdBeforeTick = gameState.activePlayerId;
+
+      // Bench deploy is a discrete one-shot action, not per-frame held input
+      // — consumed here (before the tick) rather than threaded through
+      // InputState/TouchInput.
+      if (benchDeployRequestRef?.current) {
+        deployBenchPlayer(gameState, 'home', benchDeployRequestRef.current);
+        benchDeployRequestRef.current = null;
+      }
 
       const wasRestart = merged.restart;
       gameState = updateGame(gameState, merged, dt, undefined, undefined, gameModeConfigRef.current);
@@ -338,6 +370,23 @@ export default function GameCanvas({
       renderGame(ctx, gameState, homeTeamName, ballRotation);
       playerRendererRef.current?.update(resolveBotPlayerRenderStates(gameState, facingTracker));
 
+      if (onBenchStateChange && now - lastBenchUiUpdate >= BENCH_UI_THROTTLE_MS) {
+        lastBenchUiUpdate = now;
+        const bench: BenchPlayerUiState[] = gameState.players
+          .filter((p) => p.team === 'home' && p.role === 'field_player' && p.matchStatus !== 'field')
+          .map((p) => {
+            const deployment = gameState.benchDeployments.find((d) => d.playerId === p.id);
+            return {
+              id: p.id,
+              label: p.label,
+              matchStatus: p.matchStatus,
+              remainingMs: p.matchStatus === 'temporarily_deployed' ? (deployment?.remainingMs ?? null) : null,
+              used: p.benchUsed,
+            };
+          });
+        onBenchStateChange(bench);
+      }
+
       rafId = requestAnimationFrame(loop);
     };
 
@@ -355,7 +404,9 @@ export default function GameCanvas({
   // gameModeConfigRef and enableBounceTimeDebugRef are intentionally excluded —
   // they update synchronously each render via ref assignment above, so the
   // RAF loop always reads the latest values without triggering a game restart.
-  }, [onMatchEnd, onRestart, onFirstGoal, onSubstitution, onBounceTimeChange, touchInputRef, homeTeamName]);
+  // benchDeployRequestRef is a ref (stable identity, read via .current each
+  // tick) so it's intentionally excluded too, same as touchInputRef.
+  }, [onMatchEnd, onRestart, onFirstGoal, onSubstitution, onBounceTimeChange, touchInputRef, homeTeamName, benchDeployRequestRef, onBenchStateChange]);
 
   return (
     <div style={{ position: 'relative', width: '100%', maxWidth: CANVAS_W }}>

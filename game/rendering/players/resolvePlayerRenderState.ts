@@ -55,7 +55,10 @@ export function resolveBotPlayerRenderStates(
     : 0;
   const removedIds = new Set(state.temporaryRemovals.map((r) => r.playerId));
 
-  return state.players.map((p): PlayerRenderState => {
+  // Bench players (see benchDeployment.ts) are parked off-pitch and must
+  // never be drawn — 'temporarily_deployed' and 'field' players render
+  // exactly like today.
+  return state.players.filter((p) => p.matchStatus !== 'bench').map((p): PlayerRenderState => {
     const isActive = p.id === state.activePlayerId && p.team === 'home';
     const isGoalkeeper = p.role === 'goalkeeper';
     // Goalkeeper wears the same team colors as field players — visual

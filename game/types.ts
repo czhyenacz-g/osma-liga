@@ -1,5 +1,6 @@
 import type { GameplayProfile, GameplayModifier } from './gameplayProfiles';
 import type { PlayerStats } from './playerStats';
+import type { BenchDeployment } from './benchDeployment';
 
 export type Team = 'home' | 'away';
 export type GamePhase = 'playing' | 'goal' | 'ended';
@@ -9,6 +10,14 @@ export type GamePhase = 'playing' | 'goal' | 'ended';
 // substitutes, bench, temporary reinforcements) instead of scattering
 // role-specific booleans/ifs across the engine.
 export type PlayerRole = 'field_player' | 'goalkeeper';
+
+// Bench + temporary substitute (see benchDeployment.ts). 'field' — normal,
+// always-on-pitch player (every goalkeeper, and the 3 original field players
+// per team). 'bench' — parked, not rendered/collided, eligible for a single
+// deploy (unless benchUsed). 'temporarily_deployed' — currently on the pitch
+// for a limited window (BENCH_DEPLOY_DURATION_MS), behaves exactly like a
+// normal field player everywhere except it reverts to 'bench' on expiry.
+export type PlayerMatchStatus = 'field' | 'bench' | 'temporarily_deployed';
 
 export interface Vec2 {
   x: number;
@@ -34,6 +43,12 @@ export interface Player {
   // clones from DEFAULT_FIELD_PLAYER_STATS/DEFAULT_GOALKEEPER_STATS), so
   // future per-player variation never mutates a shared default object.
   stats: PlayerStats;
+  // Bench/temporary-substitute status — see benchDeployment.ts. Goalkeepers
+  // and the 3 original field players always stay 'field'/benchUsed=false.
+  matchStatus: PlayerMatchStatus;
+  // Once true, this bench player can never be deployed again this match —
+  // the 30s window is a single-use boost, not a repeatable swap.
+  benchUsed: boolean;
 }
 
 export interface Ball {
@@ -101,6 +116,10 @@ export interface GameState {
   cornerClearCooldown: number;
   // Temporary player removal (see temporaryRemoval.ts) — MVP: random substitution.
   temporaryRemovals: TemporaryPlayerRemoval[];
+  // Bench + 30s temporary substitute (see benchDeployment.ts) — separate
+  // mechanic from temporaryRemovals above: this tracks players the human/bot
+  // deliberately brought ON from the bench, not players being taken off.
+  benchDeployments: BenchDeployment[];
   randomSubstitutionTriggerSecond: { home: number; away: number };
   randomSubstitutionTriggered: { home: boolean; away: boolean };
   // Gameplay profile selected at match start (see gameplayProfiles.ts) — only
