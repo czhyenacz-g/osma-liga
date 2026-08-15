@@ -1,10 +1,13 @@
 import Link from "next/link";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
+import FootballAffiliateBanner from "@/components/league/FootballAffiliateBanner";
 import { LEAGUE_LANDING_PAGES, type LeagueLandingPage } from "@/lib/leagueLandingPages";
 
 export default function LeagueLandingPageView({ league }: { league: LeagueLandingPage }) {
   const otherLeagues = LEAGUE_LANDING_PAGES.filter((l) => l.slug !== league.slug);
+  // slug is always "<name>-liga", e.g. "osma-liga" -> "osma", matching Dognet's d2 taxonomy.
+  const affiliateD2 = league.slug.split("-")[0];
 
   return (
     <>
@@ -69,6 +72,8 @@ export default function LeagueLandingPageView({ league }: { league: LeagueLandin
               {league.ctaText}
             </Link>
           </section>
+
+          <FootballAffiliateBanner d2={affiliateD2} />
 
           {/* Odkazy na ostatní ligové stránky */}
           <section className="mb-10">
