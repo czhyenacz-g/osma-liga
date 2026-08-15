@@ -1,18 +1,5 @@
 import Image from "next/image";
-
-const DOGNET_CHID = "HgqwsHBn";
-const DOGNET_D1 = "osmaliga";
-const DOGNET_TARGET_URL = "https://www.fotbalovydarek.cz/";
-
-function buildDognetUrl(d2: string): string {
-  const params = new URLSearchParams({
-    chid: DOGNET_CHID,
-    d1: DOGNET_D1,
-    d2,
-    url: DOGNET_TARGET_URL,
-  });
-  return `https://go.dognet.com/?${params.toString()}`;
-}
+import { buildDognetUrl } from "@/lib/dognet";
 
 export default function FootballAffiliateBanner({ d2 = "main" }: { d2?: string }) {
   return (

@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import AuthStatus from "@/components/auth/AuthStatus";
+import HomeAffiliateBanner from "@/components/league/HomeAffiliateBanner";
+import { buildDognetUrl } from "@/lib/dognet";
 import { CLUBS } from "@/data/clubs";
 
 const TEASER_CLUBS = CLUBS.slice(0, 6);
@@ -61,6 +63,7 @@ export default function ComingSoonHome() {
         <DateBlock />
         <Claim />
         <ClubRow />
+        <HomeAffiliateBanner />
         <FeatureStrip />
       </main>
 
@@ -187,7 +190,21 @@ function Claim() {
       className="mt-6 text-white/80"
       style={{ fontSize: "clamp(14px, 1.6vw, 18px)", textShadow: "0 2px 10px rgba(0,0,0,0.6)" }}
     >
-      Vyber si klub. Vlez na hřiště.
+      <Link href="/kluby" className="transition hover:text-white">
+        Vyber si klub.
+      </Link>{" "}
+      <a
+        href={buildDognetUrl("homepage-text")}
+        target="_blank"
+        rel="sponsored noopener noreferrer"
+        className="font-semibold underline decoration-transparent transition hover:decoration-current"
+        style={{ color: "#e3b94f" }}
+      >
+        Oblékni dres.
+      </a>{" "}
+      <Link href="/hra" className="transition hover:text-white">
+        Vlez na hřiště.
+      </Link>
     </p>
   );
 }
