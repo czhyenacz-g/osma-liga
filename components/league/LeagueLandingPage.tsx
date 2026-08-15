@@ -56,6 +56,8 @@ export default function LeagueLandingPageView({ league }: { league: LeagueLandin
             </p>
           </section>
 
+          <FootballAffiliateBanner d2={affiliateD2} />
+
           {/* Block 3 — CTA do hlavního světa */}
           <section
             className="mb-10 rounded-xl p-6 text-center"
@@ -72,8 +74,6 @@ export default function LeagueLandingPageView({ league }: { league: LeagueLandin
               {league.ctaText}
             </Link>
           </section>
-
-          <FootballAffiliateBanner d2={affiliateD2} />
 
           {/* Odkazy na ostatní ligové stránky */}
           <section className="mb-10">
