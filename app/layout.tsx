@@ -27,6 +27,8 @@ export const metadata: Metadata = {
     description: defaultDescription,
     images: [defaultOgImage],
   },
+  // Seznam Webmaster Tools — ověření vlastnictví domény.
+  other: { "seznam-wmt": "Sjj0QeWD9FkoztX6o0Qk8SgHBCrZK2KX" },
 };
 
 export default function RootLayout({
