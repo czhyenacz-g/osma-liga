@@ -14,8 +14,7 @@ import { getPlayerVisualTemplate, onPlayerVisualTemplateChange } from '@/game/pr
 import { playKickoffWhistle, playGoalSound, playRestartSound } from '@/lib/audio/whistleEngine';
 import { inMatchAudio } from '@/game/audio/inMatchAudio';
 import {
-  PRESSURE_DISTANCE, CROWD_PRESSURE_MAX_VOLUME,
-  NEAR_GOAL_OOH_PRESSURE_THRESHOLD, NEAR_GOAL_OOH_MIN_BALL_SPEED,
+  PRESSURE_DISTANCE,
   NEAR_GOAL_PRESSURE_THRESHOLD, NEAR_GOAL_PRESSURE_BED_STOP_THRESHOLD,
   NEAR_GOAL_PRESSURE_FADE_IN_MS, NEAR_GOAL_PRESSURE_FADE_OUT_MS,
   NEAR_GOAL_PRESSURE_BED_VOLUME_BASE, NEAR_GOAL_PRESSURE_BED_VOLUME_MAX, NEAR_GOAL_PRESSURE_BED_VOLUME_RANGE,
@@ -250,7 +249,7 @@ export default function GameCanvas({
         inMatchAudio.play(bounceProfileActive ? 'pongBounce' : 'ballBounce');
       }
 
-      // ── Crowd pressure loop + near-goal "ooh" ──────────────────────────────
+      // ── Crowd pressure ─────────────────────────────────────────────────────
       // pressure = how close the ball is to whichever goal it's nearest to.
       if (gameState.phase === 'playing') {
         const distToGoal = Math.min(
@@ -258,15 +257,9 @@ export default function GameCanvas({
           Math.hypot(ball.pos.x - FIELD_R, ball.pos.y - FIELD_CY),
         );
         const pressure = 1 - Math.max(0, Math.min(1, distToGoal / PRESSURE_DISTANCE));
-        inMatchAudio.setLoopVolume('crowdPressure', pressure * CROWD_PRESSURE_MAX_VOLUME);
-
-        const ballSpeed = Math.hypot(ball.vel.x, ball.vel.y);
-        if (pressure > NEAR_GOAL_OOH_PRESSURE_THRESHOLD && ballSpeed > NEAR_GOAL_OOH_MIN_BALL_SPEED) {
-          inMatchAudio.play('nearGoalOoh'); // internally cooldown-gated (NEAR_GOAL_OOH_COOLDOWN_MS)
-        }
 
         // ── Near-goal crowd pressure bed (symmetric, long dynamic bed) ───────
-        // Reuses the same "pressure" as the ambient crowdPressure loop above
+        // Uses the "pressure" computed above
         // (closeness to whichever goal the ball is nearest) — fires for
         // pressure near EITHER goal, whether the human or the bot is
         // attacking/defending. Instead of repeated long one-shots, a single
@@ -311,8 +304,7 @@ export default function GameCanvas({
           }
         }
       } else if (prevPhase !== 'goal' && gameState.phase === 'goal') {
-        // Ball just went in — hush the crowd pressure loop during the reset.
-        inMatchAudio.setLoopVolume('crowdPressure', 0);
+        // Ball just went in — hush the crowd pressure bed during the reset.
         smoothedNearGoalPressure = 0;
         inMatchAudio.stopBed('nearGoalPressureBed');
         nearGoalBedActive = false;

@@ -147,7 +147,6 @@ export default function MatchPageClient({
     void unlockAudio(); // pre-warm Tone.js AudioContext in user gesture handler
     inMatchAudio.unlock(); // same user gesture also unlocks the in-match SFX/ambient layer
     inMatchAudio.startLoop('ambientBase', 0.14);
-    inMatchAudio.startLoop('crowdPressure', 0); // volume ramps up per-tick in GameCanvas as the ball nears a goal
     setCountdownNum(3);
     setGamePhase('countdown');
     setMatchScore(null);
@@ -158,7 +157,6 @@ export default function MatchPageClient({
     setFullTimeMessage(pickRandomMessage(fullTimeMessages));
     playFullTimeWhistle();
     inMatchAudio.stopLoop('ambientBase', 800);
-    inMatchAudio.stopLoop('crowdPressure', 500);
   }, []);
 
   const handleRestart = useCallback(() => {

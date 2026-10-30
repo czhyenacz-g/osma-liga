@@ -49,12 +49,33 @@ Create separate 2–4s enemy-near-goal-sting-* files for short one-shot
 reactions (viz připravený, zatím prázdný pool `nearGoalStings` v
 `inMatchSoundConfig.ts`).
 
+## Licence (ověřeno 2026-10-30 na Freesound.org)
+
+| Soubor | Freesound | Autor | Název | Licence |
+|---|---|---|---|---|
+| `397434__foolboymedia__crowd-cheer.wav` | https://freesound.org/s/397434/ | FoolBoyMedia | Crowd Cheer | Creative Commons 0 |
+| `649156__tylermyers1992__mlb-crowd-cheer-09032022.wav` | https://freesound.org/s/649156/ | tylermyers1992 | MLB Crowd Cheer - 09032022.wav | Creative Commons 0 |
+| `652571__thankzalotz__cheers.m4a` | https://freesound.org/s/652571/ | thankzalotz | Cheers.m4a | Creative Commons 0 |
+
+Délky na Freesound odpovídají souborům v repozitáři (20,4 s / 25,9 s / 38,6 s).
+
 ## TODO
 
-- ověřit a doplnit přesnou licenci zdrojových souborů — název `397434__...`,
-  `649156__...` a `652571__...` odpovídá formátu Freesound.org (ID + autor +
-  název), licence není v projektu zatím nikde zaznamenaná
 - `after_goal.wav` nemá v názvu žádné ID zdroje — licence needotvrzená
+
+## Zrušené reference (2026-10-30)
+
+Kód původně (`38458c2`) počítal ještě se dvěma crowd soubory, které nikdy
+nevznikly a v produkci vracely 404:
+
+- `crowd-pressure-loop.mp3` — smyčka `crowdPressure` s hlasitostí podle
+  vzdálenosti míče od branky,
+- `crowd-near-goal-ooh-01.mp3` — one-shot `nearGoalOoh` při tlaku u branky.
+
+Obojí funkčně nahradil pressure bed `nearGoalPressureBed` (`2158e44`), který
+reaguje na stejný tlak u branky s fade-in/fade-out. Doplnění souborů by
+znamenalo dvě crowd vrstvy přes sebe, proto byly reference odstraněny místo
+přidání nového assetu. Budoucí krátké reakce patří do poolu `nearGoalStings`.
 
 ## Zapojení v kódu
 

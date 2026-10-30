@@ -35,14 +35,5 @@ frekvence/komprese — jen kontejner) kvůli širší kompatibilitě napříč p
 
 ## Poznámka k ambient/crowd zvukům
 
-`public/sounds/osmaliga/ambient/` a `public/sounds/osmaliga/crowd/` záměrně
-neobsahují žádné soubory — nejsou to krátká herní SFX, pro která je Kenney vhodný
-zdroj (žádný z balíčků nemá stadionový crowd/ambient materiál). Kód
-(`game/audio/inMatchAudio.ts` + `game/audio/inMatchSoundConfig.ts`) na tyto cesty
-odkazuje a s chybějícími soubory počítá — viz pravidlo "chybějící asset nesmí
-shodit hru" v `game/audio/inMatchAudio.ts`. Až budou k dispozici skutečné
-ambientní/crowd nahrávky, stačí je do těchto složek doplnit pod existující názvy:
-
-- `public/sounds/osmaliga/ambient/ambient-base-loop.mp3`
-- `public/sounds/osmaliga/crowd/crowd-pressure-loop.mp3`
-- `public/sounds/osmaliga/crowd/crowd-near-goal-ooh-01.mp3`
+Ambient a crowd zvuky nejsou z Kenney balíčků — mají vlastní evidenci v
+`public/sounds/osmaliga/ambient/SOURCE.md` a `public/sounds/osmaliga/crowd/SOURCE.md`.

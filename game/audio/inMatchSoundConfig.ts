@@ -9,10 +9,9 @@ export type InMatchSoundKey =
   | 'playerSwitch'
   | 'ballBounce'
   | 'pongBounce'
-  | 'nearGoalOoh'
   | 'buttonClick';
 
-export type InMatchLoopKey = 'ambientBase' | 'crowdPressure';
+export type InMatchLoopKey = 'ambientBase';
 
 // Sound pools — a "logical event" maps to a list of file variants, one of
 // which is picked at random each time (see inMatchAudio.ts playRandomFromPool).
@@ -33,26 +32,20 @@ export const KICK_SOUND_COOLDOWN_MS = 80;
 export const PLAYER_SWITCH_SOUND_COOLDOWN_MS = 100;
 export const BOUNCE_SOUND_COOLDOWN_MS = 100;
 export const PONG_BOUNCE_SOUND_COOLDOWN_MS = 100;
-export const NEAR_GOAL_OOH_COOLDOWN_MS = 4000;
 export const AFTER_GOAL_CROWD_COOLDOWN_MS = 1500;
 // Placeholder cooldown for the (currently empty) nearGoalStings pool.
 export const NEAR_GOAL_STINGS_COOLDOWN_MS = 3500;
 
-// Crowd pressure loop: how "close to a goal" the ball needs to be for the
-// crowd to start reacting, and how loud that gets at maximum.
+// Crowd pressure: how "close to a goal" the ball needs to be for the crowd
+// (nearGoalPressureBed below) to start reacting. The original separate
+// crowdPressure loop + nearGoalOoh one-shot never had audio files and were
+// superseded by the bed — see public/sounds/osmaliga/crowd/SOURCE.md.
 export const PRESSURE_DISTANCE = 320;
-export const CROWD_PRESSURE_MAX_VOLUME = 0.28;
-
-// Near-goal "ooh": only fires above this pressure, and only while the ball is
-// actually moving (not just resting near the goal mouth).
-export const NEAR_GOAL_OOH_PRESSURE_THRESHOLD = 0.75;
-export const NEAR_GOAL_OOH_MIN_BALL_SPEED = 40;
 
 // Near-goal pressure bed: a long crowd-reaction file played as a controlled,
 // volume-faded loop (not a repeated one-shot) while pressure near either
-// goal stays elevated. Symmetric — triggers near EITHER goal (same
-// nearest-goal distance the ambient crowdPressure loop already uses in
-// GameCanvas.tsx), regardless of which team is attacking/defending.
+// goal stays elevated. Symmetric — triggers near EITHER goal (nearest-goal
+// distance computed in GameCanvas.tsx), regardless of which team is attacking/defending.
 // Only starts once smoothed pressure crosses this threshold...
 export const NEAR_GOAL_PRESSURE_THRESHOLD = 0.45;
 // ...and is told to stop (with its own fade-out) once smoothed pressure
@@ -76,7 +69,7 @@ interface OneShotConfig {
 
 interface LoopConfig {
   src: string;
-  /** Výchozí hlasitost při startu smyčky; crowdPressure se dál řídí za běhu setLoopVolume(). */
+  /** Výchozí hlasitost při startu smyčky; za běhu ji lze měnit setLoopVolume(). */
   volume: number;
 }
 
@@ -86,13 +79,11 @@ export const IN_MATCH_SOUNDS: Record<InMatchSoundKey, OneShotConfig> = {
   playerSwitch: { src: '/sounds/osmaliga/kenney/player-switch.wav', volume: 0.22, cooldownMs: PLAYER_SWITCH_SOUND_COOLDOWN_MS },
   ballBounce: { src: '/sounds/osmaliga/kenney/ball-bounce.wav', volume: 0.35, cooldownMs: BOUNCE_SOUND_COOLDOWN_MS },
   pongBounce: { src: '/sounds/osmaliga/kenney/pong-bounce.wav', volume: 0.4, cooldownMs: PONG_BOUNCE_SOUND_COOLDOWN_MS },
-  nearGoalOoh: { src: '/sounds/osmaliga/crowd/crowd-near-goal-ooh-01.mp3', volume: 0.28, cooldownMs: NEAR_GOAL_OOH_COOLDOWN_MS },
   buttonClick: { src: '/sounds/osmaliga/kenney/button-click.wav', volume: 0.3, cooldownMs: KICK_SOUND_COOLDOWN_MS },
 };
 
 export const IN_MATCH_LOOPS: Record<InMatchLoopKey, LoopConfig> = {
   ambientBase: { src: '/sounds/osmaliga/ambient/ambient-base-loop.mp3', volume: 0.14 },
-  crowdPressure: { src: '/sounds/osmaliga/crowd/crowd-pressure-loop.mp3', volume: 0 },
 };
 
 interface PoolConfig {

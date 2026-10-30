@@ -25,8 +25,9 @@ ffmpeg -i 533861__larserikertzgaardringen__football-training-session-notodden-fk
 
 ## TODO
 
-- ověřit a doplnit přesnou licenci původního souboru (pravděpodobně Freesound.org
-  dle názvu se sample ID `533861`) před jakýmkoli veřejným/komerčním použitím
+- ~~ověřit licenci `533861`~~ — ověřeno 2026-10-30: https://freesound.org/s/533861/,
+  autor LarsErikErtzgaardRingen, „Football training session Notodden FK.wav“,
+  licence Creative Commons 0
 - `206003__habbis92__norwegian-football-matchsoccer-game-ambience.wav` je ve
   stejné složce, ale zatím nebyl použit — licence rovněž needotvrzená
 

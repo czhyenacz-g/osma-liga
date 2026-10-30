@@ -29,9 +29,8 @@ Zvuky pro píšťalku rozhodčího, gól a konec zápasu (`lib/audio/whistleEngi
 syntetizované procedurálně (Tone.js / Web Audio API), nejde o audio soubory — žádný
 externí zdroj/licence se na ně nevztahuje.
 
-Ambientní a crowd zvuky (`public/sounds/osmaliga/ambient/`, `.../crowd/`) zatím
-neexistují — nejde o krátká Kenney SFX a žádný z balíčků nemá vhodný stadionový
-materiál. Kód s jejich chybějící přítomností počítá (viz pravidlo "chybějící asset
-nesmí shodit hru" v `game/audio/inMatchAudio.ts`).
+Ambientní a crowd zvuky (`public/sounds/osmaliga/ambient/`, `.../crowd/`) pocházejí
+z Freesound.org (CC0, kromě `after_goal.wav` s needoloženým původem) — zdroje,
+autoři a licence viz `SOURCE.md` v těchto složkách.
 
 Podrobné mapování a poznámky viz `public/sounds/osmaliga/kenney/SOURCE.md`.
