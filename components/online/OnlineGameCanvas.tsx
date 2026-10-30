@@ -270,6 +270,7 @@ export default function OnlineGameCanvas({
         rp.team = tp.team;
         rp.label = tp.label;
         rp.removed = tp.removed;
+        rp.matchStatus = tp.matchStatus;
       }
 
       // Charge-ring progress from the local kick button hold — purely visual,

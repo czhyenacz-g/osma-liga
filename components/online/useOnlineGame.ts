@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { playFullTimeWhistle, playKickoffWhistle } from '@/lib/audio/whistleEngine';
+import type { PlayerMatchStatus } from '@/game/types';
 
 export interface OnlinePlayer {
   id: string;
@@ -21,6 +22,10 @@ export interface OnlinePlayer {
   // server's per-player visual size in px. Feeds resolvePlayerRenderState.ts's
   // sizeScale; never a physical/collision value on the client.
   size?: number;
+  // Mirrors project-hub-api's OnlinePlayer.matchStatus (benchDeployment.ts).
+  // 'bench' players are not drawn (resolveOnlinePlayerRenderStates); absent
+  // on snapshots from an older backend.
+  matchStatus?: PlayerMatchStatus;
 }
 
 export interface OnlineSnapshot {

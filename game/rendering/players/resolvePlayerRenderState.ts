@@ -1,4 +1,4 @@
-import type { GameState } from '../../types';
+import type { GameState, PlayerMatchStatus } from '../../types';
 import { KICK_RANGE, KICK_COOLDOWN, KICK_MAX_CHARGE_MS, PLAYER_RADIUS } from '../../constants';
 import { dist } from '../../physics';
 import { TEAM_COLORS, FACING_DEADZONE_VX, MOVING_SPEED_THRESHOLD } from './playerVisualConfig';
@@ -120,6 +120,9 @@ export interface OnlineRenderPlayerInput {
   // playerStats.ts) as sent over the socket snapshot. Falls back to
   // PLAYER_RADIUS (no visual scaling) if a snapshot predates this field.
   size?: number;
+  // Server's OnlinePlayer.matchStatus (backend benchDeployment.ts). Missing
+  // on snapshots from an older backend — treated like 'field'.
+  matchStatus?: PlayerMatchStatus;
 }
 
 export function resolveOnlinePlayerRenderStates(
@@ -129,7 +132,9 @@ export function resolveOnlinePlayerRenderStates(
   kickChargeProgress: number,
   facingTracker: FacingDirectionTracker,
 ): PlayerRenderState[] {
-  return players.map((p): PlayerRenderState => {
+  // Same rule as resolveBotPlayerRenderStates: bench players are parked
+  // off-pitch and never drawn; any other (or missing) status renders as today.
+  return players.filter((p) => p.matchStatus !== 'bench').map((p): PlayerRenderState => {
     const isGoalkeeper = !!p.isGoalkeeper;
     const colors = TEAM_COLORS[p.team];
     const isMyActivePlayer = p.active && myTeam !== null && p.team === myTeam;

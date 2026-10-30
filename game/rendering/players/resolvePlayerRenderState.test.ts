@@ -189,4 +189,62 @@ describe('resolveOnlinePlayerRenderStates', () => {
     const result = resolveOnlinePlayerRenderStates(players, { x: 480, y: 280 }, 'home', 0, tracker);
     expect(result[0].isRemoved).toBe(true);
   });
+
+  describe('matchStatus (bench)', () => {
+    const tracker = () => createFacingDirectionTracker();
+    const ball = { x: 480, y: 280 };
+
+    it('does not render bench players', () => {
+      const players = [
+        ...basePlayers,
+        { id: 'h-bench-0', team: 'home' as const, label: 'B1', rx: 100, ry: 540, pvx: 0, pvy: 0, active: false, matchStatus: 'bench' as const },
+        { id: 'a-bench-0', team: 'away' as const, label: 'B1', rx: 860, ry: 540, pvx: 0, pvy: 0, active: false, matchStatus: 'bench' as const },
+      ];
+      const result = resolveOnlinePlayerRenderStates(players, ball, 'home', 0, tracker());
+      expect(result.map((p) => p.id)).toEqual(['h1', 'a1']);
+      expect(result.some((p) => p.label === 'B1')).toBe(false);
+    });
+
+    it('renders field and temporarily deployed players', () => {
+      const players = [
+        { ...basePlayers[0], matchStatus: 'field' as const },
+        { id: 'h-bench-0', team: 'home' as const, label: 'B1', rx: 150, ry: 450, pvx: 0, pvy: 0, active: false, matchStatus: 'temporarily_deployed' as const },
+      ];
+      const result = resolveOnlinePlayerRenderStates(players, ball, 'home', 0, tracker());
+      expect(result.map((p) => p.id)).toEqual(['h1', 'h-bench-0']);
+    });
+
+    it('renders players without matchStatus (older backend snapshot)', () => {
+      const result = resolveOnlinePlayerRenderStates(basePlayers, ball, 'home', 0, tracker());
+      expect(result).toHaveLength(2);
+    });
+
+    it('renders the goalkeeper as goalkeeper with its server size', () => {
+      const players = [
+        ...basePlayers,
+        { id: 'h-gk', team: 'home' as const, label: 'GK', rx: 94, ry: 280, pvx: 0, pvy: 0, active: false, isGoalkeeper: true, size: PLAYER_RADIUS * 1.15, matchStatus: 'field' as const },
+      ];
+      const gk = resolveOnlinePlayerRenderStates(players, ball, 'home', 0, tracker()).find((p) => p.id === 'h-gk')!;
+      expect(gk.isGoalkeeper).toBe(true);
+      expect(gk.sizeScale).toBeCloseTo(1.15);
+      expect(gk.isActive).toBe(false);
+    });
+
+    it('keeps the active-player highlight when bench players are filtered out', () => {
+      const players = [
+        { id: 'h-bench-0', team: 'home' as const, label: 'B1', rx: 100, ry: 540, pvx: 0, pvy: 0, active: false, matchStatus: 'bench' as const },
+        ...basePlayers,
+      ];
+      const result = resolveOnlinePlayerRenderStates(players, ball, 'home', 0.5, tracker());
+      const h1 = result.find((p) => p.id === 'h1')!;
+      expect(h1.isActive).toBe(true);
+      expect(h1.chargeProgress).toBe(0.5);
+    });
+
+    it('does not throw on an unknown matchStatus and still renders the player', () => {
+      const players = [{ ...basePlayers[0], matchStatus: 'injured' as unknown as 'field' }];
+      expect(() => resolveOnlinePlayerRenderStates(players, ball, 'home', 0, tracker())).not.toThrow();
+      expect(resolveOnlinePlayerRenderStates(players, ball, 'home', 0, tracker())).toHaveLength(1);
+    });
+  });
 });
