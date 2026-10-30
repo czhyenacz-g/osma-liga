@@ -115,8 +115,8 @@ export default function LeagueHeader({
             </div>
 
             {/* Navigace — mobil (řádek pod brandem) */}
-            <div className="md:hidden w-full flex items-center justify-between pb-2">
-              <nav className="flex items-center gap-4">
+            <div className="md:hidden w-full flex flex-wrap items-center justify-between gap-y-2 pb-2">
+              <nav className="flex items-center gap-3">
                 {/* Stránka s vlastní navigací (homepage) ji ukáže i na mobilu,
                     ostatní stránky si drží původní zkrácený seznam. */}
                 {(navItems === NAV ? MOBILE_NAV : navItems).map((item) => (

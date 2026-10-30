@@ -3,10 +3,10 @@ import Link from "next/link";
 import ClubPreviewLightbox from "@/components/ClubPreviewLightbox";
 
 const NAV = [
-  { label: "Úvod",      href: "#uvod" },
-  { label: "Výsledky",  href: "#vysledky" },
-  { label: "Kluby",     href: "#kluby" },
-  { label: "Nábor",     href: "#aktuality" },
+  { label: "Úvod",      href: "/" },
+  { label: "Hrát",      href: "/hra/bot" },
+  { label: "Turnaje",   href: "/turnaj" },
+  { label: "Kluby",     href: "/kluby" },
   { label: "Partneři",  href: "#partneri" },
 ];
 
