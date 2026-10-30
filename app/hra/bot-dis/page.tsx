@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { notFoundInProduction } from '@/lib/devRoutes';
 
 // /hra/bot-dis was renamed to /hra/bot-test. Redirect preserves any query params.
 export default async function HraBotDisPage({
@@ -6,6 +7,7 @@ export default async function HraBotDisPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  notFoundInProduction();
   const params = await searchParams;
   const qs = new URLSearchParams(
     Object.entries(params).flatMap(([k, v]) =>

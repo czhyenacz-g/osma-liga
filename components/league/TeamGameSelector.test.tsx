@@ -42,11 +42,11 @@ describe('TeamGameSelector', () => {
 
     fireEvent.click(screen.getByRole('button', { name: new RegExp(thirdClub.name) }));
 
-    expect(screen.getByRole('link', { name: /Proti počítači/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Hrát proti botovi/ })).toHaveAttribute(
       'href',
       `/hra/bot?club=${thirdClub.slug}`,
     );
-    expect(screen.getByRole('link', { name: /Online proti hráči/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Hrát online/ })).toHaveAttribute(
       'href',
       `/hra/multiplayer?club=${thirdClub.slug}`,
     );

@@ -12,13 +12,11 @@ import SoundToggleButton from './SoundToggleButton';
 import BenchPanel from './BenchPanel';
 import PlayerVisualTemplateSwitcher from '@/components/PlayerVisualTemplateSwitcher';
 import BounceTimeOverlay from './BounceTimeOverlay';
-import { MATCH_DURATION } from '@/game/constants';
 import type { TouchInput } from '@/game/types';
 import type { GameplayProfile } from '@/game/gameplayProfiles';
 import { CLUBS } from '@/data/clubs';
 import { firstGoalMessages, fullTimeMessages, substitutionMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 
-type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 type GamePhase = 'idle' | 'countdown' | 'playing';
 
 const NO_SELECT: React.CSSProperties = {
@@ -83,7 +81,6 @@ export default function MatchPageClient({
 }: Props) {
   const homeTeamName = (homeClubSlug && CLUBS.find((c) => c.slug === homeClubSlug)?.name) || 'Náhoda FC';
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
-  const [saveState, setSaveState] = useState<SaveState>('idle');
   const [gamePhase, setGamePhase] = useState<GamePhase>('idle');
   const [countdownNum, setCountdownNum] = useState(3);
   const [isPortrait, setIsPortrait] = useState(false);
@@ -154,12 +151,10 @@ export default function MatchPageClient({
     setCountdownNum(3);
     setGamePhase('countdown');
     setMatchScore(null);
-    setSaveState('idle');
   };
 
   const handleMatchEnd = useCallback((score: { home: number; away: number }) => {
     setMatchScore(score);
-    setSaveState('idle');
     setFullTimeMessage(pickRandomMessage(fullTimeMessages));
     playFullTimeWhistle();
     inMatchAudio.stopLoop('ambientBase', 800);
@@ -170,7 +165,6 @@ export default function MatchPageClient({
     const t = touchRef.current;
     t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false;
     setMatchScore(null);
-    setSaveState('idle');
     setGamePhase('idle');
     if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);
     setFirstGoalMessage(null);
@@ -214,27 +208,6 @@ export default function MatchPageClient({
   const handleFullscreen = async () => {
     const ok = await requestGameFullscreen(gameWrapperRef.current);
     if (!ok) setFsStatus('unavailable');
-  };
-
-  const save = async () => {
-    if (!matchScore) return;
-    setSaveState('saving');
-    try {
-      const res = await fetch('/api/match-results', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          homeScore: matchScore.home,
-          awayScore: matchScore.away,
-          durationSeconds: matchDurationSeconds ?? MATCH_DURATION,
-          ...(homeClubSlug ? { homeClubSlug } : {}),
-        }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setSaveState('saved');
-    } catch {
-      setSaveState('error');
-    }
   };
 
   const countdownText = countdownNum > 0 ? String(countdownNum) : 'HRAJ!';
@@ -444,51 +417,6 @@ export default function MatchPageClient({
         <p className="text-xs italic text-center max-w-sm" style={{ color: 'rgba(209,250,229,0.5)' }}>
           {fullTimeMessage}
         </p>
-      )}
-
-      {matchScore !== null && (
-        <div className="flex items-center gap-3 text-sm" style={{ minHeight: 36 }}>
-          {saveState === 'idle' && (
-            <button
-              onClick={save}
-              className="rounded-lg px-4 py-1.5 text-xs font-bold transition hover:opacity-90 active:scale-95"
-              style={{ background: '#d6a94a', color: '#041f14' }}
-            >
-              Zapsat výsledek
-            </button>
-          )}
-
-          {saveState === 'saving' && (
-            <span className="text-xs" style={{ color: 'rgba(209,250,229,0.5)' }}>
-              Zapisuji…
-            </span>
-          )}
-
-          {saveState === 'saved' && (
-            <>
-              <span className="text-xs" style={{ color: '#6dbf8a' }}>
-                Výsledek zapsán do zápisu utkání.
-              </span>
-              <button
-                disabled
-                className="rounded-lg px-4 py-1.5 text-xs font-bold opacity-30 cursor-not-allowed"
-                style={{ background: 'rgba(255,255,255,0.12)', color: '#fff' }}
-              >
-                Výsledek už je zapsaný
-              </button>
-            </>
-          )}
-
-          {saveState === 'error' && (
-            <button
-              onClick={save}
-              className="rounded-lg px-4 py-1.5 text-xs font-semibold transition hover:opacity-90"
-              style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}
-            >
-              Výsledek se nepodařilo zapsat. Zkus to znovu.
-            </button>
-          )}
-        </div>
       )}
     </>
   );

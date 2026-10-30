@@ -25,14 +25,29 @@ type MatchRow = {
   onlineMatchId?: string | null;
 };
 
+// Stejné okno jako tabulka klubů (rolling 30 dní na backendu).
+const RECENT_WINDOW_DAYS = 30;
+const SHOWN_RESULTS = 5;
+
+// Ukazujeme jen výsledky, které spočítal server (online/tréninkové/turnajové
+// zápasy). Výsledky proti botovi ('singleplayer') posílal klient s libovolným
+// skóre, takže je veřejně nevydáváme za odehrané zápasy.
+function isPublicResult(r: MatchRow, now: number): boolean {
+  if (r.mode === 'singleplayer') return false;
+  const age = now - new Date(r.playedAt).getTime();
+  return age <= RECENT_WINDOW_DAYS * 86_400_000;
+}
+
 async function fetchRecentResults(): Promise<MatchRow[] | null> {
   try {
-    const res = await fetch(`${HUB_URL}/api/osma-liga/match-results?limit=5`, {
+    const res = await fetch(`${HUB_URL}/api/osma-liga/match-results?limit=20`, {
       headers: { 'X-Project-Hub-Key': HUB_KEY },
       next: { revalidate: 30 },
     });
     if (!res.ok) return null;
-    return res.json() as Promise<MatchRow[]>;
+    const rows = await res.json() as MatchRow[];
+    const now = Date.now();
+    return rows.filter((r) => isPublicResult(r, now)).slice(0, SHOWN_RESULTS);
   } catch {
     return null;
   }
@@ -64,8 +79,8 @@ export default async function RecentResults() {
         </h2>
 
         {!results || results.length === 0 ? (
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            Zatím není zapsaný žádný odehraný zápas.
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            Za posledních {RECENT_WINDOW_DAYS} dní se tu zatím žádný online zápas nehrál. Klidně můžeš být první.
           </p>
         ) : (
           <ul className="space-y-3">

@@ -16,6 +16,12 @@ const NAV: NavItem[] = [
   { label: "Partneři", href: "#partneri",  active: false },
 ];
 
+const MOBILE_NAV: NavItem[] = [
+  { label: "Šatna",    href: "/satna"    },
+  { label: "Kluby",    href: "#kluby"    },
+  { label: "Partneři", href: "#partneri" },
+];
+
 export default function LeagueHeader({
   compact = false,
   navItems = NAV,
@@ -111,11 +117,9 @@ export default function LeagueHeader({
             {/* Navigace — mobil (řádek pod brandem) */}
             <div className="md:hidden w-full flex items-center justify-between pb-2">
               <nav className="flex items-center gap-4">
-                {([
-                  { label: "Šatna",    href: "/satna"    },
-                  { label: "Kluby",    href: "#kluby"    },
-                  { label: "Partneři", href: "#partneri" },
-                ] as const).map((item) => (
+                {/* Stránka s vlastní navigací (homepage) ji ukáže i na mobilu,
+                    ostatní stránky si drží původní zkrácený seznam. */}
+                {(navItems === NAV ? MOBILE_NAV : navItems).map((item) => (
                   <a
                     key={item.href}
                     href={item.href}

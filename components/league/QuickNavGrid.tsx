@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
 const ITEMS = [
-  { title: 'Tabulka', text: 'Podívej se, jak si vedou všechny týmy.', href: '/demo#tabulka' },
+  { title: 'Proti botovi', text: 'Rychlý zápas hned teď, bez čekání na soupeře.', href: '/hra/bot' },
+  { title: 'Online', text: 'Založ zápas, nebo se připoj k čekající výzvě.', href: '/hra/multiplayer' },
+  { title: 'Turnaje', text: 'Založ turnaj pro partu a hrajte o titul okresu.', href: '/turnaj' },
   { title: 'Kluby', text: 'Prohlédni si kluby Osmé ligy.', href: '/kluby' },
-  { title: 'Turnaje', text: 'Zapoj se do turnajů a speciálních akcí.', href: '/turnaj' },
-  { title: 'Aktuality', text: 'Novinky a dění z Osmé ligy.', href: '/demo#aktuality' },
 ];
 
 export default function QuickNavGrid() {

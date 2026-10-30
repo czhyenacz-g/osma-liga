@@ -11,7 +11,20 @@ function isValidDuration(v: unknown): v is number {
   return typeof v === 'number' && Number.isFinite(v) && v >= 30 && v <= 600;
 }
 
+// Zápis výsledků zápasů proti botovi je dočasně vypnutý: skóre posílá klient,
+// takže ho nejde ověřit, a zápis by se objevil ve veřejných výsledcích.
+// Online/tréninkové/turnajové výsledky ukládá server (project-hub-api) sám
+// a tento endpoint nepoužívají. Původní implementace zůstává níže.
+const BOT_RESULT_WRITES_ENABLED = false;
+
 export async function POST(req: NextRequest) {
+  if (!BOT_RESULT_WRITES_ENABLED) {
+    return NextResponse.json(
+      { error: 'Zápis výsledků zápasů proti botovi je dočasně vypnutý.' },
+      { status: 410 },
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();

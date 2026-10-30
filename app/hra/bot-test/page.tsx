@@ -4,6 +4,7 @@ import GameNavLink from '@/components/ui/GameNavLink';
 import { CLUBS } from '@/data/clubs';
 import BotTestClient from './BotTestClient';
 import { resolveMode } from './botTestModes';
+import { notFoundInProduction } from '@/lib/devRoutes';
 
 export const metadata: Metadata = {
   title: 'Bot test',
@@ -14,6 +15,7 @@ export default async function HraBotTestPage({
 }: {
   searchParams: Promise<{ club?: string; mode?: string }>;
 }) {
+  notFoundInProduction();
   const { club: clubSlug, mode: modeParam } = await searchParams;
   const initialMode = resolveMode(modeParam);
 

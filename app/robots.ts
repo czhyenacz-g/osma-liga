@@ -12,7 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         "/hra/",
         "/muj-profil",
         "/obecni-prebor",
-        "/demo",
+        "/dev",
         "/api/",
       ],
     },

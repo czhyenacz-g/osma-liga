@@ -73,8 +73,19 @@ function ChallengeMatchup({ clubSlug }: { clubSlug: string | null }) {
   );
 }
 
-export default function MatchHero({ challenge }: { challenge?: ActiveChallenge }) {
+// liveOnly: vykreslí jen kartu skutečně čekající výzvy (a bez ní nic) — bez
+// fiktivního "posledního utkání" a "příštího zápasu", které by veřejná homepage
+// jinak prezentovala jako skutečně odehrané/naplánované zápasy.
+export default function MatchHero({
+  challenge,
+  liveOnly = false,
+}: {
+  challenge?: ActiveChallenge;
+  liveOnly?: boolean;
+}) {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  if (liveOnly && !challenge) return null;
 
   return (
     <section
@@ -85,8 +96,9 @@ export default function MatchHero({ challenge }: { challenge?: ActiveChallenge }
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/75" />
 
       <div className="relative mx-auto max-w-[1240px] px-4 sm:px-6 py-10 lg:py-16">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:gap-16 xl:gap-24">
+        <div className={`flex flex-col lg:flex-row lg:items-start lg:gap-16 xl:gap-24${liveOnly ? " items-center lg:justify-center" : ""}`}>
 
+          {!liveOnly && (<>
           {/* ── LEVÁ ČÁST: poslední utkání ── */}
           <div className="flex-1 min-w-0 text-white space-y-5">
             <div className="max-w-[720px] space-y-5">
@@ -167,10 +179,11 @@ export default function MatchHero({ challenge }: { challenge?: ActiveChallenge }
 
           {/* Svislá linka — desktop */}
           <div className="hidden lg:block w-px self-stretch bg-white/10 shrink-0" />
+          </>)}
 
           {/* ── PRAVÁ KARTA: příští zápas / aktivní výzva ── */}
           <div
-            className="w-full lg:w-[360px] shrink-0 rounded-2xl bg-white shadow-2xl overflow-hidden mt-8 lg:mt-0"
+            className={`w-full lg:w-[360px] shrink-0 rounded-2xl bg-white shadow-2xl overflow-hidden ${liveOnly ? "max-w-[360px]" : "mt-8 lg:mt-0"}`}
             style={
               challenge
                 ? { border: "2px solid #d6a94a", boxShadow: "0 0 28px rgba(214,169,74,0.3)" }

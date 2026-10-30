@@ -5,8 +5,11 @@ const HOME_CLUB_SLUG = 'nahoda-fc';
 const TOP_N = 5;
 
 export default async function LeagueTable() {
-  const { standings } = await getClubStandings();
+  const { period, standings } = await getClubStandings();
   const top = standings.slice(0, TOP_N);
+  // Tabulka počítá jen online zápasy za klouzavé období (30 dní). Když se za ně
+  // nic nehrálo, místo řady nul ukážeme prázdný stav.
+  const hasMatches = standings.some((entry) => entry.stats.matches > 0);
 
   return (
     <section id="vysledky" className="bg-white border-b border-gray-200 py-12">
@@ -18,45 +21,59 @@ export default async function LeagueTable() {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-gray-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
-                <th className="py-2.5 pl-4 text-left w-8">#</th>
-                <th className="py-2.5 px-2 text-left">Klub</th>
-                <th className="py-2.5 pr-4 text-right">Body</th>
-              </tr>
-            </thead>
-            <tbody>
-              {top.map((entry, i) => {
-                const isHomeClub = entry.club.slug === HOME_CLUB_SLUG;
-                return (
-                  <tr
-                    key={entry.club.id}
-                    className={`border-b border-gray-100 last:border-0 ${
-                      isHomeClub ? 'bg-green-50' : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    <td className="py-2.5 pl-4 text-gray-400 font-mono text-xs">{i + 1}.</td>
-                    <td className={`py-2.5 px-2 font-semibold ${isHomeClub ? 'text-green-800' : 'text-gray-800'}`}>
-                      {entry.club.shortName ?? entry.club.name}
-                      {isHomeClub && (
-                        <span className="ml-2 rounded bg-green-700 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase">
-                          Náš klub
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-2.5 pr-4 text-right font-bold text-gray-900">{entry.stats.points}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        {hasMatches ? (
+          <>
+          <div className="rounded-xl border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
+                  <th className="py-2.5 pl-4 text-left w-8">#</th>
+                  <th className="py-2.5 px-2 text-left">Klub</th>
+                  <th className="py-2.5 pr-4 text-right">Body</th>
+                </tr>
+              </thead>
+              <tbody>
+                {top.map((entry, i) => {
+                  const isHomeClub = entry.club.slug === HOME_CLUB_SLUG;
+                  return (
+                    <tr
+                      key={entry.club.id}
+                      className={`border-b border-gray-100 last:border-0 ${
+                        isHomeClub ? 'bg-green-50' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <td className="py-2.5 pl-4 text-gray-400 font-mono text-xs">{i + 1}.</td>
+                      <td className={`py-2.5 px-2 font-semibold ${isHomeClub ? 'text-green-800' : 'text-gray-800'}`}>
+                        {entry.club.shortName ?? entry.club.name}
+                        {isHomeClub && (
+                          <span className="ml-2 rounded bg-green-700 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase">
+                            Náš klub
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 pr-4 text-right font-bold text-gray-900">{entry.stats.points}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
-        <p className="mt-3 text-[11px] text-gray-400">
-          O pořadí rozhodují body, skóre a další okresní okolnosti.
-        </p>
+          <p className="mt-3 text-[11px] text-gray-400">
+            O pořadí rozhodují body, skóre a další okresní okolnosti.
+          </p>
+          </>
+        ) : (
+          <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-5 py-8 text-center">
+            <p className="text-sm font-semibold text-gray-700">Sezóna se právě rozbíhá.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Odehraj první zápas a zapiš se do historie okresu.
+            </p>
+            <p className="mt-3 text-[11px] text-gray-400">
+              Tabulka počítá online zápasy za posledních {period.days} dní.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

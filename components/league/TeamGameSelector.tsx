@@ -9,10 +9,10 @@ const STORAGE_KEY = 'osmaliga:selectedClub';
 
 interface TeamGameSelectorProps {
   /**
-   * "default" — původní prezentace (wrap do víc řad na desktopu). Používá /demo-1.
+   * "default" — původní prezentace (wrap do víc řad na desktopu).
    * "compact" — jedna horizontální řada se šipkami, menší karty, těsnější spacing.
-   * "expanded" — vícéřadý wrap layout jako "default" (blíž /demo-1), navíc karta
-   *              "Další kluby" a checkmark badge na aktivním klubu. Používá /demo.
+   * "expanded" — vícéřadý wrap layout jako "default", navíc karta
+   *              "Další kluby", nápověda k výběru a checkmark badge na aktivním klubu. Používá homepage.
    */
   variant?: 'default' | 'compact' | 'expanded';
 }
@@ -46,6 +46,12 @@ export default function TeamGameSelector({ variant = 'default' }: TeamGameSelect
 
   return (
     <div className="w-full">
+      {isExpanded && (
+        <p className="mb-3 text-xs font-semibold text-white/60">
+          Klikni na erb a vyber si klub, za který nastoupíš.
+        </p>
+      )}
+
       {/* Výběr klubu — horizontální pás, na mobilu swipe.
           Gutter (sm:px-9) na wrapperu rezervuje místo pro šipky, aby nikdy nepřekrývaly karty. */}
       <div className={isCompact ? 'relative sm:px-9' : undefined}>
@@ -208,6 +214,28 @@ export default function TeamGameSelector({ variant = 'default' }: TeamGameSelect
             href={`/hra/bot?club=${selectedClub.slug}`}
             className={
               tight
+                ? 'flex flex-col items-center gap-0.5 rounded-2xl px-6 py-[18px] text-center transition hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0c75e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#052e1a]'
+                : 'flex flex-col items-center gap-1 rounded-2xl px-5 py-5 text-center transition hover:-translate-y-0.5 hover:opacity-95'
+            }
+            // Hra proti botovi je hlavní CTA — nový hráč může začít hned, bez čekání na soupeře.
+            style={{
+              background: '#d6a94a',
+              border: '1px solid rgba(255,255,255,0.25)',
+              boxShadow: '0 0 24px rgba(214,169,74,0.35)',
+            }}
+          >
+            <span className={tight ? 'text-[15px] font-black uppercase tracking-wide' : 'text-sm font-black uppercase tracking-wide'} style={{ color: '#052e1a' }}>
+              Hrát proti botovi
+            </span>
+            <span className="text-xs" style={{ color: 'rgba(5,46,26,0.75)' }}>
+              Hned, bez čekání na soupeře.
+            </span>
+          </Link>
+
+          <Link
+            href={`/hra/multiplayer?club=${selectedClub.slug}`}
+            className={
+              tight
                 ? 'flex flex-col items-center gap-0.5 rounded-2xl px-6 py-[18px] text-center transition hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6dbf8a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#052e1a]'
                 : 'flex flex-col items-center gap-1 rounded-2xl px-5 py-5 text-center transition hover:-translate-y-0.5 hover:opacity-95'
             }
@@ -217,29 +245,9 @@ export default function TeamGameSelector({ variant = 'default' }: TeamGameSelect
             }}
           >
             <span className={tight ? 'text-[15px] font-black uppercase tracking-wide text-white' : 'text-sm font-black uppercase tracking-wide text-white'}>
-              Proti počítači
+              Hrát online
             </span>
-            <span className="text-xs text-white/75">Rychlý zápas proti botovi.</span>
-          </Link>
-
-          <Link
-            href={`/hra/multiplayer?club=${selectedClub.slug}`}
-            className={
-              tight
-                ? 'flex flex-col items-center gap-0.5 rounded-2xl px-6 py-[18px] text-center transition hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0c75e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#052e1a]'
-                : 'flex flex-col items-center gap-1 rounded-2xl px-5 py-5 text-center transition hover:-translate-y-0.5 hover:opacity-95'
-            }
-            style={{
-              background: '#d6a94a',
-              border: '1px solid rgba(255,255,255,0.25)',
-            }}
-          >
-            <span className={tight ? 'text-[15px] font-black uppercase tracking-wide' : 'text-sm font-black uppercase tracking-wide'} style={{ color: '#052e1a' }}>
-              Online proti hráči
-            </span>
-            <span className="text-xs" style={{ color: 'rgba(5,46,26,0.75)' }}>
-              Zahraj si online zápas s jiným hráčem.
-            </span>
+            <span className="text-xs text-white/75">Zápas s jiným hráčem přes internet.</span>
           </Link>
         </div>
       </div>

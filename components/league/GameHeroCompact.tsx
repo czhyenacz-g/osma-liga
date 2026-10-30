@@ -2,9 +2,8 @@
 
 import TeamGameSelector from '@/components/league/TeamGameSelector';
 
-// Hero sekce pro /demo — vícéřadý výběr klubů blíž vizuální hustotě /demo-1,
-// ale se zachovaným kompaktním spacingem a scroll cue dolů na další obsah.
-// Původní varianta zůstává v GameHero.tsx (používá /demo-1).
+// Hero sekce veřejné homepage — vícéřadý výběr klubů s kompaktním spacingem
+// a scroll cue dolů na další obsah.
 export default function GameHeroCompact() {
   function scrollToNextSection() {
     const target = document.getElementById('after-hero');
@@ -22,6 +21,12 @@ export default function GameHeroCompact() {
         }}
       />
       <div className="relative mx-auto max-w-[1000px]">
+        <p
+          className="mb-2 text-[11px] font-bold uppercase tracking-[0.22em] sm:text-xs"
+          style={{ color: '#6dbf8a' }}
+        >
+          Osmá liga je zpět
+        </p>
         <h1
           className="font-extrabold uppercase"
           style={{
@@ -32,16 +37,21 @@ export default function GameHeroCompact() {
             textShadow: '0 2px 20px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5)',
           }}
         >
-          Vyber si tým.{' '}
-          <span style={{ color: '#e3b94f' }}>Vlez na hřiště.</span>
+          Velký fotbal.{' '}
+          <span style={{ color: '#e3b94f' }}>Malý okres.</span>
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-sm text-white/75 sm:text-base">
-          Vyber si klub a hraj za něj proti počítači nebo ostatním hráčům.
+          Vyber si klub, vyběhni na hřiště a ukaž, že na okresní přebor máš.
+          <br className="hidden sm:block" /> VAR nemáme. Výmluvy taky ne.
         </p>
 
         <div className="mt-5">
           <TeamGameSelector variant="expanded" />
         </div>
+
+        <p className="mt-3 text-xs font-semibold uppercase tracking-widest text-white/55">
+          Zdarma. Přímo v prohlížeči.
+        </p>
 
         <button
           type="button"
