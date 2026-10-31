@@ -8,18 +8,13 @@ interface NavItem {
   active?: boolean;
 }
 
+// Skutečné stránky, ne kotvy — header se používá i tam, kde homepage
+// sekce (#vysledky, #kluby, …) neexistují.
 const NAV: NavItem[] = [
-  { label: "Šatna",    href: "/satna",     active: false },
-  { label: "Výsledky", href: "#vysledky",  active: false },
-  { label: "Kluby",    href: "#kluby",     active: false },
-  { label: "Nábor",    href: "#aktuality", active: false },
-  { label: "Partneři", href: "#partneri",  active: false },
-];
-
-const MOBILE_NAV: NavItem[] = [
-  { label: "Šatna",    href: "/satna"    },
-  { label: "Kluby",    href: "#kluby"    },
-  { label: "Partneři", href: "#partneri" },
+  { label: "Hrát",    href: "/hra/bot" },
+  { label: "Online",  href: "/hra/multiplayer" },
+  { label: "Turnaje", href: "/turnaj" },
+  { label: "Kluby",   href: "/kluby" },
 ];
 
 export default function LeagueHeader({
@@ -65,7 +60,7 @@ export default function LeagueHeader({
               className="mt-1 font-semibold uppercase tracking-[0.22em]"
               style={{ fontSize: "10px", color: "#6dbf8a" }}
             >
-              Oficiální web soutěže
+              Fotbalová hra z českého okresu
             </div>
           </div>
         </Link>
@@ -117,9 +112,7 @@ export default function LeagueHeader({
             {/* Navigace — mobil (řádek pod brandem) */}
             <div className="md:hidden w-full flex flex-wrap items-center justify-between gap-y-2 pb-2">
               <nav className="flex items-center gap-3">
-                {/* Stránka s vlastní navigací (homepage) ji ukáže i na mobilu,
-                    ostatní stránky si drží původní zkrácený seznam. */}
-                {(navItems === NAV ? MOBILE_NAV : navItems).map((item) => (
+                {navItems.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
