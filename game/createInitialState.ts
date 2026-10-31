@@ -1,6 +1,7 @@
 import type { GameState, Player } from './types';
+import { getSidelineBenchSpot } from './benchSideline';
 import {
-  FIELD_CX, FIELD_CY, FIELD_L, FIELD_R, FIELD_T, GOALKEEPER_DEFAULT_DEPTH, MATCH_DURATION,
+  FIELD_CX, FIELD_CY, FIELD_L, FIELD_R, GOALKEEPER_DEFAULT_DEPTH, MATCH_DURATION,
   DEFAULT_BENCH_SIZE,
 } from './constants';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, TemporaryRemovalConfig, pickRandomTriggerSecond } from './temporaryRemoval';
@@ -52,19 +53,19 @@ function makeGoalkeeper(
   };
 }
 
-// Bench holding spot, above the field like temporaryRemoval.ts's bench zone
-// but on the opposite (non-overlapping) side, with extra bench slots offset
-// vertically so DEFAULT_BENCH_SIZE > 1 doesn't stack players exactly on top
-// of each other.
+// Bench holding spot at the bottom-touchline bench (benchSideline.ts), with
+// extra bench slots offset sideways so DEFAULT_BENCH_SIZE > 1 doesn't stack
+// players exactly on top of each other. Never drawn or collided while
+// 'bench'.
 function makeBenchPlayer(
   id: string,
   team: 'home' | 'away',
   index: number,
   label: string,
 ): Player {
-  const x = team === 'home' ? FIELD_CX - 100 : FIELD_CX + 100;
-  const y = FIELD_T - 25 - index * 20;
-  const player = makePlayer(id, team, x, y, label);
+  const spot = getSidelineBenchSpot(team);
+  const x = spot.x + (team === 'home' ? -1 : 1) * index * 24;
+  const player = makePlayer(id, team, x, spot.y, label);
   player.matchStatus = 'bench';
   return player;
 }

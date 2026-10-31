@@ -1,5 +1,6 @@
 import type { GameState, Player, Team, TemporaryPlayerRemoval, Vec2 } from './types';
-import { FIELD_L, FIELD_R, FIELD_T, FIELD_CX, FIELD_CY, MATCH_DURATION, SUPPORT_PLAYER_SPEED } from './constants';
+import { FIELD_L, FIELD_R, FIELD_B, FIELD_CX, FIELD_CY, MATCH_DURATION, SUPPORT_PLAYER_SPEED } from './constants';
+import { getSidelineBenchSpot } from './benchSideline';
 
 // Config for the generic "temporary removal" mechanic — shared groundwork for
 // future stamina/cards/injury events. MVP only implements randomSubstitution.
@@ -34,17 +35,20 @@ export function getRemovedPlayerIds(state: GameState): Set<string> {
   return new Set(state.temporaryRemovals.map((r) => r.playerId));
 }
 
-// Symbolic bench zone just above the field — within canvas bounds but
-// outside play, one slot per side so removals from both teams don't overlap.
+// The bench — just past the bottom touchline (benchSideline.ts), one slot
+// per side so removals from both teams don't overlap. The player walks off
+// downwards and later comes back on from below.
 function getBenchPosition(team: Team): Vec2 {
-  return { x: team === 'home' ? FIELD_CX - 100 : FIELD_CX + 100, y: FIELD_T - 25 };
+  return getSidelineBenchSpot(team);
 }
 
-// Safe return spot: center of the team's own attacking-half quadrant. Nudges
-// sideways if a teammate is already standing there.
+// Safe return spot: center of the team's own-half quadrant on the bench
+// (bottom) side — the mirror of the old top-side spot, so the walk back on
+// from the bench is practically as long as before (133px vs 140px). Nudges sideways if a
+// teammate is already standing there.
 function computeReturnPosition(team: Team, onFieldTeammates: Player[]): Vec2 {
   const baseX = team === 'home' ? (FIELD_L + FIELD_CX) / 2 : (FIELD_CX + FIELD_R) / 2;
-  const baseY = (FIELD_T + FIELD_CY) / 2;
+  const baseY = (FIELD_CY + FIELD_B) / 2;
 
   let x = baseX;
   for (let attempt = 0; attempt < 4; attempt++) {

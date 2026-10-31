@@ -10,6 +10,7 @@ import { renderGame } from '@/game/renderGame';
 import { resumeAudio } from '@/game/audio';
 import PlayerRenderer, { type PlayerRendererHandle } from '@/game/rendering/players/PlayerRenderer';
 import { resolveBotPlayerRenderStates, createFacingDirectionTracker } from '@/game/rendering/players/resolvePlayerRenderState';
+import { createSubstitutionAnimator } from '@/game/rendering/players/substitutionAnimation';
 import { getPlayerVisualTemplate, onPlayerVisualTemplateChange } from '@/game/presentation/playerVisualSettings';
 import { playKickoffWhistle, playGoalSound, playRestartSound } from '@/lib/audio/whistleEngine';
 import { inMatchAudio } from '@/game/audio/inMatchAudio';
@@ -107,6 +108,8 @@ export default function GameCanvas({
     );
     const input: InputState = createInputState();
     const facingTracker = createFacingDirectionTracker();
+    // Render-only bench entrance/exit (bottom touchline) — see substitutionAnimation.ts.
+    const animateSubstitutions = createSubstitutionAnimator();
 
     const removeInput = attachInputListeners(input);
 
@@ -367,7 +370,9 @@ export default function GameCanvas({
       ballRotation += (ballSpeed / BALL_RADIUS) * dt;
 
       renderGame(ctx, gameState, homeTeamName, ballRotation);
-      playerRendererRef.current?.update(resolveBotPlayerRenderStates(gameState, facingTracker));
+      playerRendererRef.current?.update(
+        animateSubstitutions(gameState.players, resolveBotPlayerRenderStates(gameState, facingTracker), now),
+      );
 
       if (onBenchStateChange && now - lastBenchUiUpdate >= BENCH_UI_THROTTLE_MS) {
         lastBenchUiUpdate = now;

@@ -4,6 +4,7 @@ import type { OnlineSnapshot, OnlinePlayer } from './useOnlineGame';
 import { concededGoalMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
 import PlayerRenderer, { type PlayerRendererHandle } from '@/game/rendering/players/PlayerRenderer';
 import { resolveOnlinePlayerRenderStates, createFacingDirectionTracker } from '@/game/rendering/players/resolvePlayerRenderState';
+import { createSubstitutionAnimator } from '@/game/rendering/players/substitutionAnimation';
 import { getPlayerVisualTemplate, onPlayerVisualTemplateChange } from '@/game/presentation/playerVisualSettings';
 import { drawFootball, BALL_VISUAL_RADIUS_SCALE } from '@/game/rendering/ball/drawFootball';
 
@@ -221,6 +222,7 @@ export default function OnlineGameCanvas({
     // Tracks whether the player overlay is currently shown, so setVisible()
     // is only called on an actual change rather than every frame.
     let playersVisible = true;
+    const animateSubstitutions = createSubstitutionAnimator();
     // Purely cosmetic rolling rotation for the SVG-style football (see
     // drawFootball.ts), derived from the interpolated render position delta
     // (no server-side ball velocity is transmitted) — never read by
@@ -299,13 +301,19 @@ export default function OnlineGameCanvas({
       }
 
       const myTeam: 'home' | 'away' | null = role === 'home' ? 'home' : role === 'guest' ? 'away' : null;
+      // Bench entrance/exit is derived from the snapshot's matchStatus
+      // only (render-only, no extra socket events) — substitutionAnimation.ts.
       playerRendererRef.current?.update(
-        resolveOnlinePlayerRenderStates(
+        animateSubstitutions(
           r.players,
-          { x: r.ball.rx, y: r.ball.ry },
-          myTeam,
-          kickChargeProgress,
-          facingTrackerRef.current,
+          resolveOnlinePlayerRenderStates(
+            r.players,
+            { x: r.ball.rx, y: r.ball.ry },
+            myTeam,
+            kickChargeProgress,
+            facingTrackerRef.current,
+          ),
+          performance.now(),
         ),
       );
 

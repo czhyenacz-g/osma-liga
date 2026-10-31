@@ -1,6 +1,7 @@
 import type { BenchRole, GameState, Player, Team, Vec2 } from './types';
 import { FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY, BENCH_DEPLOY_DURATION_MS } from './constants';
 import { getRemovedPlayerIds } from './temporaryRemoval';
+import { BENCH_SIDELINE_Y } from './benchSideline';
 
 // Bench + 30s temporary substitute — a separate mechanic from
 // temporaryRemoval.ts's random-substitution ("leaving/bench/returning")
@@ -27,13 +28,16 @@ export function isSelectableFieldPlayer(p: Player, removedIds: Set<string>): boo
   return p.role !== 'goalkeeper' && p.matchStatus !== 'bench' && !removedIds.has(p.id);
 }
 
-// Mirrored holding spot inside each team's own defensive third, away from
-// the other 3 field players + GK so a freshly deployed player doesn't spawn
-// on top of anyone.
+// Where a freshly deployed substitute physically starts: inside the pitch
+// near the bottom (bench) touchline in its own corner, away from the other
+// 3 field players + GK so it doesn't spawn on top of anyone. The renderer
+// shows it running up into this spot from the bench line
+// (rendering/players/substitutionAnimation.ts) — the engine position itself
+// is unchanged.
 export function getBenchEntryPosition(team: Team): Vec2 {
   return {
     x: team === 'home' ? FIELD_L + 90 : FIELD_R - 90,
-    y: FIELD_B - 60,
+    y: BENCH_SIDELINE_Y - 60,
   };
 }
 
