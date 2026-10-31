@@ -36,7 +36,8 @@ v toleranci, ≈ = rozdíl jen ve velikosti kroku (viz *Známé rozdíly*).
 | Ochrana vlastní střely | 0,25 s po kopu bez kontroly míče střelcem | `kickSelfTrap*` | `kickSelfTrap` per tým | `short kick` ✔ | – |
 | V3 příprava otočky | `BALL_PHYSICS_V3` (níže) | `game/dribblePrep.ts` | `src/gameEngine/dribblePrep.ts` | otočky, `shot after a 180° turn` ≈ | bot výzvy `preparedTurns=false` |
 | Náraz hráč→míč | `BUMP_FORCE` 110 na krok | `updateGame` | `tick.ts` | `defender *` ≈ | – |
-| Brankář | zóna, 150 px/s, reakce 390 px, útlum 0,18 + bump 60 | `goalkeeperAI.ts` | `goalkeeperAI.ts` | `goalkeeper blocks shot` (vyřazeno, viz níže) | – |
+| Brankář | zóna, 150 px/s, reakce 390 px, útlum 0,18 + bump 60 | `goalkeeperAI.ts` | `goalkeeperAI.ts` | `goalkeeper blocks shot` ✔ | – |
+| Kontakt s brankářem | hitbox 28 (hráč 18 + míč 10), průchod tělem hlídá swept kontrola (níže) | `sweepBallAgainstGoalkeepers` | `sweepBallAgainstGoalkeepers` | `goalkeeperCollision.test.ts` | – |
 | Žolík | 30 s, jednorázový, vstup (150, 450), role útočník/obránce | `bench*.ts` | `bench*.ts` | `žolík entry + expiry` ✔ | – |
 | Dočasné oslabení | 10 s pod spodní čarou | `temporaryRemoval.ts` | `temporaryRemoval.ts` | `temporary weakening` ✔ | – |
 | **Bot: rychlost** | lokální bot 165, bot výzvy 210 | `BOT_SPEED` | `ai.ts` | – | obtížnost |
@@ -58,11 +59,28 @@ podle příčiny:
   dá na serveru o krok jinou sílu (rozdíl jen v `ballX`).
 - **BUMP.** Odraz od obránce je v jednom kroku 110 px/s; na 30 Hz je
   chaotičtější. Rozdíl je jen v poloze/rychlosti míče, ne v tom, kdo míč má.
-- **GK — sdílená chyba tunelování.** Střela zblízka (kontaktní posun
-  12 px) může míč v jednom kroku dostat *za* brankáře a překryv ho vyřeší
-  do branky. Stává se v obou enginech: 18–26 gólů ze 180 lokálně, 34 ze
-  180 na serveru. Brankář se v tomto kroku nepřepisoval; oprava = kontrola
-  průchodu (swept collision) v obou enginech zároveň.
+## Kontakt s brankářem (od 2026-10-31)
+
+Míč nesmí projít tělem brankáře bez kontaktu. Překryv se dřív řešil jen
+podle koncové polohy míče: když jeden krok dostal míč za střed brankáře,
+vytlačení „od středu“ ho poslalo dál do sítě. Stávalo se to hlavně
+**při kopu přitisknutém k brankáři**: posazení míče před kopajícího
+(32 px) + kontaktní posun (12 px) míč přeneslo přímo za brankáře, a to
+na všech frekvencích (30–144 Hz) v obou enginech. Lokálně k tomu ještě
+**zásek snímku** (`dt` až 0,05 s = 40 px na krok).
+
+Oprava (`sweepBallAgainstGoalkeepers`, v obou enginech stejně):
+- jen pro brankáře; hráči v poli a V3 vedení míče beze změny;
+- kontroluje se úsečka pohybu míče v kroku (od polohy na začátku kroku
+  kvůli kopu a od polohy před posunem v `updateBallPhysics`);
+- když míč vstoupí do kruhu 28 px a vyjde z něj, nebo skončí za bodem
+  nejbližším středu, vrátí se na místo vstupu (1 px vně) a odrazí se
+  stejným útlumem a bumpem jako běžný kontakt. Jeden kontakt na krok;
+- míč, který jen vnikne zepředu, řeší dál běžný překryv. Hitbox se
+  nemění; brankář se kreslí o 15 % větší (20,7 px), to je jen vzhled.
+
+Teč brankáře, po které míč stejně skončí v síti, je dál možná a počítá
+se střelci (viz `docs/goal-attribution.md`).
 
 ## Jak fyziku bezpečně rozšířit
 
