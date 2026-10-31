@@ -1,7 +1,7 @@
 import Link from "next/link";
 import LeagueHeader from "@/components/league/LeagueHeader";
 import SiteFooter from "@/components/league/SiteFooter";
-import FootballAffiliateBanner from "@/components/league/FootballAffiliateBanner";
+import AdSlot from "@/components/ads/AdSlot";
 import { LEAGUE_LANDING_PAGES, type LeagueLandingPage } from "@/lib/leagueLandingPages";
 
 export default function LeagueLandingPageView({ league }: { league: LeagueLandingPage }) {
@@ -46,17 +46,7 @@ export default function LeagueLandingPageView({ league }: { league: LeagueLandin
             </p>
           </section>
 
-          {/* Block 2 — kurzy, tipy a partneři */}
-          <section className="mb-8 rounded-xl border border-gray-200 bg-gray-50 p-6">
-            <h2 className="text-sm font-black uppercase tracking-wide text-gray-900 mb-2">
-              Kurzy, tipy a partneři
-            </h2>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              {league.oddsPlaceholder}
-            </p>
-          </section>
-
-          <FootballAffiliateBanner d2={affiliateD2} />
+          <AdSlot slot="league_page" d2={affiliateD2} theme="light" className="mb-10" />
 
           {/* Block 3 — CTA do hlavního světa */}
           <section

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import AuthStatus from "@/components/auth/AuthStatus";
-import HomeAffiliateBanner from "@/components/league/HomeAffiliateBanner";
+import AdSlot from "@/components/ads/AdSlot";
 import { buildDognetUrl } from "@/lib/dognet";
 import { CLUBS } from "@/data/clubs";
 
@@ -63,7 +63,7 @@ export default function ComingSoonHome() {
         <DateBlock />
         <Claim />
         <ClubRow />
-        <HomeAffiliateBanner />
+        <AdSlot slot="homepage_primary" className="mt-10 w-full max-w-5xl" />
         <FeatureStrip />
       </main>
 

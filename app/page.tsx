@@ -15,18 +15,11 @@ const TITLE = "Osmá liga — velký fotbal, malý okres";
 const DESCRIPTION =
   "Arkádový okresní fotbal zdarma přímo v prohlížeči. Vyber si klub a hraj proti botovi nebo online proti ostatním hráčům.";
 
-const HOME_NAV = [
-  { label: "Hrát",    href: "/hra/bot" },
-  { label: "Online",  href: "/hra/multiplayer" },
-  { label: "Turnaje", href: "/turnaj" },
-  { label: "Kluby",   href: "/kluby" },
-];
-
 // Veřejná homepage. Předchozí coming-soon teaser zůstává v
 // components/league/ComingSoonHome.tsx pro případný rychlý rollback.
-// Reklamní sloty (AdSlot) a statické aktuality (NewsSection) se tu zatím
-// záměrně nevykreslují; jediná reklama je původní partnerský banner
-// z teaseru (HomeAffiliateBanner, Dognet d2=homepage-banner).
+// Statické aktuality (NewsSection) se tu záměrně nevykreslují; jediná
+// reklama je slot homepage_primary (HomeAffiliateBanner, kampaně
+// v lib/ads/campaigns.ts).
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
@@ -72,7 +65,7 @@ export default async function HomePage() {
           backgroundPosition: "top center",
         }}
       >
-        <LeagueHeader navItems={HOME_NAV} />
+        <LeagueHeader />
         <GameHeroCompact />
       </div>
 
@@ -82,20 +75,13 @@ export default async function HomePage() {
           <MatchHero challenge={challenge} liveOnly />
         </div>
 
-        {/* Partnerský banner z původního teaseru — těsně nad výsledky */}
-        <section
-          aria-label="Partnerská nabídka"
-          className="px-4 sm:px-6 pt-8"
-          style={{ background: "#0a1f10" }}
-        >
-          <HomeAffiliateBanner className="mx-auto block w-full max-w-5xl" />
-        </section>
+        {/* Partnerský banner (lib/ads/campaigns.ts) — těsně nad výsledky;
+            bez aktivní kampaně se nevykreslí nic */}
+        <HomeAffiliateBanner />
 
         <RecentResults />
         <QuickNavGrid />
-        <div id="tabulka">
-          <LeagueTable />
-        </div>
+        <LeagueTable />
         <ClubGrid />
       </main>
       <SiteFooter />

@@ -26,7 +26,6 @@ export type LeagueLandingPage = {
   intro: string;
   ctaText: string;
   matchesPlaceholder: string;
-  oddsPlaceholder: string;
   /** One-line description of this league's tone, used in copy/comments only. */
   tone: string;
 };
@@ -40,14 +39,12 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
     metaDescription:
       "Třetí liga je svět skoro profesionálního amatérského fotbalu inspirovaný českými okresními a krajskými soutěžemi. Zápasy, výsledky a fotbalový chaos o pár pater výš.",
     heroTitle: "Třetí liga",
-    heroSubtitle: "Zápasy, výsledky, kurzy a fotbalový chaos o pár pater výš.",
+    heroSubtitle: "Zápasy, výsledky a fotbalový chaos o pár pater výš.",
     intro:
       "Třetí liga je úroveň, kde si týmy už říkají, že hrají skoro profesionálně — dres sedí, rozcvička má řád a někdo si dokonce vede statistiky. Pořád je to ale amatérský fotbal s ambicemi o level vyšší, než kolik reálně předvádí na hřišti.",
     ctaText: "Vstoupit do světa Osmé ligy",
     matchesPlaceholder:
       "Tady bude postupně prostor pro přehled zápasů, výsledků a klubových příběhů spojených s touto ligovou úrovní.",
-    oddsPlaceholder:
-      "Do budoucna zde může být prostor pro partnerské odkazy, sázkové inspirace nebo přehled kurzů. Zatím nic nefingujeme.",
     tone: "skoro profíci, vyšší ambice, pořád ale nižší fotbal",
   },
   {
@@ -64,8 +61,6 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
     ctaText: "Vstoupit do světa Osmé ligy",
     matchesPlaceholder:
       "Tady bude postupně prostor pro přehled zápasů, výsledků a klubových příběhů spojených s touto ligovou úrovní.",
-    oddsPlaceholder:
-      "Do budoucna zde může být prostor pro partnerské odkazy, sázkové inspirace nebo přehled kurzů. Zatím nic nefingujeme.",
     tone: "vážnější amatérský fotbal, lokální rivality",
   },
   {
@@ -82,8 +77,6 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
     ctaText: "Vstoupit do světa Osmé ligy",
     matchesPlaceholder:
       "Tady bude postupně prostor pro přehled zápasů, výsledků a klubových příběhů spojených s touto ligovou úrovní.",
-    oddsPlaceholder:
-      "Do budoucna zde může být prostor pro partnerské odkazy, sázkové inspirace nebo přehled kurzů. Zatím nic nefingujeme.",
     tone: "střed mezi ambicemi a hospodou po zápase",
   },
   {
@@ -100,8 +93,6 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
     ctaText: "Vstoupit do světa Osmé ligy",
     matchesPlaceholder:
       "Tady bude postupně prostor pro přehled zápasů, výsledků a klubových příběhů spojených s touto ligovou úrovní.",
-    oddsPlaceholder:
-      "Do budoucna zde může být prostor pro partnerské odkazy, sázkové inspirace nebo přehled kurzů. Zatím nic nefingujeme.",
     tone: "tvrdý lokální fotbal, známé tváře, malé stadiony",
   },
   {
@@ -118,8 +109,6 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
     ctaText: "Vstoupit do světa Osmé ligy",
     matchesPlaceholder:
       "Tady bude postupně prostor pro přehled zápasů, výsledků a klubových příběhů spojených s touto ligovou úrovní.",
-    oddsPlaceholder:
-      "Do budoucna zde může být prostor pro partnerské odkazy, sázkové inspirace nebo přehled kurzů. Zatím nic nefingujeme.",
     tone: "poslední zastávka před opravdovým okresem",
   },
   {
@@ -136,8 +125,6 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
     ctaText: "Hrát Osmou ligu",
     matchesPlaceholder:
       "Aktuální zápasy, výsledky a tabulku Osmé ligy najdeš na hlavní stránce — tahle sekce zde zůstává jako součást společné šablony pro všechny ligové úrovně.",
-    oddsPlaceholder:
-      "Do budoucna zde může být prostor pro partnerské odkazy, sázkové inspirace nebo přehled kurzů. Zatím nic nefingujeme.",
     tone: "hlavní herní svět, chaos, výzvy, fiktivní kluby, zápasy",
   },
 ];
