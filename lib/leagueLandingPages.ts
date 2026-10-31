@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { absoluteUrl, ogImageUrl } from "@/lib/seo";
+import type { LeagueLevel } from "@/lib/football/matches";
 
 // Config-driven content for the per-league SEO landing pages under /[slug]-liga.
 // Each entry maps 1:1 to a route in app/(league pages) and, eventually, to a
@@ -26,6 +27,8 @@ export type LeagueLandingPage = {
   intro: string;
   ctaText: string;
   matchesPlaceholder: string;
+  /** Výchozí soutěž vyhledávače "Kam na fotbal?"; bez ní stránka zůstává u textu matchesPlaceholder. */
+  matchFinderLevel?: LeagueLevel;
   /** One-line description of this league's tone, used in copy/comments only. */
   tone: string;
 };
@@ -33,6 +36,7 @@ export type LeagueLandingPage = {
 export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
   {
     slug: "treti-liga",
+    matchFinderLevel: 3,
     displayName: "Třetí liga",
     externalDomain: "tretiliga.cz",
     metaTitle: "Třetí liga — skoro profíci, pořád ale nižší fotbal",
@@ -49,6 +53,7 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
   },
   {
     slug: "ctvrta-liga",
+    matchFinderLevel: 4,
     displayName: "Čtvrtá liga",
     externalDomain: "ctvrtaliga.cz",
     metaTitle: "Čtvrtá liga — vážnější amatérský fotbal a lokální rivality",
@@ -65,6 +70,7 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
   },
   {
     slug: "pata-liga",
+    matchFinderLevel: 5,
     displayName: "Pátá liga",
     externalDomain: "pataliga.cz",
     metaTitle: "Pátá liga — mezi ambicemi a hospodou po zápase",
@@ -81,6 +87,7 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
   },
   {
     slug: "sesta-liga",
+    matchFinderLevel: 6,
     displayName: "Šestá liga",
     externalDomain: "sestaliga.cz",
     metaTitle: "Šestá liga — tvrdý lokální fotbal a malé stadiony",
@@ -97,6 +104,7 @@ export const LEAGUE_LANDING_PAGES: LeagueLandingPage[] = [
   },
   {
     slug: "sedma-liga",
+    matchFinderLevel: 7,
     displayName: "Sedmá liga",
     externalDomain: "sedmaliga.cz",
     metaTitle: "Sedmá liga — poslední zastávka před opravdovým okresem",
