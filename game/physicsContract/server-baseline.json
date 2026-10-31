@@ -1,6 +1,6 @@
 {
   "engine": "project-hub-api",
-  "commit": "d5375bc",
+  "commit": "bb645ea",
   "tickHz": 30,
   "scenarios": {
     "straight run": {
@@ -248,15 +248,15 @@
       "playerY": 280,
       "minPlayerY": 280,
       "maxPlayerY": 280,
-      "ballX": 900.7,
+      "ballX": 824.6,
       "ballY": 280,
-      "ballSpeed": 197.1,
-      "lossSeconds": 1.2,
+      "ballSpeed": 0.2,
+      "lossSeconds": 0,
       "contacts": 0,
-      "shotTravel": 66,
-      "goal": true,
+      "shotTravel": -10,
+      "goal": false,
       "frontSeconds": null,
-      "maxBallSpeed": 800,
+      "maxBallSpeed": 255.9,
       "at": {}
     },
     "turn 90 (R→D)": {
@@ -734,7 +734,7 @@
       "benchSeconds": 10,
       "playerX": 270,
       "playerY": 395,
-      "maxPlayerY": 524.7,
+      "maxPlayerY": 526.8,
       "at": {}
     }
   }

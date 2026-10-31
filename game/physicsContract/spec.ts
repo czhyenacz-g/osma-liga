@@ -152,11 +152,4 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   'turn with defender beside': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
   'turn between two defenders': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
   'turn right after a shot': { metrics: ['ballX', 'ballY', 'shotTravel', 'at.'], why: 'BUMP: the shot runs into the player turning after it (local 30–144 Hz: 54–98 px travel)' },
-  // GK: a point-blank shot can pass THROUGH the goalkeeper in both engines
-  // (discrete collision: the contact nudge leaves the ball 0–1 px short of
-  // the keeper, the next step moves it ~26 px into him and the overlap is
-  // resolved behind him). Which side of that 1 px a step lands on differs —
-  // here the server scores and local blocks. Shared latent bug, documented,
-  // not part of this unification.
-  'goalkeeper blocks shot': { metrics: ['*'], why: 'GK: point-blank shot tunnels through the keeper (shared bug, 1 px decides)' },
 };
