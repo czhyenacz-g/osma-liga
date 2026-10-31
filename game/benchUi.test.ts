@@ -1,9 +1,25 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { resolveBenchUiState, type BenchCandidate } from './benchUi';
 import { createInitialState } from './createInitialState';
 import { updateGame } from './updateGame';
 import { deployBenchPlayer, computeBenchRoleTarget, chooseBotBenchRole } from './benchDeployment';
 import { BENCH_DEPLOY_DURATION_MS, MATCH_DURATION, FIELD_L, FIELD_R, FIELD_CX, SUPPORT_PLAYER_SPEED } from './constants';
+
+// The bot's shot variation and the random temporary weakening use
+// Math.random, so a few seconds of a real match could end differently
+// (a goal pause stalls the žolík clock, the bot may push the ball deep) and
+// these tests failed now and then. Seeded per test so every run replays
+// the same match; production AI is untouched.
+beforeEach(() => {
+  let seed = 0x5eed;
+  vi.spyOn(Math, 'random').mockImplementation(() => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  });
+});
+afterEach(() => { vi.restoreAllMocks(); });
 import type { GameState, InputState, Team } from './types';
 
 function noInput(): InputState {
