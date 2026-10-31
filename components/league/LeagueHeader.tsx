@@ -57,7 +57,7 @@ export default function LeagueHeader({
               Osmá liga
             </div>
             <div
-              className="mt-1 font-semibold uppercase tracking-[0.22em]"
+              className="mt-1 font-semibold uppercase tracking-[0.1em] sm:tracking-[0.22em]"
               style={{ fontSize: "10px", color: "#6dbf8a" }}
             >
               Fotbalová hra z českého okresu
