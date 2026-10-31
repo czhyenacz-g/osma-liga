@@ -1,5 +1,6 @@
 import type { Player, Ball } from './types';
 import { clampPos } from './physics';
+import { computeBenchRoleTarget } from './benchDeployment';
 import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CY,
   PLAYER_RADIUS, SUPPORT_PLAYER_SPEED,
@@ -14,9 +15,33 @@ export function applySupportPositioning(
   ball: Ball,
   dt: number,
 ): void {
-  const nonActive = homePlayers.filter(p => p !== active);
+  // Deployed bench substitutes get their own role target (below); the two
+  // support slots stay with the starters as before.
+  const nonActive = homePlayers.filter(p => p !== active && p.matchStatus !== 'temporarily_deployed');
   const defender  = nonActive[0];
   const runner    = nonActive[1];
+
+  for (const sub of homePlayers) {
+    if (sub === active || sub.matchStatus !== 'temporarily_deployed') continue;
+    const target = computeBenchRoleTarget('home', sub.benchRole ?? 'attacker', ball.pos);
+    const sdx = target.x - sub.pos.x;
+    const sdy = target.y - sub.pos.y;
+    const sd  = Math.sqrt(sdx * sdx + sdy * sdy);
+    if (sd > 5) {
+      sub.vel.x = (sdx / sd) * SUPPORT_PLAYER_SPEED;
+      sub.vel.y = (sdy / sd) * SUPPORT_PLAYER_SPEED;
+    } else {
+      sub.vel.x = 0;
+      sub.vel.y = 0;
+    }
+    sub.pos.x += sub.vel.x * dt;
+    sub.pos.y += sub.vel.y * dt;
+    sub.pos = clampPos(
+      sub.pos,
+      FIELD_L + PLAYER_RADIUS, FIELD_R - PLAYER_RADIUS,
+      FIELD_T + PLAYER_RADIUS, FIELD_B - PLAYER_RADIUS,
+    );
+  }
 
   if (defender) {
     const defTarget = {

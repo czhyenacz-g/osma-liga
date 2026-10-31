@@ -1,13 +1,14 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import type { BenchUiState } from '@/game/benchUi';
+import type { BenchRole } from '@/game/types';
 import { BENCH_DEPLOY_DURATION_MS } from '@/game/constants';
 
 // Shared bench ("Lavička") panel for all three game modes — local bot game
 // (MatchPageClient → local engine) and both online modes (OnlineGameClient →
 // server 'deploy_bench_player'). The panel never decides that a deployment
 // happened: it only renders `bench` as the engine reports it and asks via
-// onActivate.
+// onActivate, with the role the žolík is called up as.
 
 const NO_SELECT: React.CSSProperties = {
   userSelect: 'none',
@@ -15,11 +16,20 @@ const NO_SELECT: React.CSSProperties = {
   WebkitTouchCallout: 'none',
 };
 
-// After a request, the button stays disabled until the engine reports the
+// After a request, the buttons stay disabled until the engine reports the
 // deployment — or this long, so a rejected/lost request can be retried.
 export const BENCH_REQUEST_PENDING_MS = 2000;
 
 const DURATION_S = Math.round(BENCH_DEPLOY_DURATION_MS / 1000);
+
+const ROLES: { role: BenchRole; label: string; key: string; codes: string[] }[] = [
+  { role: 'attacker', label: 'Útočník', key: '1', codes: ['Digit1', 'Numpad1'] },
+  { role: 'defender', label: 'Obránce', key: '2', codes: ['Digit2', 'Numpad2'] },
+];
+
+const ROLE_NAME: Record<BenchRole, string> = { attacker: 'útočník', defender: 'obránce' };
+// Accusative for the aria-label ("povolat … jako útočníka / obránce").
+const ROLE_ACC: Record<BenchRole, string> = { attacker: 'útočníka', defender: 'obránce' };
 
 function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -35,9 +45,9 @@ export default function BenchPanel({
   notice = null,
 }: {
   bench: BenchUiState | null;
-  onActivate: (playerId: string) => void;
+  onActivate: (playerId: string, role: BenchRole) => void;
   // inline: compact row under the pitch (desktop HUD).
-  // floating: fixed touch button above PŘEP./KOP (mobile), clear of the D-pad.
+  // floating: fixed touch buttons above PŘEP./KOP (mobile), clear of the D-pad.
   variant?: 'inline' | 'floating';
   // Short transient message, e.g. a server rejection.
   notice?: string | null;
@@ -59,25 +69,26 @@ export default function BenchPanel({
     return () => clearTimeout(t);
   }, [phase, requestedAt]);
 
-  const activateRef = useRef<() => void>(() => {});
-  activateRef.current = () => {
+  const activateRef = useRef<(role: BenchRole) => void>(() => {});
+  activateRef.current = (role) => {
     if (!bench || bench.phase !== 'ready' || pending) return;
     const t = Date.now();
     setRequestedAt(t);
     setNow(t);
-    onActivate(bench.playerId);
+    onActivate(bench.playerId, role);
   };
 
-  // Key "1" (top row or numpad). One activation per physical press — held
-  // key auto-repeat is ignored — and never while typing into a form field.
-  // Doesn't touch WASD/arrows/Space/Q/R, so no existing control changes.
+  // Keys "1" = útočník, "2" = obránce (top row or numpad). One activation
+  // per physical press — held-key auto-repeat is ignored — and never while
+  // typing into a form field. Doesn't touch WASD/arrows/Space/Q/R.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code !== 'Digit1' && e.code !== 'Numpad1') return;
+      const match = ROLES.find((r) => r.codes.includes(e.code));
+      if (!match) return;
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
       if (isTypingTarget(e.target)) return;
       e.preventDefault();
-      activateRef.current();
+      activateRef.current(match.role);
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -86,38 +97,27 @@ export default function BenchPanel({
   if (!bench) return null;
 
   const floating = variant === 'floating';
+  const roleName = bench.role ? ROLE_NAME[bench.role] : null;
 
   let title: string;
   let detail: string | null;
   if (bench.phase === 'ready') {
-    title = 'Žolík z lavičky';
-    detail = pending ? 'Volám žolíka…' : `Povolat na ${DURATION_S} s`;
+    // Floating (mobile) keeps it to one compact line above the buttons.
+    title = floating ? `Žolík na ${DURATION_S} s` : 'Žolík z lavičky';
+    detail = pending ? 'Volám žolíka…' : floating ? null : `Povolat na ${DURATION_S} s`;
   } else if (bench.phase === 'active') {
-    title = 'Žolík je na hřišti';
+    title = roleName ? `Žolík (${roleName}) je na hřišti` : 'Žolík je na hřišti';
     detail = bench.remainingMs !== null ? `Zbývá ${Math.max(0, Math.ceil(bench.remainingMs / 1000))} s` : null;
   } else {
     title = 'Žolík už má odpracováno';
     detail = null;
   }
 
-  const palette =
-    bench.phase === 'ready'
-      ? { background: 'rgba(214,169,74,0.9)', border: '1px solid rgba(214,169,74,1)', color: '#041f14' }
-      : bench.phase === 'active'
-        ? { background: 'rgba(109,191,138,0.22)', border: '1px solid rgba(109,191,138,0.55)', color: '#d1fae5' }
-        : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', color: 'rgba(209,250,229,0.45)' };
+  const muted = bench.phase === 'active'
+    ? { background: 'rgba(109,191,138,0.22)', border: '1px solid rgba(109,191,138,0.55)', color: '#d1fae5' }
+    : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', color: 'rgba(209,250,229,0.45)' };
 
-  const body = (
-    <>
-      <span style={{ fontSize: floating ? 12 : 12, fontWeight: 800, lineHeight: 1.15 }}>{title}</span>
-      {detail && (
-        <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.8, lineHeight: 1.15 }}>{detail}</span>
-      )}
-    </>
-  );
-
-  const interactive = bench.phase === 'ready';
-  const statusStyle: React.CSSProperties = {
+  const boxStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: floating ? 'column' : 'row',
     alignItems: floating ? 'flex-start' : 'center',
@@ -125,40 +125,70 @@ export default function BenchPanel({
     padding: floating ? '8px 12px' : '6px 12px',
     minHeight: floating ? 48 : 34,
     borderRadius: 10,
-    touchAction: 'manipulation',
     textAlign: 'left',
-    ...palette,
     ...NO_SELECT,
   };
 
-  const control = interactive ? (
-    <button
-      type="button"
-      onClick={() => activateRef.current()}
-      disabled={pending}
-      aria-label={`Povolat žolíka z lavičky na ${DURATION_S} sekund${floating ? '' : ' (klávesa 1)'}`}
-      style={{ ...statusStyle, cursor: pending ? 'wait' : 'pointer', opacity: pending ? 0.75 : 1 }}
-    >
-      {body}
-      {!floating && (
-        <kbd
-          aria-hidden="true"
+  const heading = (
+    <>
+      <span style={{ fontSize: 12, fontWeight: 800, lineHeight: 1.15 }}>{title}</span>
+      {detail && <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.8, lineHeight: 1.15 }}>{detail}</span>}
+    </>
+  );
+
+  const buttons = bench.phase === 'ready' ? ROLES.map((r) => (
+        <button
+          key={r.role}
+          type="button"
+          onClick={() => activateRef.current(r.role)}
+          disabled={pending}
+          aria-label={`Povolat žolíka jako ${ROLE_ACC[r.role]} na ${DURATION_S} sekund${floating ? '' : ` (klávesa ${r.key})`}`}
           style={{
-            fontFamily: 'inherit',
-            fontSize: 10,
+            ...boxStyle,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            minHeight: floating ? 44 : 34,
+            padding: floating ? '0 10px' : '6px 12px',
+            fontSize: 12,
             fontWeight: 800,
-            padding: '1px 6px',
-            borderRadius: 4,
-            background: 'rgba(4,31,20,0.18)',
-            border: '1px solid rgba(4,31,20,0.35)',
+            touchAction: 'manipulation',
+            background: 'rgba(214,169,74,0.9)',
+            border: '1px solid rgba(214,169,74,1)',
+            color: '#041f14',
+            cursor: pending ? 'wait' : 'pointer',
+            opacity: pending ? 0.6 : 1,
           }}
         >
-          1
-        </kbd>
-      )}
-    </button>
+          <span>{r.label}</span>
+          {!floating && (
+            <kbd
+              aria-hidden="true"
+              style={{
+                fontFamily: 'inherit',
+                fontSize: 10,
+                fontWeight: 800,
+                padding: '1px 6px',
+                borderRadius: 4,
+                background: 'rgba(4,31,20,0.18)',
+                border: '1px solid rgba(4,31,20,0.35)',
+              }}
+            >
+              {r.key}
+            </kbd>
+          )}
+        </button>
+      )) : null;
+
+  const content = buttons ? (
+    <div style={{ display: 'flex', flexDirection: floating ? 'column' : 'row', alignItems: floating ? 'stretch' : 'center', gap: floating ? 4 : 6 }}>
+      <div style={{ ...boxStyle, padding: floating ? '0 2px' : '0 4px', minHeight: 0, color: '#f0c75e' }}>
+        {heading}
+      </div>
+      {floating ? <div style={{ display: 'flex', gap: 6 }}>{buttons}</div> : buttons}
+    </div>
   ) : (
-    <div style={statusStyle}>{body}</div>
+    <div style={{ ...boxStyle, ...muted }}>{heading}</div>
   );
 
   return (
@@ -168,7 +198,13 @@ export default function BenchPanel({
       data-bench-phase={bench.phase}
       style={
         floating
-          ? { position: 'fixed', right: 12, bottom: 156, zIndex: 40, maxWidth: 150, ...NO_SELECT }
+          ? {
+              position: 'fixed', right: 12, bottom: 156, zIndex: 40, maxWidth: 180,
+              ...(bench.phase === 'ready'
+                ? { background: 'rgba(4,31,20,0.72)', borderRadius: 12, padding: 6 }
+                : {}),
+              ...NO_SELECT,
+            }
           : {
               display: 'flex',
               flexWrap: 'wrap',
@@ -188,7 +224,7 @@ export default function BenchPanel({
           Lavička
         </span>
       )}
-      <div aria-live="polite">{control}</div>
+      <div aria-live="polite">{content}</div>
       {notice && (
         <span role="status" style={{ display: 'block', marginTop: floating ? 4 : 0, fontSize: 11, color: '#f0c75e' }}>
           {notice}

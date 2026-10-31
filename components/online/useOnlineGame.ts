@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { playFullTimeWhistle, playKickoffWhistle } from '@/lib/audio/whistleEngine';
-import type { PlayerMatchStatus } from '@/game/types';
+import type { BenchRole, PlayerMatchStatus } from '@/game/types';
 
 // Message project-hub-api's onlineGameSocket.ts emits on 'error' when it
 // refuses a 'deploy_bench_player' request.
@@ -34,6 +34,8 @@ export interface OnlinePlayer {
   // the one deployment happened; benchRemainingMs only while deployed.
   benchUsed?: boolean;
   benchRemainingMs?: number | null;
+  // Role the substitute was called up as; absent on older backends.
+  benchRole?: BenchRole | null;
 }
 
 export interface OnlineSnapshot {
@@ -132,8 +134,10 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
   // Server-authoritative: only a request — the snapshot reports whether the
   // deployment happened. The server maps the connection to its own team, so
   // only this player's own bench player can ever be deployed.
-  const deployBench = useCallback((playerId: string) => {
-    socketRef.current?.emit('deploy_bench_player', { playerId });
+  // `role` is an optional, additive field — an older backend ignores it and
+  // deploys with its default behavior.
+  const deployBench = useCallback((playerId: string, role: BenchRole) => {
+    socketRef.current?.emit('deploy_bench_player', { playerId, role });
   }, []);
 
   const startGame = useCallback(() => {

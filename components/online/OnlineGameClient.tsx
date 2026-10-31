@@ -41,7 +41,7 @@ export default function OnlineGameClient({
     return resolveBenchUiState(
       snapshot.players
         .filter((p) => p.team === ownTeam && !p.isGoalkeeper)
-        .map((p) => ({ id: p.id, label: p.label, matchStatus: p.matchStatus, benchUsed: p.benchUsed, remainingMs: p.benchRemainingMs })),
+        .map((p) => ({ id: p.id, label: p.label, matchStatus: p.matchStatus, benchUsed: p.benchUsed, remainingMs: p.benchRemainingMs, benchRole: p.benchRole })),
     );
   }, [snapshot, ownTeam]);
 
@@ -351,7 +351,7 @@ export default function OnlineGameClient({
         <>
           <BenchPanel bench={bench} onActivate={deployBench} notice={benchNotice} />
           <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
-            WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop (podrž = silnější) &nbsp;·&nbsp; Q = přepnout / přihrát &nbsp;·&nbsp; 1 = žolík z lavičky
+            WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop (podrž = silnější) &nbsp;·&nbsp; Q = přepnout / přihrát &nbsp;·&nbsp; 1 / 2 = žolík útočník / obránce
           </p>
         </>
       )}

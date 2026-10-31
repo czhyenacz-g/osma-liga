@@ -5,11 +5,14 @@ import {
   BOT_SPEED, BOT_KICK_FORCE, BOT_KICK_RANGE, BOT_KICK_COOLDOWN,
 } from './constants';
 import { dist, normalize, clampPos, separateSameTeamPlayers } from './physics';
-import { isSelectableFieldPlayer, canDeployFromBench, deployBenchPlayer } from './benchDeployment';
+import {
+  isSelectableFieldPlayer, canDeployFromBench, deployBenchPlayer, computeBenchRoleTarget, chooseBotBenchRole,
+} from './benchDeployment';
 
 // Trivial, deterministic bot bench usage: once the away team has less than
 // half the match left, bring on its bench player (if any, if not already
-// used) — a single fixed condition, no randomness/tactics.
+// used) — a single fixed condition, no randomness. Role by score
+// (chooseBotBenchRole): attacker unless leading.
 const BOT_BENCH_DEPLOY_TIME_LEFT_RATIO = 0.5;
 
 const EDGE_MARGIN = 68;
@@ -72,7 +75,7 @@ export function updateAI(state: GameState, dt: number): void {
   // Simple deterministic bench usage — see BOT_BENCH_DEPLOY_TIME_LEFT_RATIO.
   if (state.timeLeft <= MATCH_DURATION * BOT_BENCH_DEPLOY_TIME_LEFT_RATIO) {
     const benchPlayer = players.find((p) => p.team === 'away' && canDeployFromBench(state, p));
-    if (benchPlayer) deployBenchPlayer(state, 'away', benchPlayer.id);
+    if (benchPlayer) deployBenchPlayer(state, 'away', benchPlayer.id, chooseBotBenchRole(state, 'away'));
   }
 
   const botPlayers = players.filter(p => p.team === 'away' && isSelectableFieldPlayer(p, removedIds));
@@ -157,9 +160,14 @@ export function updateAI(state: GameState, dt: number): void {
       }
     } else {
       // ── Return to base ───────────────────────────────────────────────────
-      const d = dist(p.pos, p.basePos);
+      // A deployed substitute's basePos is its off-pitch bench spot — it
+      // heads for its role position instead (same speed as returning).
+      const home = p.matchStatus === 'temporarily_deployed'
+        ? computeBenchRoleTarget('away', p.benchRole ?? 'attacker', ball.pos)
+        : p.basePos;
+      const d = dist(p.pos, home);
       if (d > 5) {
-        const dir = normalize({ x: p.basePos.x - p.pos.x, y: p.basePos.y - p.pos.y });
+        const dir = normalize({ x: home.x - p.pos.x, y: home.y - p.pos.y });
         p.vel.x = dir.x * BOT_SPEED * 0.5;
         p.vel.y = dir.y * BOT_SPEED * 0.5;
       } else {

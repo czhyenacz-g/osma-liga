@@ -19,15 +19,21 @@ import {
   NEAR_GOAL_PRESSURE_FADE_IN_MS, NEAR_GOAL_PRESSURE_FADE_OUT_MS,
   NEAR_GOAL_PRESSURE_BED_VOLUME_BASE, NEAR_GOAL_PRESSURE_BED_VOLUME_MAX, NEAR_GOAL_PRESSURE_BED_VOLUME_RANGE,
 } from '@/game/audio/inMatchSoundConfig';
-import type { GameState, InputState, TouchInput, PlayerMatchStatus } from '@/game/types';
+import type { GameState, InputState, TouchInput, PlayerMatchStatus, BenchRole } from '@/game/types';
 import type { GameplayProfile } from '@/game/gameplayProfiles';
 import { BOUNCE_TIME_DURATION_SECONDS } from '@/game/gameplayProfiles';
 import { deployBenchPlayer } from '@/game/benchDeployment';
+
+export interface BenchDeployRequest {
+  playerId: string;
+  role: BenchRole;
+}
 
 export interface BenchPlayerUiState {
   id: string;
   label: string;
   matchStatus: PlayerMatchStatus;
+  role: BenchRole | null;
   remainingMs: number | null;
   used: boolean;
 }
@@ -58,7 +64,7 @@ interface Props {
   // One-shot bench-deploy request from the UI (BenchPanel) — set to a home
   // player's id, consumed (reset to null) on the next tick. See
   // game/benchDeployment.ts.
-  benchDeployRequestRef?: MutableRefObject<string | null>;
+  benchDeployRequestRef?: MutableRefObject<BenchDeployRequest | null>;
   // Throttled (~every BENCH_UI_THROTTLE_MS) snapshot of the home team's
   // bench players, for BenchPanel — see game/benchDeployment.ts.
   onBenchStateChange?: (bench: BenchPlayerUiState[]) => void;
@@ -182,7 +188,8 @@ export default function GameCanvas({
       // — consumed here (before the tick) rather than threaded through
       // InputState/TouchInput.
       if (benchDeployRequestRef?.current) {
-        deployBenchPlayer(gameState, 'home', benchDeployRequestRef.current);
+        const req = benchDeployRequestRef.current;
+        deployBenchPlayer(gameState, 'home', req.playerId, req.role);
         benchDeployRequestRef.current = null;
       }
 
@@ -374,6 +381,7 @@ export default function GameCanvas({
               matchStatus: p.matchStatus,
               remainingMs: p.matchStatus === 'temporarily_deployed' ? (deployment?.remainingMs ?? null) : null,
               used: p.benchUsed,
+              role: p.benchRole ?? null,
             };
           });
         onBenchStateChange(bench);

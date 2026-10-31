@@ -4,13 +4,14 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { playFullTimeWhistle, playKickoffWhistle, unlockAudio } from '@/lib/audio/whistleEngine';
 import { inMatchAudio } from '@/game/audio/inMatchAudio';
-import GameCanvas, { type BenchPlayerUiState } from './GameCanvas';
+import GameCanvas, { type BenchPlayerUiState, type BenchDeployRequest } from './GameCanvas';
 import MatchCommentaryToast from './MatchCommentaryToast';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
 import SoundToggleButton from './SoundToggleButton';
 import BenchPanel from './BenchPanel';
 import { resolveBenchUiState } from '@/game/benchUi';
+import type { BenchRole } from '@/game/types';
 import PlayerVisualTemplateSwitcher from '@/components/PlayerVisualTemplateSwitcher';
 import BounceTimeOverlay from './BounceTimeOverlay';
 import type { TouchInput } from '@/game/types';
@@ -93,7 +94,7 @@ export default function MatchPageClient({
   const [bounceTimeActive, setBounceTimeActive] = useState(false);
   const [benchPlayers, setBenchPlayers] = useState<BenchPlayerUiState[]>([]);
   const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
-  const benchDeployRequestRef = useRef<string | null>(null);
+  const benchDeployRequestRef = useRef<BenchDeployRequest | null>(null);
   const gameWrapperRef = useRef<HTMLDivElement>(null);
   const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const substitutionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -175,8 +176,8 @@ export default function MatchPageClient({
     inMatchAudio.stopAll();
   }, []);
 
-  const handleBenchActivate = useCallback((id: string) => {
-    benchDeployRequestRef.current = id;
+  const handleBenchActivate = useCallback((playerId: string, role: BenchRole) => {
+    benchDeployRequestRef.current = { playerId, role };
   }, []);
 
   // Safety net: stop all in-match audio if this component unmounts mid-match
@@ -241,7 +242,7 @@ export default function MatchPageClient({
                   <p>Pohyb: levý ovladač</p>
                   <p>Kop: tlačítko KOP (krátký ťuk = slabší, podrž = silnější)</p>
                   <p>Přepnutí hráče: tlačítko PŘEP.</p>
-                  <p>Žolík z lavičky: tlačítko vpravo nad PŘEP. (jednou za zápas, 30 s)</p>
+                  <p>Žolík z lavičky: tlačítka Útočník / Obránce vpravo nad PŘEP. (jednou za zápas, 30 s)</p>
                   <p className="mt-1.5">
                     Hra automaticky vybírá hráče nejblíž k míči. Tlačítkem PŘEP. si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.
                   </p>
@@ -252,7 +253,7 @@ export default function MatchPageClient({
                   <p>Pohyb: WASD / šipky</p>
                   <p>Kop: mezerník (krátký ťuk = slabší, podrž = silnější)</p>
                   <p>Přepnutí hráče: Q</p>
-                  <p>Žolík z lavičky: klávesa 1 (jednou za zápas, 30 s)</p>
+                  <p>Žolík z lavičky: 1 = útočník, 2 = obránce (jednou za zápas, 30 s)</p>
                   <p className="mt-1.5">
                     Hra automaticky vybírá hráče nejblíž k míči. Klávesou Q si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.
                   </p>
@@ -408,7 +409,7 @@ export default function MatchPageClient({
 
       {gamePhase === 'playing' && matchScore === null && (
         <BenchPanel
-          bench={resolveBenchUiState(benchPlayers.map((p) => ({ ...p, benchUsed: p.used })))}
+          bench={resolveBenchUiState(benchPlayers.map((p) => ({ ...p, benchUsed: p.used, benchRole: p.role })))}
           onActivate={handleBenchActivate}
           variant={isMobile ? 'floating' : 'inline'}
         />

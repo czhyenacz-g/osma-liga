@@ -43,7 +43,7 @@ export default async function HraBotTestPage({
         &nbsp;&nbsp;·&nbsp;&nbsp;
         <span style={{ color: '#d6a94a' }}>Q</span> &mdash; přepnout / přihrát
         &nbsp;&nbsp;·&nbsp;&nbsp;
-        <span style={{ color: '#d6a94a' }}>1</span> &mdash; žolík z lavičky
+        <span style={{ color: '#d6a94a' }}>1</span> / <span style={{ color: '#d6a94a' }}>2</span> &mdash; žolík útočník / obránce
         &nbsp;&nbsp;·&nbsp;&nbsp;
         R &mdash; restart
       </p>

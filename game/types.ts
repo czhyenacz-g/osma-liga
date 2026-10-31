@@ -18,6 +18,10 @@ export type PlayerRole = 'field_player' | 'goalkeeper';
 // for a limited window (BENCH_DEPLOY_DURATION_MS), behaves exactly like a
 // normal field player everywhere except it reverts to 'bench' on expiry.
 export type PlayerMatchStatus = 'field' | 'bench' | 'temporarily_deployed';
+// Role a bench substitute ("žolík") is called up with — decides where it
+// positions itself while it is not the controlled player (benchDeployment.ts
+// computeBenchRoleTarget). Mirrors project-hub-api's gameEngine BenchRole.
+export type BenchRole = 'attacker' | 'defender';
 
 export interface Vec2 {
   x: number;
@@ -49,6 +53,8 @@ export interface Player {
   // Once true, this bench player can never be deployed again this match —
   // the 30s window is a single-use boost, not a repeatable swap.
   benchUsed: boolean;
+  // Set when deployed from the bench (deployBenchPlayer); unset otherwise.
+  benchRole?: BenchRole;
 }
 
 export interface Ball {

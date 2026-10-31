@@ -1,4 +1,4 @@
-import type { PlayerMatchStatus } from './types';
+import type { BenchRole, PlayerMatchStatus } from './types';
 
 // UI view of a team's one bench player, shared by the local bot game and the
 // online modes (training challenge, multiplayer). Purely derived from the
@@ -15,6 +15,8 @@ export interface BenchUiState {
   phase: BenchPhase;
   // Only while active; null otherwise (or when the engine didn't send it).
   remainingMs: number | null;
+  // Role it was called up with — null while ready, or from an older backend.
+  role: BenchRole | null;
 }
 
 // Minimal per-player shape both engines can provide (local GameState via
@@ -25,6 +27,7 @@ export interface BenchCandidate {
   matchStatus?: PlayerMatchStatus;
   benchUsed?: boolean;
   remainingMs?: number | null;
+  benchRole?: BenchRole | null;
 }
 
 // Picks the team's bench player (DEFAULT_BENCH_SIZE is 1) — a deployed one
@@ -34,11 +37,14 @@ export function resolveBenchUiState(candidates: BenchCandidate[]): BenchUiState 
   const bench = candidates.filter((p) => p.matchStatus === 'bench' || p.matchStatus === 'temporarily_deployed');
   const active = bench.find((p) => p.matchStatus === 'temporarily_deployed');
   if (active) {
-    return { playerId: active.id, label: active.label, phase: 'active', remainingMs: active.remainingMs ?? null };
+    return {
+      playerId: active.id, label: active.label, phase: 'active',
+      remainingMs: active.remainingMs ?? null, role: active.benchRole ?? null,
+    };
   }
   const ready = bench.find((p) => !p.benchUsed);
-  if (ready) return { playerId: ready.id, label: ready.label, phase: 'ready', remainingMs: null };
+  if (ready) return { playerId: ready.id, label: ready.label, phase: 'ready', remainingMs: null, role: null };
   const used = bench[0];
-  if (used) return { playerId: used.id, label: used.label, phase: 'used', remainingMs: null };
+  if (used) return { playerId: used.id, label: used.label, phase: 'used', remainingMs: null, role: used.benchRole ?? null };
   return null;
 }
