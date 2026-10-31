@@ -104,10 +104,9 @@ export const TOLERANCE = {
 // scenario/metric is a new divergence and fails the test. When one of
 // these gets unified, remove it here so it can't silently regress.
 export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string }> = {
-  'run into top boundary': { metrics: ['minPlayerY', 'playerY'], why: 'server movePlayerByInput does not clamp the controlled player to the pitch' },
   'turn 90 (R→U)': { metrics: ['*'], why: 'different control radii (57 vs 44) and per-tick vs per-frame damping' },
   'turn 180 (R→L)': { metrics: ['*'], why: 'different control radii (57 vs 44) and per-tick vs per-frame damping' },
-  'top line pull down (R→D)': { metrics: ['*'], why: 'different control radii + server player not clamped at the line' },
+  'top line pull down (R→D)': { metrics: ['*'], why: 'different control radii' },
   'bottom line pull up (R→U)': { metrics: ['*'], why: 'different control radii (57 vs 44)' },
   'dribble straight': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at'], why: 'equilibrium ball distance differs (control radius / damping)' },
   'short kick': { metrics: ['*'], why: 'local own-shot braking by ball control (frame-rate dependent) + KICK_RANGE 57 vs 40' },
@@ -117,12 +116,12 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   // V3 scenario set (2026-10-31) — same root causes, measured for the record.
   'turn 90 (R→D)': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
   'diagonal change (R→RD→D)': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
-  'stop and restart (R, stop, D)': { metrics: ['*'], why: 'control radii + server player runs past the bottom line (no clamp)' },
-  'turn with defender ahead': { metrics: ['*'], why: 'retention radii 55 vs 42 + server player not clamped' },
-  'turn with defender behind': { metrics: ['*'], why: 'retention radii 55 vs 42 + server player not clamped' },
+  'stop and restart (R, stop, D)': { metrics: ['*'], why: 'control radii' },
+  'turn with defender ahead': { metrics: ['*'], why: 'retention radii 55 vs 42' },
+  'turn with defender behind': { metrics: ['*'], why: 'retention radii 55 vs 42' },
   'turn with defender beside': { metrics: ['*'], why: 'retention radii 55 vs 42' },
-  'turn between two defenders': { metrics: ['*'], why: 'retention radii 55 vs 42 + server player not clamped' },
-  'turn after rebound (ball arriving)': { metrics: ['*'], why: 'control radius 57 vs 44 decides whether the ball is trapped + no clamp' },
-  'turn right after a shot': { metrics: ['*'], why: 'KICK_RANGE 57 vs 40 + own-shot braking + no clamp' },
+  'turn between two defenders': { metrics: ['*'], why: 'retention radii 55 vs 42' },
+  'turn after rebound (ball arriving)': { metrics: ['*'], why: 'control radius 57 vs 44 decides whether the ball is trapped' },
+  'turn right after a shot': { metrics: ['*'], why: 'KICK_RANGE 57 vs 40 + own-shot braking' },
   'rapid direction changes': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
 };

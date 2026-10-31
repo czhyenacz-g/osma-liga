@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CONTRACT_SCENARIOS, KNOWN_DIVERGENCES, TOLERANCE, type ContractMetrics } from './spec';
 import { runLocalContractScenario } from './harness';
+import { LIVE_GAMEPLAY_PROFILE } from '../gameplayProfiles';
 import { FIELD_T, FIELD_B, PLAYER_SPEED, BENCH_DEPLOY_DURATION_MS } from '../constants';
 import serverBaseline from './server-baseline.json';
 import localBaseline from './local-baseline.json';
@@ -79,7 +80,7 @@ describe('physics contract — local (60 Hz) vs server (30 Hz) on the same scena
   for (const sc of CONTRACT_SCENARIOS) {
     const known = KNOWN_DIVERGENCES[sc.name];
     it(`${sc.name}${known ? ' [known divergence]' : ''}`, () => {
-      const diffs = differences(local(sc.name), server[sc.name]);
+      const diffs = differences(local(sc.name, 60, LIVE_GAMEPLAY_PROFILE), server[sc.name]);
       const unexpected = known
         ? diffs.filter((d) => !known.metrics.includes('*') && !known.metrics.some((m) => d.startsWith(m)))
         : diffs;

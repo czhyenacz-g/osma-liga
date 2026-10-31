@@ -3,12 +3,13 @@ import { BALL_WALL_RESTITUTION } from './constants';
 // Named gameplay profiles — a config layer on top of the single shared
 // engine (updateGame.ts), not a second engine. `classic` reproduces today's
 // behavior exactly; `v2`/`bounce` are alternate parameter sets for the same
-// code paths. Currently only reachable via /hra/bot-dis (?profile=...) and
-// the /hra/bot-test physics switch — /hra/bot, multiplayer and training
-// challenge always resolve to `classic`.
+// code paths. /hra/bot plays LIVE_GAMEPLAY_PROFILE; /hra/bot-dis
+// (?profile=...) and the /hra/bot-test physics switch can pick any.
+// Multiplayer and the training challenge run on the server engine, whose
+// human teams mirror v3-dribble (project-hub-api TeamBehaviorConfig
+// .preparedTurns).
 //
-// `v2-shot` / `v2-turn` are EXPERIMENTAL ball-control variants (see
-// docs/gameplay-physics-contract.md) — test-only, never a production default:
+// Ball-control variants (see docs/gameplay-physics-contract.md):
 //   v2-shot    = classic + kickSelfTrapProtection
 //   v2-turn    = v2-shot + turnAssist
 //   v3-dribble = v2-shot + dribblePrep (NOT turnAssist — no double slow-down)
@@ -193,6 +194,10 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
 };
 
 export const DEFAULT_GAMEPLAY_PROFILE: GameplayProfile = 'classic';
+
+// What the live game plays: /hra/bot passes it to the match, and the
+// physics contract compares it against the server engine.
+export const LIVE_GAMEPLAY_PROFILE: GameplayProfile = 'v3-dribble';
 
 // Parses a `?profile=` query value; any unrecognized value falls back to
 // the default profile rather than erroring.

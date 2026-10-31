@@ -34,7 +34,7 @@ Měří se to automaticky v `game/physicsContract/`, viz poslední sekci.
 | Rychlost bota | `ai.ts` `BOT_SPEED` | `ai.ts` → `stats.speed` (jako člověk) | 165 / 210 px/s | ≈ obtížnost AI | ponechat jako explicitní parametr obtížnosti | – |
 | PlayerStats | `game/playerStats.ts` | `src/gameEngine/playerStats.ts` | hráč 210/shot 1/stop 0/r 18; GK 150/1/1/r 20,7 | = | – | – |
 | 8 směrů | normalizovaná diagonála | normalizovaná diagonála | | = | – | `diagonal run` |
-| Hranice hřiště (ovládaný hráč) | `clampPos` na `FIELD ± PLAYER_RADIUS` | **bez clampu** | y_min 68 / **−192** | ❌ **chyba serveru** | clamp jako lokálně | `run into top boundary` |
+| Hranice hřiště (ovládaný hráč) | `clampPos` na `FIELD ± PLAYER_RADIUS` | `clamp` na `FIELD ± PLAYER_RADIUS` (od 1b3c957, dřív bez clampu: −192) | y_min 68 / 68 | = | – | `run into top boundary` |
 | Oddělení spoluhráčů | 42 px / 0,5 | 42 px / 0,5 | | = | – | – |
 | Podpůrní hráči | 120 px/s | 120 px/s | | = | – | – |
 
@@ -92,7 +92,7 @@ Měří se to automaticky v `game/physicsContract/`, viz poslední sekci.
 Otočky, vedení a odrazy od hráče zůstávají mírně Hz-závislé: ztráta při
 otočce 90° je 0,9 s na 30 Hz a 0,7 s na 144 Hz.
 
-## Experimentální profily V2 a V3 (jen `/hra/bot-test`)
+## Profily V2 a V3 (V3 je od 2026-10-31 ostrá, viz níže)
 
 Profily patří do existujícího `GameplayProfileConfig`
 (`game/gameplayProfiles.ts`). Konstanty jsou v `BALL_PHYSICS_V2` a
@@ -252,7 +252,39 @@ npx tsx scripts/physics-contract-server-baseline.mts ../project-hub-api \
   > game/physicsContract/server-baseline.json
 ```
 
-## Plán přenosu V3 na server (až po schválení)
+## V3 v ostrých režimech (od 2026-10-31)
+
+V3 je výchozí fyzika všech hratelných režimů. Ladění přijde později,
+teď jde o základní hratelnost.
+
+- **`/hra/bot`** (lokální engine) hraje `LIVE_GAMEPLAY_PROFILE` =
+  `v3-dribble` (`game/gameplayProfiles.ts`).
+- **Multiplayer a tréninková výzva** (server, `tickGame`): lidské týmy mají
+  `TeamBehaviorConfig.preparedTurns = true`. Patří k tomu
+  `src/gameEngine/dribblePrep.ts`, port 1:1 se stejnými konstantami
+  (`BALL_PHYSICS_V3` v `constants.ts`), a ochrana vlastní střely
+  (`KICK_SELF_TRAP_PROTECTION_SECONDS` 0,25 s). Stav je zvlášť pro každý tým:
+  `OnlineGameState.dribblePrep` a `kickSelfTrap`.
+- **Bot výzvy** (`trainingChallengeAi`) má `preparedTurns = false`, takže
+  hraje beze změny.
+- **Clamp hráče na serveru:** ovládaný hráč se nově drží uvnitř hřiště
+  stejně jako lokálně.
+- **`/hra/bot-test`** dál umožňuje přepínat všechny profily, classic zůstává
+  pro srovnání.
+- **Kontrakt:** test „local vs server“ teď porovnává `LIVE_GAMEPLAY_PROFILE`
+  se serverem. `server-baseline.json` je z commitu `1b3c957`.
+- **Výsledky na serveru (30 Hz):**
+  - 90° a stažení od čáry: před hráčem za 0,3 s, ztráta 0;
+  - 180°: 0,5 s, ztráta 0;
+  - diagonála: 0,4 s;
+  - obránce zepředu nebo zboku: beze změny;
+  - rychlé změny směru: ztráta 0,7 s (lokálně 0 s, rozdíl dělá poloměr
+    kontroly 44 vs 57).
+
+Zbývající rozdíly lokál↔server jsou poloměry kontroly a retence,
+`KICK_RANGE`, nabíjení kopu a útlum za frame proti útlumu za tick.
+
+## Původní plán přenosu V3 na server (proveden, viz výše)
 
 1. **Modul.** `dribblePrep.ts` je čistá funkce nad stavem a `dt`. Na server
    se přenese jako `src/gameEngine/dribblePrep.ts` se stejnými konstantami.

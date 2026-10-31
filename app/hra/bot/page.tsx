@@ -3,6 +3,7 @@ import Link from 'next/link';
 import MatchPageClient from '@/components/game/MatchPageClient';
 import GameNavLink from '@/components/ui/GameNavLink';
 import { CLUBS } from '@/data/clubs';
+import { LIVE_GAMEPLAY_PROFILE } from '@/game/gameplayProfiles';
 
 export const metadata: Metadata = {
   title: 'Zápas proti botovi',
@@ -34,7 +35,7 @@ export default async function HraBotPage({
         </p>
       </div>
 
-      <MatchPageClient homeClubSlug={clubSlug} />
+      <MatchPageClient homeClubSlug={clubSlug} gameplayProfile={LIVE_GAMEPLAY_PROFILE} />
 
       <p className="hidden sm:block text-sm text-center font-semibold" style={{ color: 'rgba(209,250,229,0.65)' }}>
         <span style={{ color: '#d6a94a' }}>WASD</span> / šipky &mdash; pohyb
