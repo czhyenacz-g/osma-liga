@@ -17,7 +17,9 @@ import { FIELD_L, FIELD_R, FIELD_T, FIELD_B } from './constants';
 //      player ramps back to full speed over recoverSeconds.
 // Everything is time-based (dt), not frame-based. An opponent near the
 // ball, letting go of the controls, kicking or losing the ball ends it at
-// once — no protection in duels, no endless assist.
+// once — no protection in duels, no endless assist. One exception: a
+// drag-back AWAY from a pressing opponent (shield turn) stays assisted
+// while no opponent touches the ball or stands in the new direction.
 
 const C = BALL_PHYSICS_V3;
 const DEG = Math.PI / 180;
@@ -25,7 +27,7 @@ const DEG = Math.PI / 180;
 export function createDribblePrepState(): DribblePrepState {
   return {
     playerId: null, controlSeconds: 0, phase: 'none', remaining: 0, recoverTotal: 0, side: 1,
-    prepDir: null, chainSeconds: 0, idleSeconds: 0,
+    prepDir: null, chainSeconds: 0, idleSeconds: 0, shield: false,
   };
 }
 
@@ -33,13 +35,20 @@ export function resetDribblePrep(state: GameState): void {
   state.dribblePrep = createDribblePrepState();
 }
 
-function nearestOpponentToBall(state: GameState, team: Player['team']): number {
-  let nearest = Infinity;
+function opponentsNearBall(state: GameState, team: Player['team']): Vec2[] {
+  const near: Vec2[] = [];
   for (const p of state.players) {
     if (p.team === team || p.matchStatus === 'bench') continue;
-    nearest = Math.min(nearest, Math.hypot(p.pos.x - state.ball.pos.x, p.pos.y - state.ball.pos.y));
+    if (Math.hypot(p.pos.x - state.ball.pos.x, p.pos.y - state.ball.pos.y) <= C.noOpponentRadius) near.push(p.pos);
   }
-  return nearest;
+  return near;
+}
+
+// Shield turn allowed: every near opponent is off the ball (not touching
+// it) and on the side the player is turning away from.
+function shieldClear(near: Vec2[], player: Vec2, ball: Vec2, dir: Vec2): boolean {
+  return near.every((o) => Math.hypot(o.x - ball.x, o.y - ball.y) > C.shieldContactRadius
+    && (o.x - player.x) * dir.x + (o.y - player.y) * dir.y < 0);
 }
 
 // Angle (deg, 0..180) between the ball's position relative to the player
@@ -54,8 +63,9 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
 // Which way round the player the ball travels. For a clear turn the short
 // way; for a near-reversal the side whose halfway point is farther from
-// the touchlines, so at the top line the ball goes round the bottom.
-function chooseSide(player: Vec2, rel: Vec2, dir: Vec2): number {
+// the touchlines (and from a pressing opponent), so at the top line the
+// ball goes round the bottom and a drag-back goes round the free side.
+function chooseSide(player: Vec2, rel: Vec2, dir: Vec2, opponents: Vec2[]): number {
   const thB = Math.atan2(rel.y, rel.x);
   const delta = wrap(Math.atan2(dir.y, dir.x) - thB);
   if (Math.abs(delta) < 150 * DEG) return delta >= 0 ? 1 : -1;
@@ -63,7 +73,9 @@ function chooseSide(player: Vec2, rel: Vec2, dir: Vec2): number {
     const a = thB + side * Math.PI / 2;
     const x = player.x + Math.cos(a) * C.targetDistance;
     const y = player.y + Math.sin(a) * C.targetDistance;
-    return Math.min(x - FIELD_L, FIELD_R - x, y - FIELD_T, FIELD_B - y);
+    let r = Math.min(x - FIELD_L, FIELD_R - x, y - FIELD_T, FIELD_B - y);
+    for (const o of opponents) r = Math.min(r, Math.hypot(o.x - x, o.y - y) - C.shieldContactRadius);
+    return r;
   };
   const plus = room(1), minus = room(-1);
   if (Math.abs(plus - minus) < 1) return delta >= 0 ? 1 : -1;
@@ -91,11 +103,19 @@ export function updateDribblePrep(
   const rel = { x: state.ball.pos.x - active.pos.x, y: state.ball.pos.y - active.pos.y };
   const d = Math.hypot(rel.x, rel.y);
   const relSpeed = Math.hypot(state.ball.vel.x - active.vel.x, state.ball.vel.y - active.vel.y);
-  const opponentNear = nearestOpponentToBall(state, active.team) <= C.noOpponentRadius;
-  const usable = !kickHeld && !selfTrapProtected && !opponentNear && d < C.dribbleControlRadius;
+  const near = opponentsNearBall(state, active.team);
+  const opponentNear = near.length > 0;
+  const onBall = !kickHeld && !selfTrapProtected && d < C.dribbleControlRadius;
   // A settled dribble (ball moving with the player) — required to START a
   // chain, so a loose ball rolling past is never pulled in.
-  dp.controlSeconds = usable && relSpeed < C.dribbleMaxRelativeSpeed ? Math.min(1, dp.controlSeconds + dt) : 0;
+  dp.controlSeconds = onBall && relSpeed < C.dribbleMaxRelativeSpeed ? Math.min(1, dp.controlSeconds + dt) : 0;
+  // Which kind of prep a turn toward `aim` may use: plain (nobody near),
+  // shield (sharp turn away from the pressure) or none.
+  const turnKind = (aim: Vec2, off: number): 'plain' | 'shield' | null => {
+    if (!onBall) return null;
+    if (!opponentNear) return 'plain';
+    return off >= C.shieldTurnMinAngleDeg && shieldClear(near, active.pos, state.ball.pos, aim) ? 'shield' : null;
+  };
 
   if (dp.phase === 'prep') dp.chainSeconds += dt;
   else dp.idleSeconds += dt;
@@ -103,13 +123,16 @@ export function updateDribblePrep(
 
   const full = active.stats.speed;
   const budgetLeft = dp.chainSeconds < C.maxChainSeconds;
-  const startPrep = (aim: Vec2, off: number) => {
+  const startPrep = (aim: Vec2, off: number, kind: 'plain' | 'shield') => {
     const sharp = Math.max(0, Math.min(1, (off - 90) / 90));
     dp.phase = 'prep';
     dp.remaining = C.prepSeconds + (C.prepSeconds180 - C.prepSeconds) * sharp;
-    dp.side = chooseSide(active.pos, rel, aim);
+    dp.side = chooseSide(active.pos, rel, aim, near);
     dp.prepDir = aim;
     dp.idleSeconds = 0;
+    // A sharp turn may carry on under the shield rules even if it started
+    // in the clear and an opponent closes in on the way round.
+    dp.shield = kind === 'shield' || off >= C.shieldTurnMinAngleDeg;
   };
   const toRecover = () => {
     dp.phase = 'recover';
@@ -119,7 +142,11 @@ export function updateDribblePrep(
   };
 
   if (dp.phase === 'prep') {
-    if (!dir || !usable) {
+    // A running shield turn keeps going while the pressure stays off the
+    // ball and behind; the ball has already swung part-way, so the angle
+    // test only applies when it starts.
+    const allowed = onBall && (!opponentNear || (dp.shield && !!dir && shieldClear(near, active.pos, state.ball.pos, dir)));
+    if (!dir || !allowed) {
       dp.phase = 'none';
       dp.prepDir = null;
       return Infinity;
@@ -127,8 +154,10 @@ export function updateDribblePrep(
     // New turn mid-prep: re-aim (fresh window), but only within the chain
     // budget — the budget, not the window, is what can't be extended.
     if (dp.prepDir && offAngleDeg(dp.prepDir, dir) >= C.reaimMinAngleDeg) {
-      if (!budgetLeft) { toRecover(); return C.prepPlayerSpeed; }
-      startPrep(dir, offAngleDeg(rel, dir));
+      const off = offAngleDeg(rel, dir);
+      const kind = turnKind(dir, off);
+      if (!budgetLeft || !kind) { toRecover(); return C.prepPlayerSpeed; }
+      startPrep(dir, off, kind);
       return C.prepPlayerSpeed;
     }
     const settled = offAngleDeg(rel, dir) <= C.settledAngleDeg
@@ -140,11 +169,12 @@ export function updateDribblePrep(
   }
 
   // Start (from a settled dribble) or continue a chain (from recover).
-  const canStart = dp.phase === 'recover' ? usable : dp.controlSeconds >= C.dribbleMinControlSeconds;
+  const canStart = dp.phase === 'recover' || dp.controlSeconds >= C.dribbleMinControlSeconds;
   if (dir && budgetLeft && canStart) {
     const off = offAngleDeg(rel, dir);
-    if (off >= C.turnMinAngleDeg) {
-      startPrep(dir, off);
+    const kind = off >= C.turnMinAngleDeg ? turnKind(dir, off) : null;
+    if (kind) {
+      startPrep(dir, off, kind);
       return C.prepPlayerSpeed;
     }
   }

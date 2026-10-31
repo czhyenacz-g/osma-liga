@@ -167,6 +167,10 @@ export interface DribblePrepState {
   // has run (a long enough gap resets the chain) — bounds the assist.
   chainSeconds: number;
   idleSeconds: number;
+  // Current prep is a sharp turn (≥ BALL_PHYSICS_V3.shieldTurnMinAngleDeg)
+  // — a drag-back that may run under the shield rules (opponent off the
+  // ball and behind) instead of the plain no-opponent rule.
+  shield: boolean;
 }
 
 export interface InputState {

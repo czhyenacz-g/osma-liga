@@ -51,6 +51,14 @@ export const BALL_PHYSICS_V3 = {
   dribbleMinControlSeconds: 0.12,
   // Opponent this close to the ball → no prep / prep aborted (duels stay real).
   noOpponentRadius: 70,
+  // Drag-back exception: turning at least this far AWAY from every opponent
+  // inside noOpponentRadius (each one on the side the player is leaving,
+  // none touching the ball — centre farther than shieldContactRadius from
+  // it) is still assisted; the ball goes round the side away from them.
+  // Turning into an opponent or a ball already being challenged stays a
+  // real duel.
+  shieldTurnMinAngleDeg: 120,
+  shieldContactRadius: 36,
   // Prep starts when the ball sits at least this far off the new direction.
   turnMinAngleDeg: 60,
   // Prep window: base, growing linearly to the 180° value (s).

@@ -122,7 +122,8 @@ Profily patří do existujícího `GameplayProfileConfig`
 - Míč je od ovládaného hráče blíž než 57 px.
 - Relativní rychlost míče vůči hráči je pod 160 px/s, a to aspoň 0,12 s.
 - Kop není držený a neběží ochrana vlastní střely.
-- Žádný soupeř není od míče blíž než 70 px.
+- Žádný soupeř není od míče blíž než 70 px. Výjimkou je stažení míče od
+  soupeře (viz níže).
 
 Volný ani právě odkopnutý míč se nikdy nepřitahuje.
 
@@ -152,6 +153,19 @@ přímá otočka.
 **Okamžité přerušení:** soupeř do 70 px, puštění ovládání, kop nebo míč
 dál než 57 px.
 
+**Stažení míče od soupeře (shield turn, od 2026-10-31):** Otočka aspoň o
+120° *od* soupeře, typicky couvnutí nebo obrat k vlastní bráně, když
+soupeř napadá zepředu, je asistovaná i se soupeřem do 70 px. Platí to,
+pokud každý soupeř do 70 px:
+- stojí na straně, od které se hráč odvrací (skalární součin polohy soupeře
+  vůči hráči a nového směru je záporný);
+- nedotýká se míče (střed je od míče dál než 36 px).
+
+Ostrá otočka (≥ 120°), která začala bez soupeře, pokračuje podle stejných
+pravidel, i když se soupeř během otáčení přiblíží. Oblouk vede na stranu
+dál od soupeře i od čáry. Otočka *do* soupeře nebo souboj o míč, kterého
+se soupeř už dotýká, zůstává beze změny jako v classic.
+
 **Řetězec otoček:** Změna směru uprostřed přípravy ji přesměruje. Celkový
 čas přípravy v řetězci je ale omezený na 1,2 s. Potom musí přijít 0,3 s bez
 asistence, takže nekonečný slalom s asistencí nejde.
@@ -171,7 +185,11 @@ asistence, takže nekonečný slalom s asistencí nejde.
 
   Neúspěch nastává jen při otočce do čáry, u které hráč stojí.
 
-**Soupeř do 70 px:** V3 se chová přesně jako classic.
+**Soupeř do 70 px:** V3 se chová přesně jako classic, s výjimkou stažení
+míče od soupeře. Couvnutí od stojícího obránce 50–90 px před míčem: V3 má
+ztrátu 0 s a míč je před hráčem za 0,5 s, classic ztratí míč na víc než
+1 s. Proti napadajícímu botovi si V3 při couvnutí míč udrží, classic ho
+ztratí pokaždé.
 
 **Co V3 neřeší:**
 - Classic kontrola mimo přípravu dál tlumí za frame. Po přípravě se proto
@@ -197,6 +215,8 @@ asistence, takže nekonečný slalom s asistencí nejde.
   - frekvenční stabilitu;
   - že 180° je pomalejší než 90°;
   - že soupeř asistenci vypne;
+  - stažení míče od napadajícího soupeře, oblouk na volnou stranu, žádnou
+    asistenci při otočce do soupeře nebo u míče, kterého se soupeř dotýká;
   - že se míč neotáčí kolem hráče (orbit);
   - že asistence není nekonečná (limit řetězce);
   - že rychlost a zrychlení míče jsou omezené;

@@ -77,6 +77,67 @@ describe('V3 prepared turn — duels stay real', () => {
   });
 });
 
+describe('V3 prepared turn — drag-back away from pressure', () => {
+  // Dribble right into a defender standing ahead, then reverse (toward the
+  // own goal). gap = defender ↔ ball distance at the moment of the turn.
+  const reverse = (gap: number, defenderY = 0): ContractScenario => ({
+    name: `reverse, defender ${gap} px ahead of the ball`, start: { x: 250, y: 280 }, ball: { x: 30, y: 0 },
+    defender: { x: 126 + 32 + gap, y: defenderY },
+    steps: [{ input: { right: true }, seconds: 0.6 }, { input: { left: true }, seconds: 1.5, mark: true }],
+    probes: ['0.3', '0.6', '1'],
+  });
+
+  it('reversing away from a pressing defender keeps the ball (classic loses it)', () => {
+    for (const gap of [50, 70, 90]) {
+      for (const hz of HZ) {
+        const m = v3(reverse(gap), hz);
+        expect(m.lossSeconds, `gap ${gap} @ ${hz}`).toBe(0);
+        expect(m.frontSeconds, `gap ${gap} @ ${hz}`).not.toBeNull();
+        expect(m.frontSeconds!, `gap ${gap} @ ${hz}`).toBeLessThanOrEqual(0.6);
+      }
+      expect(classic(reverse(gap)).lossSeconds, `classic gap ${gap}`).toBeGreaterThan(1);
+    }
+  });
+
+  it('the ball goes round the side away from the defender', () => {
+    for (const side of [1, -1]) {
+      let worst = Infinity;
+      v3(reverse(50, side * 20), 60, (s) => {
+        if (s.dribblePrep.phase !== 'prep') return;
+        const d = s.players.find((p) => p.team === 'away' && p.matchStatus !== 'bench' && p.role === 'field_player')!;
+        worst = Math.min(worst, Math.hypot(d.pos.x - s.ball.pos.x, d.pos.y - s.ball.pos.y));
+      });
+      expect(worst, `defender ${side > 0 ? 'below' : 'above'}`).toBeGreaterThan(BALL_PHYSICS_V3.shieldContactRadius);
+    }
+  });
+
+  it('no assist when turning INTO a near opponent or when the opponent already touches the ball', () => {
+    const steps = [{ input: { right: true }, seconds: 0.6 }, { input: { left: true }, seconds: 1, mark: true }];
+    // Passed on the run; at the turn it sits just behind the player, in
+    // the new direction, ~60 px from the ball.
+    const into: ContractScenario = {
+      name: 'reverse into a defender behind', start: { x: 300, y: 280 }, ball: { x: 30, y: 0 }, defender: { x: 110, y: 38 }, steps, probes: ['0.3', '0.6'],
+    };
+    // Ahead and already on the ball when the player turns.
+    const touching: ContractScenario = {
+      name: 'reverse with defender on the ball', start: { x: 300, y: 280 }, ball: { x: 30, y: 0 }, defender: { x: 185, y: 0 }, steps, probes: ['0.3', '0.6'],
+    };
+    // Without the defender the same reversal is assisted — the cases below
+    // are switched off by the opponent, not by anything else.
+    let freePrep = 0;
+    v3({ ...into, defender: undefined }, 60, (s) => { if (s.dribblePrep.phase === 'prep') freePrep++; });
+    expect(freePrep).toBeGreaterThan(0);
+    for (const sc of [into, touching]) {
+      for (const hz of HZ) {
+        let prepFrames = 0;
+        const m = v3(sc, hz, (s) => { if (s.dribblePrep.phase === 'prep') prepFrames++; });
+        expect(prepFrames, `${sc.name} @ ${hz}`).toBe(0);
+        expect(m, `${sc.name} @ ${hz}`).toEqual(classic(sc, hz));
+      }
+    }
+  });
+});
+
 describe('V3 prepared turn — no exploits, no unnatural ball motion', () => {
   it('a shot is never pulled back (turning right after a shot = classic behaviour)', () => {
     const m = v3(byName('turn right after a shot'));
