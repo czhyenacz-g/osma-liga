@@ -4,10 +4,16 @@ import GameNavLink from '@/components/ui/GameNavLink';
 import { CLUBS } from '@/data/clubs';
 import BotTestClient from './BotTestClient';
 import { resolveMode, resolvePhysics } from './botTestModes';
-import { notFoundInProduction } from '@/lib/devRoutes';
+import { absoluteUrl } from '@/lib/seo';
 
+// Public but unlisted test playground (direct link only): local client-side
+// engine against the bot, nothing is saved anywhere. Unlike /hra/bot-dis and
+// /dev/*, it is intentionally reachable in production — no
+// notFoundInProduction() here.
 export const metadata: Metadata = {
   title: 'Bot test',
+  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+  alternates: { canonical: absoluteUrl('/hra/bot-test') },
 };
 
 export default async function HraBotTestPage({
@@ -15,7 +21,6 @@ export default async function HraBotTestPage({
 }: {
   searchParams: Promise<{ club?: string; mode?: string; physics?: string }>;
 }) {
-  notFoundInProduction();
   const { club: clubSlug, mode: modeParam, physics: physicsParam } = await searchParams;
   const initialMode = resolveMode(modeParam);
   const initialPhysics = resolvePhysics(physicsParam);
