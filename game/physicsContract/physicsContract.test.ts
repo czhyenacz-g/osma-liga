@@ -93,11 +93,13 @@ describe('physics contract — local (60 Hz) vs server (30 Hz) on the same scena
   }
 });
 
-// local-baseline.json was generated from the engine BEFORE the V3
-// experiment (classic = production, v2-* = earlier experiments) — later
-// experiments must leave all of them untouched.
+// local-baseline.json: classic / v2-* were frozen from the engine BEFORE
+// the V3 experiment; v3-dribble (= LIVE_GAMEPLAY_PROFILE, approved as the
+// base on 2026-10-31) and the scenarios added later were frozen when they
+// were added. A change that moves any of them fails here — the approved
+// feel must not drift by accident.
 describe('physics contract — existing profiles do not drift', () => {
-  for (const profile of ['classic', 'v2-shot', 'v2-turn'] as const) {
+  for (const profile of ['classic', 'v2-shot', 'v2-turn', 'v3-dribble'] as const) {
     for (const hz of [30, 60, 120, 144]) {
       it(`${profile} @ ${hz} Hz matches local-baseline.json`, () => {
         for (const sc of CONTRACT_SCENARIOS) {

@@ -84,6 +84,18 @@ export const CONTRACT_SCENARIOS: ContractScenario[] = [
   { name: 'turn after rebound (ball arriving)', start: { x: 400, y: 280 }, ball: { x: 120, y: 0 }, ballVel: { x: -260, y: 0 }, steps: [{ input: {}, seconds: 0.6 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
   { name: 'turn right after a shot', start: { x: 250, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 0.05 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
   { name: 'rapid direction changes', start: { x: 200, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.6 }, { input: D, seconds: 0.25, mark: true }, { input: R, seconds: 0.25 }, { input: U, seconds: 0.25 }, { input: R, seconds: 0.25 }, { input: D, seconds: 0.25 }, { input: R, seconds: 0.6 }], probes: ['0.6', '1.2', '1.85'] },
+  // Kick reach / charge set (2026-10-31 unification audit). Standing
+  // player, ball still in front: the shot goes toward the opponent goal.
+  { name: 'kick at the edge of reach (50 px)', start: { x: 150, y: 280 }, ball: { x: 50, y: 0 }, steps: [{ input: { kick: true }, seconds: 0.05 }, { input: {}, seconds: 1 }] },
+  { name: 'no kick out of reach (75 px)', start: { x: 150, y: 280 }, ball: { x: 75, y: 0 }, steps: [{ input: { kick: true }, seconds: 0.05 }, { input: {}, seconds: 1 }] },
+  ...([['tap', 0.05], ['250 ms', 0.25], ['500 ms', 0.5], ['1000 ms', 1], ['1500 ms', 1.5]] as const).map(([label, held]): ContractScenario => ({
+    name: `charge ${label} (standing)`, start: { x: 150, y: 280 }, ball: { x: 30, y: 0 },
+    steps: [{ input: { kick: true }, seconds: held }, { input: {}, seconds: 1 }],
+  })),
+  // Charging while running: the ball is not controlled during the charge,
+  // so a long charge can lose it — the release then must not fire.
+  { name: 'charge 1000 ms while running', start: { x: 100, y: 120 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 1 }, { input: R, seconds: 0.1 }, { input: {}, seconds: 0.9 }] },
+  { name: 'shot after a 180° turn', start: { x: 500, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.8 }, { input: L, seconds: 0.8, mark: true }, { input: { left: true, kick: true }, seconds: 0.05 }, { input: L, seconds: 0.1 }, { input: {}, seconds: 0.9 }] },
   { name: 'žolík entry + expiry', kind: 'bench', start: { x: 0, y: 0 }, ball: NO_BALL, steps: [] },
   { name: 'temporary weakening', kind: 'removal', start: { x: 0, y: 0 }, ball: NO_BALL, steps: [] },
 ];
@@ -104,24 +116,47 @@ export const TOLERANCE = {
 // scenario/metric is a new divergence and fails the test. When one of
 // these gets unified, remove it here so it can't silently regress.
 export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string }> = {
-  'turn 90 (R→U)': { metrics: ['*'], why: 'different control radii (57 vs 44) and per-tick vs per-frame damping' },
-  'turn 180 (R→L)': { metrics: ['*'], why: 'different control radii (57 vs 44) and per-tick vs per-frame damping' },
-  'top line pull down (R→D)': { metrics: ['*'], why: 'different control radii' },
-  'bottom line pull up (R→U)': { metrics: ['*'], why: 'different control radii (57 vs 44)' },
-  'dribble straight': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at'], why: 'equilibrium ball distance differs (control radius / damping)' },
-  'short kick': { metrics: ['*'], why: 'local own-shot braking by ball control (frame-rate dependent) + KICK_RANGE 57 vs 40' },
-  'charged kick (0.5 s)': { metrics: ['*'], why: 'KICK_MAX_CHARGE_MS 500 vs 1500 + local own-shot braking' },
-  'defender contact': { metrics: ['*'], why: 'control/retention radii differ (57/55 vs 44/42)' },
-  'goalkeeper blocks shot': { metrics: ['*'], why: 'shot power differs (charge curve, own-shot braking)' },
-  // V3 scenario set (2026-10-31) — same root causes, measured for the record.
-  'turn 90 (R→D)': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
-  'diagonal change (R→RD→D)': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
-  'stop and restart (R, stop, D)': { metrics: ['*'], why: 'control radii' },
-  'turn with defender ahead': { metrics: ['*'], why: 'retention radii 55 vs 42' },
-  'turn with defender behind': { metrics: ['*'], why: 'retention radii 55 vs 42' },
-  'turn with defender beside': { metrics: ['*'], why: 'retention radii 55 vs 42' },
-  'turn between two defenders': { metrics: ['*'], why: 'retention radii 55 vs 42' },
-  'turn after rebound (ball arriving)': { metrics: ['*'], why: 'control radius 57 vs 44 decides whether the ball is trapped' },
-  'turn right after a shot': { metrics: ['*'], why: 'KICK_RANGE 57 vs 40 + own-shot braking' },
-  'rapid direction changes': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
+  // Since the 2026-10-31 unification (server: control/retention 57/55, kick
+  // reach 57, charge 500 ms, reach measured before the move, friction after
+  // the move) the rules match; what is left is the STEP SIZE (local 60 Hz
+  // frame vs 33 ms server tick). Each entry below also differs between the
+  // local engine at 30 Hz and at 60 Hz — see docs/gameplay-physics-contract.md
+  // "Známé rozdíly". Only the listed metrics are tolerated.
+  //
+  // STEP: per-frame ball-control damping/force — the ball oscillates
+  // ~140–250 px/s round the player while dribbling, so the sampled
+  // speed/position depends on the step; server = local at 30 Hz.
+  'dribble straight': { metrics: ['ballSpeed'], why: 'STEP: control oscillation phase at the sample' },
+  'turn 90 (R→U)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
+  'turn 90 (R→D)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
+  'turn 180 (R→L)': { metrics: ['ballY', 'ballSpeed', 'at.1.ballY'], why: 'STEP: per-frame control damping' },
+  'top line pull down (R→D)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
+  'bottom line pull up (R→U)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
+  'diagonal change (R→RD→D)': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.0.3.ballY'], why: 'STEP: per-frame control damping' },
+  'stop and restart (R, stop, D)': { metrics: ['playerY', 'maxPlayerY', 'ballX', 'ballSpeed'], why: 'STEP: per-frame control damping' },
+  'turn after rebound (ball arriving)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.'], why: 'STEP: per-frame control damping' },
+  'rapid direction changes': { metrics: ['ballSpeed', 'at.0.6.ballY', 'at.1.2.ballY'], why: 'STEP: per-frame control damping' },
+  'shot after a 180° turn': { metrics: ['ballX', 'ballY'], why: 'STEP: where the ball sits at release after the turn (local 30–144 Hz: 105–149 px)' },
+  // CHARGE: the charge counts per step from the press step (0 on it), so
+  // 500 ms of holding reaches ~93 % at a 33 ms tick vs ~97 % at 60 Hz —
+  // the ball rolls a few px less (local 30 Hz does the same).
+  'short kick': { metrics: ['ballX'], why: 'CHARGE: per-step charge count' },
+  'charged kick (0.5 s)': { metrics: ['ballX'], why: 'CHARGE: per-step charge count' },
+  'charge 500 ms (standing)': { metrics: ['ballX'], why: 'CHARGE: per-step charge count' },
+  // BUMP: BUMP_FORCE is applied once per step of overlap, so what happens
+  // after a body contact depends on the step (local 30 vs 60 Hz differ by
+  // up to ~280 px in 'defender contact').
+  'defender contact': { metrics: ['ballX', 'ballSpeed'], why: 'BUMP: per-step bump impulse' },
+  'turn with defender ahead': { metrics: ['ballX', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
+  'turn with defender behind': { metrics: ['playerY', 'maxPlayerY', 'ballX', 'ballSpeed', 'maxBallSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
+  'turn with defender beside': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
+  'turn between two defenders': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
+  'turn right after a shot': { metrics: ['ballX', 'ballY', 'shotTravel', 'at.'], why: 'BUMP: the shot runs into the player turning after it (local 30–144 Hz: 54–98 px travel)' },
+  // GK: a point-blank shot can pass THROUGH the goalkeeper in both engines
+  // (discrete collision: the contact nudge leaves the ball 0–1 px short of
+  // the keeper, the next step moves it ~26 px into him and the overlap is
+  // resolved behind him). Which side of that 1 px a step lands on differs —
+  // here the server scores and local blocks. Shared latent bug, documented,
+  // not part of this unification.
+  'goalkeeper blocks shot': { metrics: ['*'], why: 'GK: point-blank shot tunnels through the keeper (shared bug, 1 px decides)' },
 };
