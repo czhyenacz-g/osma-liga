@@ -10,6 +10,7 @@ import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
 import SoundToggleButton from './SoundToggleButton';
 import BenchPanel from './BenchPanel';
+import { resolveBenchUiState } from '@/game/benchUi';
 import PlayerVisualTemplateSwitcher from '@/components/PlayerVisualTemplateSwitcher';
 import BounceTimeOverlay from './BounceTimeOverlay';
 import type { TouchInput } from '@/game/types';
@@ -240,6 +241,7 @@ export default function MatchPageClient({
                   <p>Pohyb: levý ovladač</p>
                   <p>Kop: tlačítko KOP (krátký ťuk = slabší, podrž = silnější)</p>
                   <p>Přepnutí hráče: tlačítko PŘEP.</p>
+                  <p>Žolík z lavičky: tlačítko vpravo nad PŘEP. (jednou za zápas, 30 s)</p>
                   <p className="mt-1.5">
                     Hra automaticky vybírá hráče nejblíž k míči. Tlačítkem PŘEP. si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.
                   </p>
@@ -250,6 +252,7 @@ export default function MatchPageClient({
                   <p>Pohyb: WASD / šipky</p>
                   <p>Kop: mezerník (krátký ťuk = slabší, podrž = silnější)</p>
                   <p>Přepnutí hráče: Q</p>
+                  <p>Žolík z lavičky: klávesa 1 (jednou za zápas, 30 s)</p>
                   <p className="mt-1.5">
                     Hra automaticky vybírá hráče nejblíž k míči. Klávesou Q si na chvíli vybereš jiného — s míčem pod kontrolou přihraje a přepne na příjemce.
                   </p>
@@ -404,7 +407,11 @@ export default function MatchPageClient({
       </div>
 
       {gamePhase === 'playing' && matchScore === null && (
-        <BenchPanel benchPlayers={benchPlayers} onActivate={handleBenchActivate} />
+        <BenchPanel
+          bench={resolveBenchUiState(benchPlayers.map((p) => ({ ...p, benchUsed: p.used })))}
+          onActivate={handleBenchActivate}
+          variant={isMobile ? 'floating' : 'inline'}
+        />
       )}
 
       {isMobile && gamePhase === 'playing' && matchScore === null && (

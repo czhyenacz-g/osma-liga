@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useOnlineGame } from './useOnlineGame';
 import OnlineGameCanvas from './OnlineGameCanvas';
@@ -8,6 +8,8 @@ import MobileOrientationOverlay from '@/components/game/MobileOrientationOverlay
 import MatchCommentaryToast from '@/components/game/MatchCommentaryToast';
 import SoundToggleButton from '@/components/game/SoundToggleButton';
 import PlayerVisualTemplateSwitcher from '@/components/PlayerVisualTemplateSwitcher';
+import BenchPanel from '@/components/game/BenchPanel';
+import { resolveBenchUiState } from '@/game/benchUi';
 import { playGoalSound } from '@/lib/audio/whistleEngine';
 import type { TouchInput } from '@/game/types';
 import { firstGoalMessages, fullTimeMessages, substitutionMessages, pickRandomMessage } from '@/lib/game/matchCommentaryMessages';
@@ -28,8 +30,28 @@ export default function OnlineGameClient({
   gameCode: string;
   playerToken: string;
 }) {
-  const { snapshot, role, gameStatus, errorMsg, sendInput, startGame, rttMs } =
+  const { snapshot, role, gameStatus, errorMsg, sendInput, startGame, rttMs, deployBench, benchRejectedAt } =
     useOnlineGame(gameCode, playerToken);
+
+  // Own bench only: the connection role decides the engine team (host →
+  // home, guest → away — same mapping as the server's requestBenchDeploy).
+  const ownTeam = role === 'home' ? 'home' : role === 'guest' ? 'away' : null;
+  const bench = useMemo(() => {
+    if (!snapshot || !ownTeam) return null;
+    return resolveBenchUiState(
+      snapshot.players
+        .filter((p) => p.team === ownTeam && !p.isGoalkeeper)
+        .map((p) => ({ id: p.id, label: p.label, matchStatus: p.matchStatus, benchUsed: p.benchUsed, remainingMs: p.benchRemainingMs })),
+    );
+  }, [snapshot, ownTeam]);
+
+  const [benchNotice, setBenchNotice] = useState<string | null>(null);
+  useEffect(() => {
+    if (benchRejectedAt === null) return;
+    setBenchNotice('Žolík teď nastoupit nemůže.');
+    const t = setTimeout(() => setBenchNotice(null), 2500);
+    return () => clearTimeout(t);
+  }, [benchRejectedAt]);
 
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -326,9 +348,12 @@ export default function OnlineGameClient({
         <MatchCommentaryToast message={firstGoalMessage ?? substitutionMessage} />
       </div>
       {!isMobile && (
-        <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
-          WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop (podrž = silnější) &nbsp;·&nbsp; Q = přepnout / přihrát
-        </p>
+        <>
+          <BenchPanel bench={bench} onActivate={deployBench} notice={benchNotice} />
+          <p className="text-xs" style={{ color: 'rgba(209,250,229,0.3)' }}>
+            WASD / šipky = pohyb &nbsp;·&nbsp; Mezerník = kop (podrž = silnější) &nbsp;·&nbsp; Q = přepnout / přihrát &nbsp;·&nbsp; 1 = žolík z lavičky
+          </p>
+        </>
       )}
       {isMobile && !isPortrait && (
         <>
@@ -336,6 +361,7 @@ export default function OnlineGameClient({
             D-pad = pohyb &nbsp;·&nbsp; KOP = kop (podrž = silnější) &nbsp;·&nbsp; PŘEP. = přepnout / přihrát
           </p>
           <MobileTouchControls touchRef={touchRef} />
+          <BenchPanel bench={bench} onActivate={deployBench} notice={benchNotice} variant="floating" />
         </>
       )}
     </main>

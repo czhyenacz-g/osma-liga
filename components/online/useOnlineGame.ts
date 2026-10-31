@@ -4,6 +4,10 @@ import { io, Socket } from 'socket.io-client';
 import { playFullTimeWhistle, playKickoffWhistle } from '@/lib/audio/whistleEngine';
 import type { PlayerMatchStatus } from '@/game/types';
 
+// Message project-hub-api's onlineGameSocket.ts emits on 'error' when it
+// refuses a 'deploy_bench_player' request.
+export const BENCH_DEPLOY_REJECTED = 'Bench deploy rejected';
+
 export interface OnlinePlayer {
   id: string;
   team: 'home' | 'away';
@@ -26,6 +30,10 @@ export interface OnlinePlayer {
   // 'bench' players are not drawn (resolveOnlinePlayerRenderStates); absent
   // on snapshots from an older backend.
   matchStatus?: PlayerMatchStatus;
+  // Bench + temporary substitute (buildSnapshot): benchUsed stays true once
+  // the one deployment happened; benchRemainingMs only while deployed.
+  benchUsed?: boolean;
+  benchRemainingMs?: number | null;
 }
 
 export interface OnlineSnapshot {
@@ -49,6 +57,9 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
   const [gameStatus, setGameStatus] = useState<'connecting' | 'waiting' | 'playing' | 'finished' | 'error'>('connecting');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [rttMs, setRttMs] = useState<number | null>(null);
+  // Last server rejection of a bench deploy (timestamp) — a recoverable,
+  // in-match condition, not a fatal room error.
+  const [benchRejectedAt, setBenchRejectedAt] = useState<number | null>(null);
 
   useEffect(() => {
     const WS_URL = process.env.NEXT_PUBLIC_PROJECT_HUB_WS_URL ?? 'http://localhost:3001';
@@ -97,6 +108,13 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
     });
 
     socket.on('error', ({ message }: { message: string }) => {
+      // The server reports a refused 'deploy_bench_player' (already used,
+      // not playing, wrong team) on the generic error channel — the match
+      // itself keeps running, so don't tear down the game screen for it.
+      if (message === BENCH_DEPLOY_REJECTED) {
+        setBenchRejectedAt(Date.now());
+        return;
+      }
       setErrorMsg(message);
       setGameStatus('error');
     });
@@ -111,9 +129,16 @@ export function useOnlineGame(gameCode: string, playerToken: string) {
     socketRef.current?.emit('input', input);
   }, []);
 
+  // Server-authoritative: only a request — the snapshot reports whether the
+  // deployment happened. The server maps the connection to its own team, so
+  // only this player's own bench player can ever be deployed.
+  const deployBench = useCallback((playerId: string) => {
+    socketRef.current?.emit('deploy_bench_player', { playerId });
+  }, []);
+
   const startGame = useCallback(() => {
     socketRef.current?.emit('start_game');
   }, []);
 
-  return { snapshot, role, gameStatus, errorMsg, sendInput, startGame, rttMs };
+  return { snapshot, role, gameStatus, errorMsg, sendInput, startGame, rttMs, deployBench, benchRejectedAt };
 }
