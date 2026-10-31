@@ -2,6 +2,7 @@ import type { GameState, InputState, Vec2 } from './types';
 import { createInitialState } from './createInitialState';
 import { updateAI } from './ai';
 import { updateGoalkeepers } from './goalkeeperAI';
+import { isOwnGoal as isOwnGoalKick } from './goalAttribution';
 import { applySupportPositioning } from './supportPositioning';
 import {
   updateBallPhysics,
@@ -139,6 +140,8 @@ function resetPositions(state: GameState): void {
   state.cornerClearCooldown = 0;
   state.lastTouchTeam = null;
   state.lastTouchPlayerId = null;
+  state.lastKickTeam = null;
+  state.lastKickPlayerId = null;
   state.isOwnGoal = false;
   state.isConceded = false;
   state.concededMessage = '';
@@ -305,6 +308,8 @@ export function updateGame(
       previousActive.kickCooldown = KICK_COOLDOWN;
       state.lastTouchTeam = 'home';
       state.lastTouchPlayerId = previousActive.id;
+      state.lastKickTeam = 'home';
+      state.lastKickPlayerId = previousActive.id;
       state.manualActivePlayerId = passTarget.id;
       state.manualLockRemaining = passAndSwitchConfig.manualLockSeconds;
       // While movement is held, the background auto-pick must follow the
@@ -522,6 +527,8 @@ export function updateGame(
       active.kickCooldown = KICK_COOLDOWN;
       state.lastTouchTeam = 'home';
       state.lastTouchPlayerId = active.id;
+      state.lastKickTeam = 'home';
+      state.lastKickPlayerId = active.id;
       // Marks a REAL shot (not a pass, not a cooldown reset) — only read when
       // kickSelfTrapProtectionEnabled (EXPERIMENTAL V2).
       state.kickSelfTrapPlayerId = active.id;
@@ -611,6 +618,9 @@ export function updateGame(
       state.ball.vel.y = dir.y * CORNER_CLEAR_SPEED + (Math.random() - 0.5) * 40;
       state.cornerTimer = 0;
       state.cornerClearCooldown = CORNER_CLEAR_COOLDOWN;
+      // The game moved the ball, not a player — nobody owns what follows.
+      state.lastKickTeam = null;
+      state.lastKickPlayerId = null;
       state.cornerKickCount += 1;
     }
   } else if (!inCorner) {
@@ -621,10 +631,9 @@ export function updateGame(
 
   const scored = checkGoal(state);
   if (scored) {
-    // Own goal: ball scored into team's OWN net by their last touch
-    const isOwnGoal =
-      (scored === 'away' && state.lastTouchTeam === 'home') ||
-      (scored === 'home' && state.lastTouchTeam === 'away');
+    // Own goal only when the conceding team kicked last — a passive touch
+    // (block, deflection, goalkeeper save) never makes one.
+    const isOwnGoal = isOwnGoalKick(scored, state.lastKickTeam);
 
     state.score[scored] += 1;
     state.phase = 'goal';

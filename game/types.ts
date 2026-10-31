@@ -108,9 +108,13 @@ export interface GameState {
   // the shot fires on release, scaled by how long it was held.
   kickWasDown: boolean;
   kickHeldSeconds: number;
-  // Last touch tracking — used for own goal detection
+  // Last player the ball touched, actively or passively (bookkeeping only).
   lastTouchTeam: Team | null;
   lastTouchPlayerId: string | null;
+  // Last ACTIVE play — kick or pass, human or bot. Decides own goals, see
+  // goalAttribution.ts; passive contacts never change it.
+  lastKickTeam: Team | null;
+  lastKickPlayerId: string | null;
   isOwnGoal: boolean;
   // Short extra line shown under the main goal message when the human
   // (home) team just conceded — empty when home scored.

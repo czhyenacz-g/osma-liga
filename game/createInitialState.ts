@@ -124,6 +124,8 @@ export function createInitialState(
     kickHeldSeconds: 0,
     lastTouchTeam: null,
     lastTouchPlayerId: null,
+    lastKickTeam: null,
+    lastKickPlayerId: null,
     isOwnGoal: false,
     isConceded: false,
     concededMessage: '',
