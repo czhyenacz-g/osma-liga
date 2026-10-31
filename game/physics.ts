@@ -50,8 +50,10 @@ const FRICTION_PER_SECOND = 0.35;
 export function updateBallPhysics(state: GameState, dt: number, wallRestitution: number = BALL_WALL_RESTITUTION): void {
   const { ball } = state;
 
+  const from = { ...ball.pos };
   ball.pos.x += ball.vel.x * dt;
   ball.pos.y += ball.vel.y * dt;
+  sweepBallAgainstGoalkeepers(state, from);
 
   // Framerate-independent friction
   const frictionFactor = Math.pow(FRICTION_PER_SECOND, dt);
@@ -173,36 +175,92 @@ export function resolvePlayerBallCollisions(state: GameState, playerRestitution 
       const overlap = minDist - d;
       ball.pos.x += dir.x * (overlap + 1);
       ball.pos.y += dir.y * (overlap + 1);
-      // Elastic reflection (bounce gameplay profile) only applies below
-      // maximum stoppingPower — a player calibrated at the goalkeeper's
-      // stoppingPower=1 baseline skips it entirely (matches the pre-refactor
-      // goalkeeper branch, which always ignored playerRestitution so its
-      // stopping power stayed consistent regardless of gameplay profile).
-      if (playerRestitution > 0 && p.stats.stoppingPower < 1) {
-        const vNormal = ball.vel.x * dir.x + ball.vel.y * dir.y;
-        if (vNormal < 0) {
-          ball.vel.x -= (1 + playerRestitution) * vNormal * dir.x;
-          ball.vel.y -= (1 + playerRestitution) * vNormal * dir.y;
-        }
-      }
-      // Stopping power: linearly interpolates/extrapolates between the
-      // field-player baseline (stoppingPower 0 — no damping, standard
-      // BUMP_FORCE) and the goalkeeper baseline (stoppingPower 1 — heavy
-      // damping, reduced bump) from playerStats.ts's default profiles. At
-      // stoppingPower 0 this reduces exactly to the old field-player impulse
-      // (damping factor 1 is a no-op); at 1 it exactly reproduces the old
-      // goalkeeper branch.
-      const damping = 1 - p.stats.stoppingPower * (1 - GOALKEEPER_BALL_DAMPING);
-      const bump = BUMP_FORCE + p.stats.stoppingPower * (GOALKEEPER_BUMP_FORCE - BUMP_FORCE);
-      ball.vel.x *= damping;
-      ball.vel.y *= damping;
-      ball.vel.x += dir.x * bump;
-      ball.vel.y += dir.y * bump;
-      // Track last touch for own goal detection
-      state.lastTouchTeam = p.team;
-      state.lastTouchPlayerId = p.id;
+      bounceBallOffPlayer(state, p, dir, playerRestitution);
     }
   }
+}
+
+// Velocity response of the ball touching player `p` along the unit normal
+// `dir` (player → ball), plus last-touch bookkeeping. Shared by the overlap
+// resolution above and the goalkeeper sweep below.
+function bounceBallOffPlayer(state: GameState, p: Player, dir: Vec2, playerRestitution: number): void {
+  const { ball } = state;
+  // Elastic reflection (bounce gameplay profile) only applies below
+  // maximum stoppingPower — a player calibrated at the goalkeeper's
+  // stoppingPower=1 baseline skips it entirely (matches the pre-refactor
+  // goalkeeper branch, which always ignored playerRestitution so its
+  // stopping power stayed consistent regardless of gameplay profile).
+  if (playerRestitution > 0 && p.stats.stoppingPower < 1) {
+    const vNormal = ball.vel.x * dir.x + ball.vel.y * dir.y;
+    if (vNormal < 0) {
+      ball.vel.x -= (1 + playerRestitution) * vNormal * dir.x;
+      ball.vel.y -= (1 + playerRestitution) * vNormal * dir.y;
+    }
+  }
+  // Stopping power: linearly interpolates/extrapolates between the
+  // field-player baseline (stoppingPower 0 — no damping, standard
+  // BUMP_FORCE) and the goalkeeper baseline (stoppingPower 1 — heavy
+  // damping, reduced bump) from playerStats.ts's default profiles. At
+  // stoppingPower 0 this reduces exactly to the old field-player impulse
+  // (damping factor 1 is a no-op); at 1 it exactly reproduces the old
+  // goalkeeper branch.
+  const damping = 1 - p.stats.stoppingPower * (1 - GOALKEEPER_BALL_DAMPING);
+  const bump = BUMP_FORCE + p.stats.stoppingPower * (GOALKEEPER_BUMP_FORCE - BUMP_FORCE);
+  ball.vel.x *= damping;
+  ball.vel.y *= damping;
+  ball.vel.x += dir.x * bump;
+  ball.vel.y += dir.y * bump;
+  // Track last touch for own goal detection
+  state.lastTouchTeam = p.team;
+  state.lastTouchPlayerId = p.id;
+}
+
+// ── Goalkeeper swept contact ─────────────────────────────────────────────────
+// The overlap resolution above only sees where the ball ends up. When one
+// step carries it past a goalkeeper's centre (a fast shot at a low frame
+// rate, or a kick that snaps the ball forward right next to him), pushing it
+// out "away from the centre" sends it on into the net — through his body.
+// For goalkeepers only, the ball's straight path from `from` to its current
+// position is checked: if it entered his collision circle and either left it
+// again or got past the point closest to his centre, the ball is put back at
+// the entry point and bounces off there exactly like a normal contact (same
+// hitbox PLAYER_RADIUS + BALL_RADIUS, same damping and bump). A ball that
+// only reaches into him and stays in front is left to the overlap resolution
+// as before. Mirrors project-hub-api src/gameEngine/physics.ts.
+export function sweepBallAgainstGoalkeepers(state: GameState, from: Vec2): Player | null {
+  const { ball } = state;
+  const r = PLAYER_RADIUS + BALL_RADIUS;
+  const dx = ball.pos.x - from.x;
+  const dy = ball.pos.y - from.y;
+  const a = dx * dx + dy * dy;
+  if (a < 1e-9) return null;
+  const removedIds = new Set(state.temporaryRemovals.map((t) => t.playerId));
+
+  let hit: Player | null = null;
+  let hitT = Infinity;
+  for (const p of state.players) {
+    if (p.role !== 'goalkeeper' || p.matchStatus === 'bench' || removedIds.has(p.id)) continue;
+    const fx = from.x - p.pos.x;
+    const fy = from.y - p.pos.y;
+    const c = fx * fx + fy * fy - r * r;
+    if (c <= 0) continue; // already touching at the start — overlap resolution's case
+    const b = 2 * (fx * dx + fy * dy);
+    const disc = b * b - 4 * a * c;
+    if (disc < 0) continue;
+    const t = (-b - Math.sqrt(disc)) / (2 * a);
+    if (t < 0 || t > 1 || t >= hitT) continue;
+    const endsInside = dist(ball.pos, p.pos) < r;
+    const pastClosest = -(fx * dx + fy * dy) / a < 1;
+    if (endsInside && !pastClosest) continue;
+    hit = p;
+    hitT = t;
+  }
+  if (!hit) return null;
+
+  const dir = normalize({ x: from.x + dx * hitT - hit.pos.x, y: from.y + dy * hitT - hit.pos.y });
+  ball.pos = { x: hit.pos.x + dir.x * (r + 1), y: hit.pos.y + dir.y * (r + 1) };
+  bounceBallOffPlayer(state, hit, dir, 0);
+  return hit;
 }
 
 // Lets a non-active, available teammate "receive" a slow/catchable ball

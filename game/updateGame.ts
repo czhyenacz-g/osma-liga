@@ -8,6 +8,7 @@ import {
   updateBallPhysics,
   checkGoal,
   resolvePlayerBallCollisions,
+  sweepBallAgainstGoalkeepers,
   dist, normalize, clampPos,
   snapBallInFrontOfKicker, separateSameTeamPlayers, findTeammateBallReceive,
 } from './physics';
@@ -205,6 +206,10 @@ export function updateGame(
     }
   }
   const gameplayConfig = resolveEffectiveGameplayConfig(state.gameplayProfile, state.activeGameplayModifier);
+  // Where the ball stood when this frame began — a kick below may snap it
+  // forward, and it must not be snapped through a goalkeeper (see
+  // sweepBallAgainstGoalkeepers).
+  const ballFrom = { ...state.ball.pos };
 
   // ── Temporary removals (MVP: random substitution) ────────────────────────
   // Runs before active-player resolution so a freshly removed player is
@@ -564,6 +569,7 @@ export function updateGame(
 
   // ── Physics ───────────────────────────────────────────────────────────────
 
+  sweepBallAgainstGoalkeepers(state, ballFrom);
   resolvePlayerBallCollisions(state, gameplayConfig.playerBallRestitution);
 
   // Teammate ball receive — a slow/catchable ball contact on a non-active
