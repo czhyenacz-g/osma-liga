@@ -139,5 +139,9 @@ export function createInitialState(
     gameplayProfile,
     activeGameplayModifier: 'none',
     gameplayModifierRemainingSeconds: 0,
+    kickSelfTrapPlayerId: null,
+    kickSelfTrapRemaining: 0,
+    lastMoveDir: null,
+    turnAssistRemaining: 0,
   };
 }

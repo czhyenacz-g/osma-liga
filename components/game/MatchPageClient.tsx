@@ -66,8 +66,8 @@ interface Props {
   // bot-dis training variant: away team AI disabled, longer match duration.
   disableOpponentAI?: boolean;
   matchDurationSeconds?: number;
-  // Gameplay profile for this match (see game/gameplayProfiles.ts) — only
-  // ever set by /hra/bot-dis today.
+  // Gameplay profile (see game/gameplayProfiles.ts) — only set by
+  // /hra/bot-dis and /hra/bot-test; changes apply live to the running match.
   gameplayProfile?: GameplayProfile;
   // Debug-only: lets the 'B' key trigger "Bounce Time!" — only set by
   // /hra/bot-dis, never by the regular /hra/bot page.

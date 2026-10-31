@@ -134,6 +134,16 @@ export interface GameState {
   gameplayProfile: GameplayProfile;
   activeGameplayModifier: GameplayModifier;
   gameplayModifierRemainingSeconds: number;
+  // EXPERIMENTAL V2 ball physics bookkeeping (gameplayProfiles.ts) — only
+  // read when the matching profile flag is on; classic never looks at it.
+  // Who fired the last real shot and how long its self-trap protection
+  // still runs (s).
+  kickSelfTrapPlayerId: string | null;
+  kickSelfTrapRemaining: number;
+  // Last non-zero held direction (unit vector) and the remaining turn
+  // assist (s) for the active player.
+  lastMoveDir: Vec2 | null;
+  turnAssistRemaining: number;
 }
 
 export interface InputState {

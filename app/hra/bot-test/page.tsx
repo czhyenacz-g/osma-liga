@@ -3,7 +3,7 @@ import Link from 'next/link';
 import GameNavLink from '@/components/ui/GameNavLink';
 import { CLUBS } from '@/data/clubs';
 import BotTestClient from './BotTestClient';
-import { resolveMode } from './botTestModes';
+import { resolveMode, resolvePhysics } from './botTestModes';
 import { notFoundInProduction } from '@/lib/devRoutes';
 
 export const metadata: Metadata = {
@@ -13,11 +13,12 @@ export const metadata: Metadata = {
 export default async function HraBotTestPage({
   searchParams,
 }: {
-  searchParams: Promise<{ club?: string; mode?: string }>;
+  searchParams: Promise<{ club?: string; mode?: string; physics?: string }>;
 }) {
   notFoundInProduction();
-  const { club: clubSlug, mode: modeParam } = await searchParams;
+  const { club: clubSlug, mode: modeParam, physics: physicsParam } = await searchParams;
   const initialMode = resolveMode(modeParam);
+  const initialPhysics = resolvePhysics(physicsParam);
 
   return (
     <main
@@ -34,7 +35,7 @@ export default async function HraBotTestPage({
         </h1>
       </div>
 
-      <BotTestClient initialMode={initialMode} homeClubSlug={clubSlug} />
+      <BotTestClient initialMode={initialMode} initialPhysics={initialPhysics} homeClubSlug={clubSlug} />
 
       <p className="hidden sm:block text-sm text-center font-semibold" style={{ color: 'rgba(209,250,229,0.65)' }}>
         <span style={{ color: '#d6a94a' }}>WASD</span> / šipky &mdash; pohyb

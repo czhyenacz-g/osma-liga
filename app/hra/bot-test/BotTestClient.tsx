@@ -2,19 +2,24 @@
 
 import { useState, useCallback } from 'react';
 import MatchPageClient from '@/components/game/MatchPageClient';
-import { VALID_MODES, MODE_CONFIG } from './botTestModes';
-import type { BotTestMode } from './botTestModes';
+import { VALID_MODES, MODE_CONFIG, PHYSICS_OPTIONS, resolveBotTestProfile } from './botTestModes';
+import type { BotTestMode, BotTestPhysics } from './botTestModes';
 
 interface Props {
   initialMode: BotTestMode;
+  initialPhysics: BotTestPhysics;
   homeClubSlug?: string;
 }
 
-export default function BotTestClient({ initialMode, homeClubSlug }: Props) {
+export default function BotTestClient({ initialMode, initialPhysics, homeClubSlug }: Props) {
   const [runtimeMode, setRuntimeMode] = useState<BotTestMode>(initialMode);
+  const [physics, setPhysics] = useState<BotTestPhysics>(initialPhysics);
   const [bounceTimeActive, setBounceTimeActive] = useState(false);
 
   const config = MODE_CONFIG[runtimeMode];
+  // Applied live to the running match (GameCanvas) — no restart.
+  const gameplayProfile = resolveBotTestProfile(runtimeMode, physics);
+  const physicsLocked = config.gameplayProfile !== 'classic';
 
   const handleBounceTimeChange = useCallback((active: boolean) => {
     setBounceTimeActive(active);
@@ -54,13 +59,44 @@ export default function BotTestClient({ initialMode, homeClubSlug }: Props) {
             <span style={{ color: '#6dbf8a', marginLeft: 8 }}>· BOUNCE TIME!</span>
           )}
         </p>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontFamily: 'monospace', color: 'rgba(209,250,229,0.55)' }}>
+          Fyzika
+          <select
+            aria-label="Fyzika"
+            data-physics-profile={gameplayProfile}
+            value={physicsLocked ? 'classic' : physics}
+            disabled={physicsLocked}
+            onChange={(e) => {
+              setPhysics(e.target.value as BotTestPhysics);
+              // Hand the keyboard back to the game right away.
+              e.target.blur();
+            }}
+            style={{
+              fontSize: 11,
+              padding: '2px 4px',
+              borderRadius: 4,
+              border: `1px solid ${physics !== 'classic' && !physicsLocked ? 'rgba(214,169,74,0.7)' : 'rgba(109,191,138,0.3)'}`,
+              background: '#06291b',
+              color: physics !== 'classic' && !physicsLocked ? '#d6a94a' : '#6dbf8a',
+              fontFamily: 'monospace',
+            }}
+          >
+            {PHYSICS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          {physicsLocked && <span style={{ color: 'rgba(209,250,229,0.3)' }}>(bounce)</span>}
+        </label>
+        <p style={{ fontSize: 10, color: 'rgba(209,250,229,0.3)', fontFamily: 'monospace', margin: 0, textAlign: 'center' }}>
+          Mění se hned, bez restartu · délka zápasu až po R
+        </p>
       </div>
 
       <MatchPageClient
         homeClubSlug={homeClubSlug}
         disableOpponentAI={config.disableOpponentAI}
         matchDurationSeconds={config.matchDurationSeconds}
-        gameplayProfile={config.gameplayProfile}
+        gameplayProfile={gameplayProfile}
         enableBounceTimeDebug={config.enableBounceTimeDebug}
         onBounceTimeChange={handleBounceTimeChange}
       />

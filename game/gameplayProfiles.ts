@@ -3,9 +3,15 @@ import { BALL_WALL_RESTITUTION } from './constants';
 // Named gameplay profiles — a config layer on top of the single shared
 // engine (updateGame.ts), not a second engine. `classic` reproduces today's
 // behavior exactly; `v2`/`bounce` are alternate parameter sets for the same
-// code paths. Currently only reachable via /hra/bot-dis (?profile=...) —
-// /hra/bot, multiplayer and training challenge always resolve to `classic`.
-export type GameplayProfile = 'classic' | 'v2' | 'bounce';
+// code paths. Currently only reachable via /hra/bot-dis (?profile=...) and
+// the /hra/bot-test physics switch — /hra/bot, multiplayer and training
+// challenge always resolve to `classic`.
+//
+// `v2-shot` / `v2-turn` are EXPERIMENTAL ball-control variants (see
+// docs/gameplay-physics-contract.md) — test-only, never a production default:
+//   v2-shot = classic + kickSelfTrapProtection
+//   v2-turn = v2-shot + turnAssist
+export type GameplayProfile = 'classic' | 'v2' | 'bounce' | 'v2-shot' | 'v2-turn';
 
 export interface GameplayProfileConfig {
   profile: GameplayProfile;
@@ -18,7 +24,36 @@ export interface GameplayProfileConfig {
   ballControlEnabled: boolean;
   ballRetentionEnabled: boolean;
   teammateReceiveEnabled: boolean;
+  // EXPERIMENTAL — after the active player actually fires a shot, its own
+  // ball control (soft trap + retention) stays off for
+  // BALL_PHYSICS_V2.kickSelfTrapProtectionSeconds so it can't brake its own
+  // shot (today that braking scales with the display's refresh rate).
+  kickSelfTrapProtectionEnabled: boolean;
+  // EXPERIMENTAL — on a sharp direction change while controlling the ball
+  // with no opponent close, the active player is briefly slowed so the
+  // existing ball control can bring the ball round to the new side.
+  turnAssistEnabled: boolean;
 }
+
+// Tunables for the experimental V2 flags above — one place, not final.
+export const BALL_PHYSICS_V2 = {
+  // Time window (s) after a real shot during which the shooter's own ball
+  // control is not applied. Time-based (dt), independent of frame count.
+  kickSelfTrapProtectionSeconds: 0.25,
+  // A turn counts when the held direction changes by at least this much
+  // versus the last held direction.
+  turnAssistMinAngleDeg: 60,
+  // Longest the slow-down may last per turn (s).
+  turnAssistMaxSeconds: 0.3,
+  // Player speed (px/s) while the assist runs (normal: stats.speed, 210).
+  turnAssistPlayerSpeed: 130,
+  // Ends early once the ball sits within this angle in front of the new
+  // direction.
+  turnAssistBallInFrontDeg: 45,
+  // No assist with an opponent this close to the ball — same threshold as
+  // ball retention (BALL_RETENTION_NO_OPPONENT_RADIUS), duels stay real.
+  turnAssistNoOpponentRadius: 70,
+} as const;
 
 export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> = {
   classic: {
@@ -29,6 +64,8 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     ballControlEnabled: true,
     ballRetentionEnabled: true,
     teammateReceiveEnabled: true,
+    kickSelfTrapProtectionEnabled: false,
+    turnAssistEnabled: false,
   },
   // Placeholder for a future simpler/fairer engine tune — intentionally
   // identical to classic for now. Exists so /hra/bot-dis?profile=v2 already
@@ -41,6 +78,8 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     ballControlEnabled: true,
     ballRetentionEnabled: true,
     teammateReceiveEnabled: true,
+    kickSelfTrapProtectionEnabled: false,
+    turnAssistEnabled: false,
   },
   // Pongier/pinball-ier: near-elastic wall bounces, no kick, no soft
   // ball-control trap, no retention, no teammate receive — ball just bounces.
@@ -52,6 +91,30 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     ballControlEnabled: false,
     ballRetentionEnabled: false,
     teammateReceiveEnabled: false,
+    kickSelfTrapProtectionEnabled: false,
+    turnAssistEnabled: false,
+  },
+  'v2-shot': {
+    profile: 'v2-shot',
+    wallRestitution: BALL_WALL_RESTITUTION,
+    playerBallRestitution: 0,
+    kickEnabled: true,
+    ballControlEnabled: true,
+    ballRetentionEnabled: true,
+    teammateReceiveEnabled: true,
+    kickSelfTrapProtectionEnabled: true,
+    turnAssistEnabled: false,
+  },
+  'v2-turn': {
+    profile: 'v2-turn',
+    wallRestitution: BALL_WALL_RESTITUTION,
+    playerBallRestitution: 0,
+    kickEnabled: true,
+    ballControlEnabled: true,
+    ballRetentionEnabled: true,
+    teammateReceiveEnabled: true,
+    kickSelfTrapProtectionEnabled: true,
+    turnAssistEnabled: true,
   },
 };
 
@@ -60,7 +123,7 @@ export const DEFAULT_GAMEPLAY_PROFILE: GameplayProfile = 'classic';
 // Parses a `?profile=` query value; any unrecognized value falls back to
 // the default profile rather than erroring.
 export function resolveGameplayProfile(value: string | undefined | null): GameplayProfile {
-  if (value === 'classic' || value === 'v2' || value === 'bounce') return value;
+  if (value === 'classic' || value === 'v2' || value === 'bounce' || value === 'v2-shot' || value === 'v2-turn') return value;
   return DEFAULT_GAMEPLAY_PROFILE;
 }
 

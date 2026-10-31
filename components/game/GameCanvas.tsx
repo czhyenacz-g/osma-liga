@@ -56,8 +56,9 @@ interface Props {
   // bot-dis training variant: away team AI disabled, longer match duration.
   disableOpponentAI?: boolean;
   matchDurationSeconds?: number;
-  // Gameplay profile for this match (see gameplayProfiles.ts) — only ever
-  // set by /hra/bot-dis today.
+  // Gameplay profile (see gameplayProfiles.ts) — only ever set by /hra/bot-dis
+  // and /hra/bot-test. Applied live: changing it mid-match switches the
+  // running match's physics without a restart.
   gameplayProfile?: GameplayProfile;
   // Debug-only: lets the 'B' key trigger "Bounce Time!" — only wired up by
   // /hra/bot-dis, never by the regular /hra/bot page.
@@ -194,6 +195,18 @@ export default function GameCanvas({
         const req = benchDeployRequestRef.current;
         deployBenchPlayer(gameState, 'home', req.playerId, req.role);
         benchDeployRequestRef.current = null;
+      }
+
+      // Live physics-profile switch (/hra/bot-test): the profile prop is read
+      // through the ref every frame and applied to the running match — no
+      // restart, score/positions/timers untouched. Pages that don't pass a
+      // profile (/hra/bot) never enter this branch and stay on 'classic'.
+      const liveProfile = gameModeConfigRef.current.gameplayProfile;
+      if (liveProfile && gameState.gameplayProfile !== liveProfile) {
+        gameState.gameplayProfile = liveProfile;
+        gameState.kickSelfTrapPlayerId = null;
+        gameState.kickSelfTrapRemaining = 0;
+        gameState.turnAssistRemaining = 0;
       }
 
       const wasRestart = merged.restart;

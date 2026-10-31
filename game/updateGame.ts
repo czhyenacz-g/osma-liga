@@ -39,7 +39,7 @@ import {
   hasBallControl, findBestPassTarget, computePassVelocity, findNearestTeammateToBall,
 } from './passAndSwitch';
 import {
-  GameplayProfile, resolveEffectiveGameplayConfig,
+  GameplayProfile, resolveEffectiveGameplayConfig, BALL_PHYSICS_V2,
 } from './gameplayProfiles';
 
 const GOAL_MESSAGES = [
@@ -349,9 +349,51 @@ export function updateGame(
 
   // Normalize diagonal movement
   const mvLen = Math.sqrt(mvx * mvx + mvy * mvy);
+
+  // EXPERIMENTAL V2 timers (time-based, so frame-rate independent).
+  if (state.kickSelfTrapRemaining > 0) {
+    state.kickSelfTrapRemaining = Math.max(0, state.kickSelfTrapRemaining - dt);
+    if (state.kickSelfTrapRemaining === 0) state.kickSelfTrapPlayerId = null;
+  }
+  // Own shot still protected from this player's own ball control?
+  const selfTrapProtected = gameplayConfig.kickSelfTrapProtectionEnabled
+    && state.kickSelfTrapRemaining > 0
+    && state.kickSelfTrapPlayerId === active.id;
+
+  // EXPERIMENTAL V2 turn assist — slows the active player briefly on a
+  // sharp turn while it controls the ball with no opponent near, so the
+  // EXISTING ball control has time to bring the ball round. Adds no force
+  // to the ball; collisions and duels are untouched.
+  let speed = active.stats.speed;
   if (mvLen > 0) {
-    mvx = (mvx / mvLen) * active.stats.speed;
-    mvy = (mvy / mvLen) * active.stats.speed;
+    const dir = { x: mvx / mvLen, y: mvy / mvLen };
+    if (gameplayConfig.turnAssistEnabled && gameplayConfig.ballControlEnabled && !input.kick && !selfTrapProtected) {
+      const ballDist = dist(active.pos, state.ball.pos);
+      const noOpponent = nearestOpponentDistance(state, state.ball.pos, 'home') > BALL_PHYSICS_V2.turnAssistNoOpponentRadius;
+      const prev = state.lastMoveDir;
+      const turnDeg = prev ? Math.acos(Math.max(-1, Math.min(1, prev.x * dir.x + prev.y * dir.y))) * 180 / Math.PI : 0;
+      if (prev && turnDeg >= BALL_PHYSICS_V2.turnAssistMinAngleDeg && ballDist < BALL_CONTROL_RADIUS && noOpponent) {
+        state.turnAssistRemaining = BALL_PHYSICS_V2.turnAssistMaxSeconds;
+      }
+      if (state.turnAssistRemaining > 0) {
+        const bx = state.ball.pos.x - active.pos.x;
+        const by = state.ball.pos.y - active.pos.y;
+        const bLen = Math.hypot(bx, by);
+        const ballInFront = bLen > 0.001
+          && (bx * dir.x + by * dir.y) / bLen >= Math.cos(BALL_PHYSICS_V2.turnAssistBallInFrontDeg * Math.PI / 180);
+        if (ballInFront || ballDist >= BALL_CONTROL_RADIUS || !noOpponent) {
+          state.turnAssistRemaining = 0;
+        } else {
+          speed = Math.min(speed, BALL_PHYSICS_V2.turnAssistPlayerSpeed);
+          state.turnAssistRemaining = Math.max(0, state.turnAssistRemaining - dt);
+        }
+      }
+    } else {
+      state.turnAssistRemaining = 0;
+    }
+    state.lastMoveDir = dir;
+    mvx = dir.x * speed;
+    mvy = dir.y * speed;
   }
 
   active.vel.x = mvx;
@@ -373,13 +415,13 @@ export function updateGame(
   // deactivated entirely by gameplayConfig.ballControlEnabled (e.g. the
   // 'bounce' profile / Bounce Time modifier) — classic/v2 keep it on.
 
-  if (gameplayConfig.ballControlEnabled && !input.kick && activeDist < BALL_CONTROL_RADIUS) {
+  if (gameplayConfig.ballControlEnabled && !input.kick && !selfTrapProtected && activeDist < BALL_CONTROL_RADIUS) {
     state.ball.vel.x *= BALL_CONTROL_DAMPING;
     state.ball.vel.y *= BALL_CONTROL_DAMPING;
 
     const hasInput = mvLen > 0.1;
     const targetDir = hasInput
-      ? { x: mvx / active.stats.speed, y: mvy / active.stats.speed }
+      ? { x: mvx / speed, y: mvy / speed }
       : normalize({ x: FIELD_R - active.pos.x, y: FIELD_CY - active.pos.y });
 
     const targetPoint = {
@@ -430,7 +472,7 @@ export function updateGame(
     if (state.kickWasDown && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
       let kickDir: Vec2;
       if (mvLen > 0.1) {
-        kickDir = { x: mvx / active.stats.speed, y: mvy / active.stats.speed };
+        kickDir = { x: mvx / speed, y: mvy / speed };
       } else {
         kickDir = normalize({
           x: FIELD_R - state.ball.pos.x,
@@ -467,6 +509,10 @@ export function updateGame(
       active.kickCooldown = KICK_COOLDOWN;
       state.lastTouchTeam = 'home';
       state.lastTouchPlayerId = active.id;
+      // Marks a REAL shot (not a pass, not a cooldown reset) — only read when
+      // kickSelfTrapProtectionEnabled (EXPERIMENTAL V2).
+      state.kickSelfTrapPlayerId = active.id;
+      state.kickSelfTrapRemaining = BALL_PHYSICS_V2.kickSelfTrapProtectionSeconds;
     }
     state.kickWasDown = false;
     state.kickHeldSeconds = 0;
