@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
+// Bot a online mají hlavní CTA v hero hned nad výsledky; tady jen to, co
+// hero nenabízí.
 const ITEMS = [
-  { title: 'Proti botovi', text: 'Rychlý zápas hned teď, bez čekání na soupeře.', href: '/hra/bot' },
-  { title: 'Online', text: 'Založ zápas, nebo se připoj k čekající výzvě.', href: '/hra/multiplayer' },
   { title: 'Turnaje', text: 'Založ turnaj pro partu a hrajte o titul okresu.', href: '/turnaj' },
   { title: 'Kluby', text: 'Prohlédni si kluby Osmé ligy.', href: '/kluby' },
 ];
@@ -10,7 +10,7 @@ const ITEMS = [
 export default function QuickNavGrid() {
   return (
     <section className="px-4 py-10" style={{ background: '#041f14' }}>
-      <div className="mx-auto grid max-w-[1240px] grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+      <div className="mx-auto grid max-w-[1240px] grid-cols-2 gap-3 sm:gap-4">
         {ITEMS.map((item) => (
           <Link
             key={item.title}

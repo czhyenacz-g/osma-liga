@@ -12,6 +12,7 @@
 | Backend (`project-hub-api`) | Hetzner VPS (`178.104.20.225`) | Docker Compose, Nginx reverse proxy, Certbot HTTPS. |
 | Databáze | Hetzner, Docker síť `project-hub-net` | PostgreSQL 17-alpine, **bez veřejného portu**. |
 | Domény | `osmaliga.cz` (frontend), `api.osmaliga.cz` (backend) | DNS mimo scope tohoto repa. |
+| Ligové domény | `tretiliga.cz`, `ctvrtaliga.cz`, `pataliga.cz`, `sestaliga.cz`, `sedmaliga.cz` (DNS Websupport) | 301 na `/<liga>` přes **dva skoky** (`http://www.osmaliga.cz/…` → https). Lepší jeden skok rovnou na `https://www.osmaliga.cz/<liga>` — nastavení u registrátora, ne v kódu. |
 
 ## Vercel (frontend)
 

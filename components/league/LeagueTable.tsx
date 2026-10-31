@@ -12,7 +12,7 @@ export default async function LeagueTable() {
   const hasMatches = standings.some((entry) => entry.stats.matches > 0);
 
   return (
-    <section id="vysledky" className="bg-white border-b border-gray-200 py-12">
+    <section id="tabulka" className="bg-white border-b border-gray-200 py-12">
       <div className="mx-auto max-w-2xl px-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2 mb-6">
           <h2 className="text-xl font-black text-gray-900">Tabulka</h2>

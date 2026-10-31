@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: absoluteUrl("/"), lastModified: now, changeFrequency: "weekly", priority: 1 },
     { url: absoluteUrl("/kluby"), lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: absoluteUrl("/turnaj"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
   ];
 
   const leagueRoutes: MetadataRoute.Sitemap = LEAGUE_LANDING_PAGES.map((league) => ({
