@@ -26,8 +26,9 @@ function flatten(m: ContractMetrics): Flat {
 }
 
 function tolerance(key: string, ref: number): number {
-  if (key === 'shotTravel' || key === 'ballSpeed') return Math.max(TOLERANCE.positionPx, Math.abs(ref) * TOLERANCE.relative);
+  if (key === 'shotTravel' || key === 'ballSpeed' || key === 'maxBallSpeed') return Math.max(TOLERANCE.positionPx, Math.abs(ref) * TOLERANCE.relative);
   if (key === 'lossSeconds') return TOLERANCE.lossSeconds;
+  if (key === 'frontSeconds') return TOLERANCE.lossSeconds;
   if (key === 'benchSeconds') return TOLERANCE.benchSeconds;
   if (key.endsWith('relDeg')) return TOLERANCE.relDeg;
   return TOLERANCE.positionPx;
@@ -45,7 +46,7 @@ function differences(a: ContractMetrics, b: ContractMetrics): string[] {
 }
 
 const server = serverBaseline.scenarios as Record<string, ContractMetrics>;
-const baseline = localBaseline as Record<string, Record<string, ContractMetrics>>;
+const baseline = localBaseline as Record<string, Record<string, Record<string, ContractMetrics>>>;
 const byName = (name: string) => CONTRACT_SCENARIOS.find((s) => s.name === name)!;
 const local = (name: string, hz = 60, profile: Parameters<typeof runLocalContractScenario>[2] = 'classic') =>
   runLocalContractScenario(byName(name), hz, profile);
@@ -91,13 +92,18 @@ describe('physics contract — local (60 Hz) vs server (30 Hz) on the same scena
   }
 });
 
-describe('physics contract — production classic profile does not drift', () => {
-  for (const hz of [30, 60, 120, 144]) {
-    it(`classic @ ${hz} Hz matches local-baseline.json`, () => {
-      for (const sc of CONTRACT_SCENARIOS) {
-        expect(differences(local(sc.name, hz), baseline[hz][sc.name]), `${sc.name} @ ${hz} Hz`).toEqual([]);
-      }
-    });
+// local-baseline.json was generated from the engine BEFORE the V3
+// experiment (classic = production, v2-* = earlier experiments) — later
+// experiments must leave all of them untouched.
+describe('physics contract — existing profiles do not drift', () => {
+  for (const profile of ['classic', 'v2-shot', 'v2-turn'] as const) {
+    for (const hz of [30, 60, 120, 144]) {
+      it(`${profile} @ ${hz} Hz matches local-baseline.json`, () => {
+        for (const sc of CONTRACT_SCENARIOS) {
+          expect(differences(local(sc.name, hz, profile), baseline[profile][hz][sc.name]), `${sc.name} @ ${hz} Hz`).toEqual([]);
+        }
+      });
+    }
   }
 });
 

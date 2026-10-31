@@ -41,6 +41,7 @@ import {
 import {
   GameplayProfile, resolveEffectiveGameplayConfig, BALL_PHYSICS_V2,
 } from './gameplayProfiles';
+import { updateDribblePrep, applyDribblePrepBallControl, resetDribblePrep } from './dribblePrep';
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
@@ -365,6 +366,16 @@ export function updateGame(
   // EXISTING ball control has time to bring the ball round. Adds no force
   // to the ball; collisions and duels are untouched.
   let speed = active.stats.speed;
+  // EXPERIMENTAL V3 prepared turn (dribblePrep.ts) — speed cap while the
+  // ball is carried round; Infinity = no effect.
+  let dribblePrepSpeed = Infinity;
+  if (gameplayConfig.dribblePrepEnabled && gameplayConfig.ballControlEnabled) {
+    dribblePrepSpeed = updateDribblePrep(
+      state, active, mvLen > 0 ? { x: mvx / mvLen, y: mvy / mvLen } : null, input.kick, selfTrapProtected, dt,
+    );
+  } else if (state.dribblePrep.phase !== 'none') {
+    resetDribblePrep(state);
+  }
   if (mvLen > 0) {
     const dir = { x: mvx / mvLen, y: mvy / mvLen };
     if (gameplayConfig.turnAssistEnabled && gameplayConfig.ballControlEnabled && !input.kick && !selfTrapProtected) {
@@ -391,6 +402,7 @@ export function updateGame(
     } else {
       state.turnAssistRemaining = 0;
     }
+    speed = Math.min(speed, dribblePrepSpeed);
     state.lastMoveDir = dir;
     mvx = dir.x * speed;
     mvy = dir.y * speed;
@@ -415,7 +427,8 @@ export function updateGame(
   // deactivated entirely by gameplayConfig.ballControlEnabled (e.g. the
   // 'bounce' profile / Bounce Time modifier) — classic/v2 keep it on.
 
-  if (gameplayConfig.ballControlEnabled && !input.kick && !selfTrapProtected && activeDist < BALL_CONTROL_RADIUS) {
+  const dribblePrepHandled = gameplayConfig.dribblePrepEnabled && applyDribblePrepBallControl(state, active, dt);
+  if (!dribblePrepHandled && gameplayConfig.ballControlEnabled && !input.kick && !selfTrapProtected && activeDist < BALL_CONTROL_RADIUS) {
     state.ball.vel.x *= BALL_CONTROL_DAMPING;
     state.ball.vel.y *= BALL_CONTROL_DAMPING;
 

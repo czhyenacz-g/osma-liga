@@ -6,6 +6,7 @@ import {
 } from './constants';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, TemporaryRemovalConfig, pickRandomTriggerSecond } from './temporaryRemoval';
 import { DEFAULT_GAMEPLAY_PROFILE, GameplayProfile } from './gameplayProfiles';
+import { createDribblePrepState } from './dribblePrep';
 import { DEFAULT_FIELD_PLAYER_STATS, DEFAULT_GOALKEEPER_STATS } from './playerStats';
 
 function makePlayer(
@@ -143,5 +144,6 @@ export function createInitialState(
     kickSelfTrapRemaining: 0,
     lastMoveDir: null,
     turnAssistRemaining: 0,
+    dribblePrep: createDribblePrepState(),
   };
 }

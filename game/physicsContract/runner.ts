@@ -12,7 +12,8 @@ export interface EngineAdapter {
   step(input: ContractInput, dt: number): void;
   player(): Pos;
   ball(): Pos & { vx: number; vy: number };
-  defender(): Pos | null;
+  // All opponent field players in play (contacts count against any).
+  defenders(): Pos[];
   scored(): boolean;
   controlRadius: number;
   // Player + ball radius: a defender "contact" is the ball inside it.
@@ -33,7 +34,7 @@ export function runContractScenario(sc: ContractScenario, e: EngineAdapter, dt: 
   let minPlayerY = Infinity, maxPlayerY = -Infinity;
   let markT: number | null = null, releaseT: number | null = null, ballAtRelease = 0, shotTravel: number | null = null;
   let heading: Pos | null = null;
-  let kickWasHeld = false;
+  let kickWasHeld = false, maxBallSpeed = 0, frontSince: number | null = null, frontSeconds: number | null = null;
   const at: ContractMetrics['at'] = {};
 
   for (const step of sc.steps) {
@@ -50,13 +51,22 @@ export function runContractScenario(sc: ContractScenario, e: EngineAdapter, dt: 
       maxPlayerY = Math.max(maxPlayerY, p.y);
       const d = Math.hypot(b.x - p.x, b.y - p.y);
       if (d > e.controlRadius) lossSeconds += dt;
-      const def = e.defender();
-      if (def) {
-        const now = Math.hypot(b.x - def.x, b.y - def.y) < e.contactDist + 0.5;
+      const defs = e.defenders();
+      if (defs.length) {
+        const now = defs.some((def) => Math.hypot(b.x - def.x, b.y - def.y) < e.contactDist + 0.5);
         if (now && !touching) contacts++;
         touching = now;
       }
       heading = dirOf(step.input) ?? heading;
+      maxBallSpeed = Math.max(maxBallSpeed, Math.hypot(b.vx, b.vy));
+      if (markT !== null && frontSeconds === null && heading) {
+        const cos = d > 0.001 ? ((b.x - p.x) * heading.x + (b.y - p.y) * heading.y) / d : 0;
+        const inFront = d <= 50 && cos >= Math.cos(Math.PI / 6);
+        if (inFront) {
+          if (frontSince === null) frontSince = t - markT;
+          if (t - markT - frontSince >= 0.2 - 1e-9) frontSeconds = round(frontSince);
+        } else frontSince = null;
+      }
       if (markT !== null && heading) {
         for (const probe of sc.probes ?? []) {
           if (at[probe] || t - markT < Number(probe) - 1e-9) continue;
@@ -72,6 +82,7 @@ export function runContractScenario(sc: ContractScenario, e: EngineAdapter, dt: 
   return {
     playerX: round(p.x), playerY: round(p.y), minPlayerY: round(minPlayerY), maxPlayerY: round(maxPlayerY),
     ballX: round(b.x), ballY: round(b.y), ballSpeed: round(Math.hypot(b.vx, b.vy)),
-    lossSeconds: round(lossSeconds), contacts, shotTravel, goal, at,
+    lossSeconds: round(lossSeconds), contacts, shotTravel, goal,
+    frontSeconds: markT === null ? null : frontSeconds, maxBallSpeed: round(maxBallSpeed), at,
   };
 }

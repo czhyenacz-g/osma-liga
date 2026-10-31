@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { MutableRefObject } from 'react';
-import { CANVAS_W, CANVAS_H, FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CY, BALL_RADIUS, KICK_MAX_CHARGE_MS, PLAYER_RADIUS } from '@/game/constants';
+import { CANVAS_W, CANVAS_H, FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CY, BALL_RADIUS, KICK_MAX_CHARGE_MS, PLAYER_RADIUS, BALL_CONTROL_RADIUS } from '@/game/constants';
 import { createInitialState } from '@/game/createInitialState';
 import { createInputState, attachInputListeners } from '@/game/input';
 import { updateGame } from '@/game/updateGame';
@@ -23,6 +23,7 @@ import {
 import type { GameState, InputState, TouchInput, PlayerMatchStatus, BenchRole } from '@/game/types';
 import type { GameplayProfile } from '@/game/gameplayProfiles';
 import { BOUNCE_TIME_DURATION_SECONDS } from '@/game/gameplayProfiles';
+import { resetDribblePrep } from '@/game/dribblePrep';
 import { deployBenchPlayer } from '@/game/benchDeployment';
 
 export interface BenchDeployRequest {
@@ -70,18 +71,26 @@ interface Props {
   // Throttled (~every BENCH_UI_THROTTLE_MS) snapshot of the home team's
   // bench players, for BenchPanel — see game/benchDeployment.ts.
   onBenchStateChange?: (bench: BenchPlayerUiState[]) => void;
+  // /hra/bot-test only: the human's ball status for the small physics
+  // indicator — fires only when it changes.
+  onDribbleStatusChange?: (status: DribbleStatus) => void;
 }
+
+export type DribbleStatus = 'control' | 'prep' | 'loose';
 
 export default function GameCanvas({
   onMatchEnd, onRestart, onFirstGoal, onSubstitution, onBounceTimeChange, touchInputRef, homeTeamName,
   disableOpponentAI, matchDurationSeconds, gameplayProfile, enableBounceTimeDebug,
-  benchDeployRequestRef, onBenchStateChange,
+  benchDeployRequestRef, onBenchStateChange, onDribbleStatusChange,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRendererRef = useRef<PlayerRendererHandle>(null);
 
   // These refs allow the RAF loop to read the latest prop values each tick
   // without the effect restarting (and resetting the match) on every change.
+  // Read through a ref so the parent re-rendering never restarts the loop.
+  const onDribbleStatusChangeRef = useRef(onDribbleStatusChange);
+  onDribbleStatusChangeRef.current = onDribbleStatusChange;
   const gameModeConfigRef = useRef({ disableOpponentAI, matchDurationSeconds, gameplayProfile });
   gameModeConfigRef.current = { disableOpponentAI, matchDurationSeconds, gameplayProfile };
   const enableBounceTimeDebugRef = useRef(enableBounceTimeDebug);
@@ -141,6 +150,7 @@ export default function GameCanvas({
     let prevPhase = gameState.phase;
     let firstGoalFired = false;
     let prevBounceTimeActive = gameState.activeGameplayModifier !== 'none';
+    let prevDribbleStatus: DribbleStatus | null = null;
     let prevRemovalIds = new Set(gameState.temporaryRemovals.map((r) => r.playerId));
     // Purely cosmetic rolling rotation for the SVG-style football (see
     // drawFootball.ts) — an arc-length/radius approximation, never read by
@@ -207,6 +217,7 @@ export default function GameCanvas({
         gameState.kickSelfTrapPlayerId = null;
         gameState.kickSelfTrapRemaining = 0;
         gameState.turnAssistRemaining = 0;
+        resetDribblePrep(gameState);
       }
 
       const wasRestart = merged.restart;
@@ -375,6 +386,19 @@ export default function GameCanvas({
       if (bounceTimeActive !== prevBounceTimeActive) {
         prevBounceTimeActive = bounceTimeActive;
         onBounceTimeChange?.(bounceTimeActive);
+      }
+
+      if (onDribbleStatusChangeRef.current) {
+        const me = gameState.players.find((p) => p.id === gameState.activePlayerId);
+        const status: DribbleStatus = gameState.dribblePrep.phase === 'prep'
+          ? 'prep'
+          : me && Math.hypot(gameState.ball.pos.x - me.pos.x, gameState.ball.pos.y - me.pos.y) < BALL_CONTROL_RADIUS
+            ? 'control'
+            : 'loose';
+        if (status !== prevDribbleStatus) {
+          prevDribbleStatus = status;
+          onDribbleStatusChangeRef.current(status);
+        }
       }
 
       prevPhase = gameState.phase;

@@ -1,4 +1,4 @@
-import type { InputState } from '../types';
+import type { GameState, InputState } from '../types';
 import { createInitialState } from '../createInitialState';
 import { updateGame } from '../updateGame';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, updateTemporaryRemovals } from '../temporaryRemoval';
@@ -17,6 +17,8 @@ export function runLocalContractScenario(
   sc: ContractScenario,
   hz: number,
   profile: GameplayProfile = 'classic',
+  // Optional per-step probe into the live state (tests only).
+  observe?: (state: GameState, playerId: string) => void,
 ): ContractMetrics {
   const dt = 1 / hz;
   if (sc.kind === 'bench') return runBench(dt);
@@ -27,16 +29,18 @@ export function runLocalContractScenario(
   let state = createInitialState(NO_REMOVALS);
   state.gameplayProfile = profile;
   const me = state.players.find((p) => p.team === 'home' && p.role === 'field_player' && p.matchStatus === 'field')!;
-  const def = state.players.find((p) => p.team === 'away' && p.role === 'field_player' && p.matchStatus === 'field')!;
+  const [def, def2] = state.players.filter((p) => p.team === 'away' && p.role === 'field_player' && p.matchStatus === 'field');
   for (const p of state.players) {
-    const keep = p === me || (sc.defender && p === def) || (sc.goalkeeper && p.role === 'goalkeeper' && p.team === 'away');
+    const keep = p === me || (sc.defender && p === def) || (sc.defender2 && p === def2)
+      || (sc.goalkeeper && p.role === 'goalkeeper' && p.team === 'away');
     if (!keep) { p.matchStatus = 'bench'; p.pos = { x: -500, y: -500 }; }
   }
   me.pos = { ...sc.start };
   state.activePlayerId = me.id;
   state.ball.pos = { x: sc.start.x + sc.ball.x, y: sc.start.y + sc.ball.y };
-  state.ball.vel = { x: 0, y: 0 };
+  state.ball.vel = { ...(sc.ballVel ?? { x: 0, y: 0 }) };
   const defPos = sc.defender ? { x: sc.start.x + sc.defender.x, y: sc.start.y + sc.defender.y } : null;
+  const defPos2 = sc.defender2 ? { x: sc.start.x + sc.defender2.x, y: sc.start.y + sc.defender2.y } : null;
   const find = (id: string) => state.players.find((p) => p.id === id)!;
 
   return runContractScenario(sc, {
@@ -48,10 +52,12 @@ export function runLocalContractScenario(
       state = updateGame(state, input, stepDt, NO_REMOVALS, undefined, { disableOpponentAI: true });
       // Static defender — same in both harnesses.
       if (defPos) { const d = find(def.id); d.pos = { ...defPos }; d.vel = { x: 0, y: 0 }; }
+      if (defPos2) { const d = find(def2.id); d.pos = { ...defPos2 }; d.vel = { x: 0, y: 0 }; }
+      observe?.(state, me.id);
     },
     player: () => find(me.id).pos,
     ball: () => ({ ...state.ball.pos, vx: state.ball.vel.x, vy: state.ball.vel.y }),
-    defender: () => (defPos ? find(def.id).pos : null),
+    defenders: () => [defPos && find(def.id).pos, defPos2 && find(def2.id).pos].filter((p): p is NonNullable<typeof p> => !!p),
     scored: () => state.phase === 'goal',
     controlRadius: BALL_CONTROL_RADIUS,
     contactDist: PLAYER_RADIUS + BALL_RADIUS,

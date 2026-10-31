@@ -92,16 +92,18 @@ Měří se to automaticky v `game/physicsContract/`, viz poslední sekci.
 Otočky, vedení a odrazy od hráče zůstávají mírně Hz-závislé: ztráta při
 otočce 90° je 0,9 s na 30 Hz a 0,7 s na 144 Hz.
 
-## Experimentální profily V2 (jen `/hra/bot-test`)
+## Experimentální profily V2 a V3 (jen `/hra/bot-test`)
 
 Profily patří do existujícího `GameplayProfileConfig`
-(`game/gameplayProfiles.ts`). Konstanty jsou v `BALL_PHYSICS_V2`.
+(`game/gameplayProfiles.ts`). Konstanty jsou v `BALL_PHYSICS_V2` a
+`BALL_PHYSICS_V3`.
 
-| Profil | `kickSelfTrapProtectionEnabled` | `turnAssistEnabled` |
-|---|---|---|
-| `classic` (produkce) | ne | ne |
-| `v2-shot` | ano | ne |
-| `v2-turn` | ano | ano |
+| Profil | `kickSelfTrapProtectionEnabled` | `turnAssistEnabled` | `dribblePrepEnabled` |
+|---|---|---|---|
+| `classic` (produkce) | ne | ne | ne |
+| `v2-shot` | ano | ne | ne |
+| `v2-turn` | ano | ano | ne |
+| `v3-dribble` | ano | ne | ano |
 
 - **Ochrana střely.** Okno začne jen při skutečně vystřeleném kopu
   (`state.kickSelfTrapPlayerId`). Nestačí k tomu změna `kickCooldown`, protože
@@ -114,6 +116,69 @@ Profily patří do existujícího `GameplayProfileConfig`
   45° před hráčem, jakmile je soupeř blízko nebo jakmile míč uteče. Míč
   nedostane žádnou novou sílu.
 
+### V3 — příprava míče před otočkou (`game/dribblePrep.ts`)
+
+**Kdy se zapne:** jen při skutečném vedení míče.
+- Míč je od ovládaného hráče blíž než 57 px.
+- Relativní rychlost míče vůči hráči je pod 160 px/s, a to aspoň 0,12 s.
+- Kop není držený a neběží ochrana vlastní střely.
+- Žádný soupeř není od míče blíž než 70 px.
+
+Volný ani právě odkopnutý míč se nikdy nepřitahuje.
+
+**Spuštění:** Příprava začne, když míč leží aspoň 60° mimo nově držený směr.
+Měří se poloha míče vůči hráči, ne rozdíl dvou posledních vstupů. Proto
+přechod přes diagonálu (vpravo → vpravo+dolů → dolů) funguje stejně jako
+přímá otočka.
+
+**Průběh přípravy:**
+- **Délka:** 0,35 s, u 180° až 0,55 s (lineárně podle úhlu).
+- **Hráč:** běží 90 px/s.
+- **Míč:** relativní rychlost míče vůči hráči se přibližuje cílové rychlosti
+  rychlostí 30/s (exponenciálně) se zrychlením nejvýš 3000 px/s². Cílová
+  rychlost má dvě složky:
+  - **tečnou:** po oblouku, nejvýš 280 px/s, zpomaluje s ubývajícím úhlem;
+  - **radiální:** drží 34 px od hráče, takže míč nejde přes jeho tělo.
+- **Žádná pevná trajektorie:** míč se nikdy neteleportuje a polohu míče kód
+  nezapisuje, mění jen jeho rychlost. Kolize zůstávají.
+- **Strana oblouku** se zvolí na začátku přípravy. U otočky 180° vede tam,
+  kde je víc místa od čáry.
+
+**Konec přípravy:**
+- Míč je do 25° před hráčem, relativně pomalý a ve vzdálenosti 24–48 px.
+- Nebo vyprší okno přípravy.
+- Potom hráč za 0,15 s lineárně zrychlí zpět na 210 px/s.
+
+**Okamžité přerušení:** soupeř do 70 px, puštění ovládání, kop nebo míč
+dál než 57 px.
+
+**Řetězec otoček:** Změna směru uprostřed přípravy ji přesměruje. Celkový
+čas přípravy v řetězci je ale omezený na 1,2 s. Potom musí přijít 0,3 s bez
+asistence, takže nekonečný slalom s asistencí nejde.
+
+**Výsledky (simulace 30/60/120/144 Hz, bez soupeře):**
+- 90° a stažení od čáry: míč je před hráčem za 0,3 s, ztráta 0 s. Classic
+  ztrácí míč na 0,7–0,9 s.
+- 180°: míč je před hráčem za 0,5 s.
+- Mřížka 270 situací (výchozí úhel míče, délka rozběhu, pozice: střed,
+  čára, roh):
+
+  | Otočka | Úspěšnost V3 (mimo čáru) |
+  |---|---|
+  | 90° | 100 % |
+  | 135° | 97 % |
+  | 180° | 80–93 % |
+
+  Neúspěch nastává jen při otočce do čáry, u které hráč stojí.
+
+**Soupeř do 70 px:** V3 se chová přesně jako classic.
+
+**Co V3 neřeší:**
+- Classic kontrola mimo přípravu dál tlumí za frame. Po přípravě se proto
+  míč na 120/144 Hz drží o 10–20° víc stranou než na 30 Hz.
+- Bez soupeře je otočka 90° prakticky vždy úspěšná. Riziko nese hlavně
+  soupeř a čára.
+
 ## Automatické testy
 
 `game/physicsContract/` (vitest, běží v `npm test`):
@@ -125,8 +190,19 @@ Profily patří do existujícího `GameplayProfileConfig`
 - **`server-baseline.json`** obsahuje výsledky stejných scénářů na
   serverovém enginu, s commitem uvnitř souboru. Generuje se stejným
   `runner.ts` nad `project-hub-api`.
-- **`local-baseline.json`** je baseline produkčního `classic` pro
-  30/60/120/144 Hz, vygenerovaná z kódu **před** zavedením V2.
+- **`local-baseline.json`** je baseline `classic`, `v2-shot` a `v2-turn`
+  pro 30/60/120/144 Hz. Je vygenerovaná z enginu **před** zavedením V3,
+  takže hlídá, že se V3 nedotkla starších profilů.
+- **`game/dribblePrep.test.ts`** kontroluje u V3:
+  - frekvenční stabilitu;
+  - že 180° je pomalejší než 90°;
+  - že soupeř asistenci vypne;
+  - že se míč neotáčí kolem hráče (orbit);
+  - že asistence není nekonečná (limit řetězce);
+  - že rychlost a zrychlení míče jsou omezené;
+  - že se nepřitahuje volný míč;
+  - reset při přepnutí profilu;
+  - V3 proti aktivnímu botovi.
 
 **Tolerance:**
 
@@ -155,3 +231,20 @@ runnerem nad lokálním checkoutem backendu:
 npx tsx scripts/physics-contract-server-baseline.mts ../project-hub-api \
   > game/physicsContract/server-baseline.json
 ```
+
+## Plán přenosu V3 na server (až po schválení)
+
+1. **Modul.** `dribblePrep.ts` je čistá funkce nad stavem a `dt`. Na server
+   se přenese jako `src/gameEngine/dribblePrep.ts` se stejnými konstantami.
+   Pro každý tým stačí `DribblePrepState` v `OnlineGameState`.
+2. **Napojení.** V `movePlayerByInput` (`tick.ts`) se omezí rychlost
+   ovládaného hráče. V bloku kontroly míče se během přípravy nahradí
+   klasická kontrola. Je to stejné místo jako lokálně.
+3. **Předpoklad.** Nejdřív sjednotit poloměry kontroly a retence a
+   `KICK_RANGE`, a opravit clamp hráče. Jinak V3 na serveru startuje
+   z jiného výchozího stavu.
+4. **Ověření.** Stejné kontraktní scénáře se na serveru spustí přes
+   `scripts/physics-contract-server-baseline.mts`. Rozdíl lokál↔server
+   u V3 scénářů pak musí být v toleranci, ne v `KNOWN_DIVERGENCES`.
+5. **Výzva a multiplayer.** Obojí volá `tickGame`, takže profil musí být
+   parametr stavu zápasu a pro oba režimy stejný.

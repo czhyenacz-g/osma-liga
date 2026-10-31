@@ -46,12 +46,13 @@ export const MODE_CONFIG: Record<BotTestMode, ModeConfig> = {
 // Physics variant picked in the bot-test switch. Applies to every mode whose
 // own profile is `classic`; test-bounce keeps its bounce profile. The V2
 // variants are EXPERIMENTAL and exist only here (see gameplayProfiles.ts).
-export type BotTestPhysics = 'classic' | 'v2-shot' | 'v2-turn';
+export type BotTestPhysics = 'classic' | 'v2-shot' | 'v2-turn' | 'v3-dribble';
 
 export const PHYSICS_OPTIONS: { value: BotTestPhysics; label: string }[] = [
   { value: 'classic', label: 'Původní fyzika' },
   { value: 'v2-shot', label: 'V2: střela' },
   { value: 'v2-turn', label: 'V2: střela + otočka' },
+  { value: 'v3-dribble', label: 'V3: Příprava míče' },
 ];
 
 export function resolvePhysics(value: string | undefined | null): BotTestPhysics {

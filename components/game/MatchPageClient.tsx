@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { playFullTimeWhistle, playKickoffWhistle, unlockAudio } from '@/lib/audio/whistleEngine';
 import { inMatchAudio } from '@/game/audio/inMatchAudio';
-import GameCanvas, { type BenchPlayerUiState, type BenchDeployRequest } from './GameCanvas';
+import GameCanvas, { type BenchPlayerUiState, type BenchDeployRequest, type DribbleStatus } from './GameCanvas';
 import MatchCommentaryToast from './MatchCommentaryToast';
 import MobileTouchControls from './MobileTouchControls';
 import MobileOrientationOverlay from './MobileOrientationOverlay';
@@ -75,11 +75,13 @@ interface Props {
   // Optional callback so a parent (e.g. BotTestClient) can react to
   // Bounce Time start/end without reaching into internal state.
   onBounceTimeChange?: (active: boolean) => void;
+  // /hra/bot-test physics indicator (see GameCanvas).
+  onDribbleStatusChange?: (status: DribbleStatus) => void;
 }
 
 export default function MatchPageClient({
   homeClubSlug, disableOpponentAI, matchDurationSeconds, gameplayProfile, enableBounceTimeDebug,
-  onBounceTimeChange,
+  onBounceTimeChange, onDribbleStatusChange,
 }: Props) {
   const homeTeamName = (homeClubSlug && CLUBS.find((c) => c.slug === homeClubSlug)?.name) || 'Náhoda FC';
   const [matchScore, setMatchScore] = useState<{ home: number; away: number } | null>(null);
@@ -312,6 +314,7 @@ export default function MatchPageClient({
               onFirstGoal={handleFirstGoal}
               onSubstitution={handleSubstitution}
               onBounceTimeChange={handleBounceTimeChange}
+              onDribbleStatusChange={onDribbleStatusChange}
               touchInputRef={touchRef}
               homeTeamName={homeTeamName}
               disableOpponentAI={disableOpponentAI}

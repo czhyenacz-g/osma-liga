@@ -1,994 +1,7097 @@
 {
+ "classic": {
   "30": {
-    "straight run": {
-      "playerX": 360,
-      "playerY": 400,
-      "minPlayerY": 400,
-      "maxPlayerY": 400,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "diagonal run": {
-      "playerX": 298.5,
-      "playerY": 251.5,
-      "minPlayerY": 251.5,
-      "maxPlayerY": 395.1,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "run into top boundary": {
-      "playerX": 300,
-      "playerY": 68,
-      "minPlayerY": 68,
-      "maxPlayerY": 113,
-      "ballX": 600,
-      "ballY": 270,
-      "ballSpeed": 0,
-      "lossSeconds": 1.5,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "dribble straight": {
-      "playerX": 465,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 498.1,
-      "ballY": 280,
-      "ballSpeed": 147.4,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "turn 90 (R→U)": {
-      "playerX": 410,
-      "playerY": 128,
-      "minPlayerY": 128,
-      "maxPlayerY": 380,
-      "ballX": 448.9,
-      "ballY": 293.4,
-      "ballSpeed": 39.5,
-      "lossSeconds": 0.9,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 138.1,
-          "relDeg": 163,
-          "ballY": 302.3
-        },
-        "0.3": {
-          "dist": 56,
-          "relDeg": 131,
-          "ballY": 353.5
-        },
-        "0.6": {
-          "dist": 83.6,
-          "relDeg": 151,
-          "ballY": 326.9
-        }
-      }
-    },
-    "turn 180 (R→L)": {
-      "playerX": 158,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 427.9,
-      "ballY": 280,
-      "ballSpeed": 8.3,
-      "lossSeconds": 1.1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 229.8,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.3": {
-          "dist": 93.5,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.6": {
-          "dist": 151,
-          "relDeg": 180,
-          "ballY": 280
-        }
-      }
-    },
-    "top line pull down (R→D)": {
-      "playerX": 410,
-      "playerY": 332,
-      "minPlayerY": 80,
-      "maxPlayerY": 332,
-      "ballX": 448.9,
-      "ballY": 166.6,
-      "ballSpeed": 39.5,
-      "lossSeconds": 0.9,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 138.1,
-          "relDeg": 163,
-          "ballY": 157.7
-        },
-        "0.3": {
-          "dist": 56,
-          "relDeg": 131,
-          "ballY": 106.5
-        },
-        "0.6": {
-          "dist": 83.6,
-          "relDeg": 151,
-          "ballY": 133.1
-        }
-      }
-    },
-    "bottom line pull up (R→U)": {
-      "playerX": 410,
-      "playerY": 228,
-      "minPlayerY": 228,
-      "maxPlayerY": 480,
-      "ballX": 448.9,
-      "ballY": 393.4,
-      "ballSpeed": 39.5,
-      "lossSeconds": 0.9,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 138.1,
-          "relDeg": 163,
-          "ballY": 402.3
-        },
-        "0.3": {
-          "dist": 56,
-          "relDeg": 131,
-          "ballY": 453.5
-        },
-        "0.6": {
-          "dist": 83.6,
-          "relDeg": 151,
-          "ballY": 426.9
-        }
-      }
-    },
-    "short kick": {
-      "playerX": 313,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 639.3,
-      "ballY": 280,
-      "ballSpeed": 162,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": 263.1,
-      "goal": false,
-      "at": {}
-    },
-    "charged kick (0.5 s)": {
-      "playerX": 418,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 894.6,
-      "ballY": 280,
-      "ballSpeed": 348.6,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": 439.9,
-      "goal": true,
-      "at": {}
-    },
-    "defender contact": {
-      "playerX": 515,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 551.3,
-      "ballY": 280,
-      "ballSpeed": 212.8,
-      "lossSeconds": 0.7,
-      "contacts": 1,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "goalkeeper blocks shot": {
-      "playerX": 795,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 826.5,
-      "ballY": 280,
-      "ballSpeed": 0.1,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": -9.2,
-      "goal": false,
-      "at": {}
-    },
-    "žolík entry + expiry": {
-      "playerX": 150,
-      "playerY": 450,
-      "benchSeconds": 30,
-      "contacts": 1,
-      "at": {}
-    },
-    "temporary weakening": {
-      "benchSeconds": 10,
-      "playerX": 270,
-      "playerY": 395,
-      "maxPlayerY": 527,
-      "at": {}
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 395.1,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 113,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 498.1,
+    "ballY": 280,
+    "ballSpeed": 147.4,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 128,
+    "minPlayerY": 128,
+    "maxPlayerY": 380,
+    "ballX": 448.9,
+    "ballY": 293.4,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 302.3
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 353.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 326.9
+     }
     }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 158,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 427.9,
+    "ballY": 280,
+    "ballSpeed": 8.3,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 229.8,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 93.5,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 151,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332,
+    "minPlayerY": 80,
+    "maxPlayerY": 332,
+    "ballX": 448.9,
+    "ballY": 166.6,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 157.7
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 106.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 133.1
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 228,
+    "minPlayerY": 228,
+    "maxPlayerY": 480,
+    "ballX": 448.9,
+    "ballY": 393.4,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 402.3
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 453.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 426.9
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 639.3,
+    "ballY": 280,
+    "ballSpeed": 162,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 263.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 524.7,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 894.6,
+    "ballY": 280,
+    "ballSpeed": 348.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 439.9,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 779.5,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 551.3,
+    "ballY": 280,
+    "ballSpeed": 212.8,
+    "lossSeconds": 0.7,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 274,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 826.5,
+    "ballY": 280,
+    "ballSpeed": 0.1,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -9.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 448.9,
+    "ballY": 286.6,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 277.7
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 226.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 253.1
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 434.7,
+    "playerY": 408.7,
+    "minPlayerY": 160,
+    "maxPlayerY": 408.7,
+    "ballX": 463.2,
+    "ballY": 267.1,
+    "ballSpeed": 54.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 111.1,
+      "relDeg": 165,
+      "ballY": 252.5
+     },
+     "0.3": {
+      "dist": 42.8,
+      "relDeg": 135,
+      "ballY": 182.7
+     },
+     "0.6": {
+      "dist": 65.5,
+      "relDeg": 153,
+      "ballY": 217.6
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 439.1,
+    "ballY": 307.3,
+    "ballSpeed": 52.2,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 118.3,
+      "relDeg": 165,
+      "ballY": 295.5
+     },
+     "0.3": {
+      "dist": 48.6,
+      "relDeg": 134,
+      "ballY": 229.1
+     },
+     "0.6": {
+      "dist": 70.7,
+      "relDeg": 153,
+      "ballY": 263.1
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 514.6,
+    "ballY": 291.8,
+    "ballSpeed": 26.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 222.5,
+      "relDeg": 154,
+      "ballY": 290.7
+     },
+     "0.3": {
+      "dist": 88,
+      "relDeg": 132,
+      "ballY": 283.9
+     },
+     "0.6": {
+      "dist": 144.5,
+      "relDeg": 145,
+      "ballY": 287.4
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 553.7,
+    "ballY": 362.5,
+    "ballSpeed": 37.2,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 142.9,
+      "relDeg": 162,
+      "ballY": 354.1
+     },
+     "0.3": {
+      "dist": 59,
+      "relDeg": 129,
+      "ballY": 305.9
+     },
+     "0.6": {
+      "dist": 87.5,
+      "relDeg": 149,
+      "ballY": 330.9
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 507,
+    "ballY": 229.8,
+    "ballSpeed": 26.1,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 205.1,
+      "relDeg": 153,
+      "ballY": 226.7
+     },
+     "0.3": {
+      "dist": 83.1,
+      "relDeg": 131,
+      "ballY": 208.9
+     },
+     "0.6": {
+      "dist": 133.1,
+      "relDeg": 144,
+      "ballY": 218.2
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 514.6,
+    "ballY": 291.8,
+    "ballSpeed": 26.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 222.5,
+      "relDeg": 154,
+      "ballY": 290.7
+     },
+     "0.3": {
+      "dist": 88,
+      "relDeg": 132,
+      "ballY": 283.9
+     },
+     "0.6": {
+      "dist": 144.5,
+      "relDeg": 145,
+      "ballY": 287.4
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 430.6,
+    "ballY": 373.5,
+    "ballSpeed": 43.9,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.1,
+    "at": {
+     "1": {
+      "dist": 130.3,
+      "relDeg": 166,
+      "ballY": 363.7
+     },
+     "0.3": {
+      "dist": 52.3,
+      "relDeg": 134,
+      "ballY": 306.5
+     },
+     "0.6": {
+      "dist": 77.7,
+      "relDeg": 154,
+      "ballY": 336.4
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 327,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 432.8,
+    "ballY": 460.5,
+    "ballSpeed": 82.2,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": 53,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 491.5,
+    "at": {
+     "1": {
+      "dist": 97.3,
+      "relDeg": 98,
+      "ballY": 476.5
+     },
+     "0.3": {
+      "dist": 81,
+      "relDeg": 31,
+      "ballY": 412.3
+     },
+     "0.6": {
+      "dist": 99,
+      "relDeg": 45,
+      "ballY": 475.8
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 564,
+    "playerY": 336,
+    "minPlayerY": 280,
+    "maxPlayerY": 336,
+    "ballX": 482.3,
+    "ballY": 296.5,
+    "ballSpeed": 36.9,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "0.6": {
+      "dist": 35.9,
+      "relDeg": 42,
+      "ballY": 295.4
+     },
+     "1.2": {
+      "dist": 58.1,
+      "relDeg": 153,
+      "ballY": 256.3
+     },
+     "1.85": {
+      "dist": 80.7,
+      "relDeg": 149,
+      "ballY": 294.3
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 527,
+    "at": {}
+   }
   },
   "60": {
-    "straight run": {
-      "playerX": 360,
-      "playerY": 400,
-      "minPlayerY": 400,
-      "maxPlayerY": 400,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "diagonal run": {
-      "playerX": 298.5,
-      "playerY": 251.5,
-      "minPlayerY": 251.5,
-      "maxPlayerY": 397.5,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "run into top boundary": {
-      "playerX": 300,
-      "playerY": 68,
-      "minPlayerY": 68,
-      "maxPlayerY": 116.5,
-      "ballX": 600,
-      "ballY": 270,
-      "ballSpeed": 0,
-      "lossSeconds": 1.5,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "dribble straight": {
-      "playerX": 465,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 497.4,
-      "ballY": 280,
-      "ballSpeed": 166.8,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "turn 90 (R→U)": {
-      "playerX": 410,
-      "playerY": 128,
-      "minPlayerY": 128,
-      "maxPlayerY": 380,
-      "ballX": 444.7,
-      "ballY": 283.9,
-      "ballSpeed": 43.5,
-      "lossSeconds": 0.8,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 128.5,
-          "relDeg": 164,
-          "ballY": 293.6
-        },
-        "0.3": {
-          "dist": 50.7,
-          "relDeg": 131,
-          "ballY": 350.2
-        },
-        "0.6": {
-          "dist": 75.9,
-          "relDeg": 151,
-          "ballY": 320.4
-        }
-      }
-    },
-    "turn 180 (R→L)": {
-      "playerX": 158,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 383.5,
-      "ballY": 280,
-      "ballSpeed": 27.7,
-      "lossSeconds": 1.1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 189.7,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.3": {
-          "dist": 78.3,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.6": {
-          "dist": 122.8,
-          "relDeg": 180,
-          "ballY": 280
-        }
-      }
-    },
-    "top line pull down (R→D)": {
-      "playerX": 410,
-      "playerY": 332,
-      "minPlayerY": 80,
-      "maxPlayerY": 332,
-      "ballX": 444.7,
-      "ballY": 176.1,
-      "ballSpeed": 43.5,
-      "lossSeconds": 0.8,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 128.5,
-          "relDeg": 164,
-          "ballY": 166.4
-        },
-        "0.3": {
-          "dist": 50.7,
-          "relDeg": 131,
-          "ballY": 109.8
-        },
-        "0.6": {
-          "dist": 75.9,
-          "relDeg": 151,
-          "ballY": 139.6
-        }
-      }
-    },
-    "bottom line pull up (R→U)": {
-      "playerX": 410,
-      "playerY": 228,
-      "minPlayerY": 228,
-      "maxPlayerY": 480,
-      "ballX": 444.7,
-      "ballY": 383.9,
-      "ballSpeed": 43.5,
-      "lossSeconds": 0.8,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 128.5,
-          "relDeg": 164,
-          "ballY": 393.6
-        },
-        "0.3": {
-          "dist": 50.7,
-          "relDeg": 131,
-          "ballY": 450.2
-        },
-        "0.6": {
-          "dist": 75.9,
-          "relDeg": 151,
-          "ballY": 420.4
-        }
-      }
-    },
-    "short kick": {
-      "playerX": 313,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 578.3,
-      "ballY": 280,
-      "ballSpeed": 126.9,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": 207.8,
-      "goal": false,
-      "at": {}
-    },
-    "charged kick (0.5 s)": {
-      "playerX": 418,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 888.3,
-      "ballY": 280,
-      "ballSpeed": 244.3,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": 400.1,
-      "goal": false,
-      "at": {}
-    },
-    "defender contact": {
-      "playerX": 515,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 272.4,
-      "ballY": 280,
-      "ballSpeed": 3.9,
-      "lossSeconds": 0.9,
-      "contacts": 1,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "goalkeeper blocks shot": {
-      "playerX": 795,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 830.7,
-      "ballY": 280,
-      "ballSpeed": 0,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": 0.4,
-      "goal": false,
-      "at": {}
-    },
-    "žolík entry + expiry": {
-      "playerX": 150,
-      "playerY": 450,
-      "benchSeconds": 30,
-      "contacts": 1,
-      "at": {}
-    },
-    "temporary weakening": {
-      "benchSeconds": 10,
-      "playerX": 270,
-      "playerY": 395,
-      "maxPlayerY": 526.2,
-      "at": {}
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 397.5,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 116.5,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 497.4,
+    "ballY": 280,
+    "ballSpeed": 166.8,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 128,
+    "minPlayerY": 128,
+    "maxPlayerY": 380,
+    "ballX": 444.7,
+    "ballY": 283.9,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 293.6
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 350.2
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 320.4
+     }
     }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 158,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 383.5,
+    "ballY": 280,
+    "ballSpeed": 27.7,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 189.7,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 78.3,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 122.8,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332,
+    "minPlayerY": 80,
+    "maxPlayerY": 332,
+    "ballX": 444.7,
+    "ballY": 176.1,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 166.4
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 109.8
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 139.6
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 228,
+    "minPlayerY": 228,
+    "maxPlayerY": 480,
+    "ballX": 444.7,
+    "ballY": 383.9,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 393.6
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 450.2
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 420.4
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 578.3,
+    "ballY": 280,
+    "ballSpeed": 126.9,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 207.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 569.3,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 888.3,
+    "ballY": 280,
+    "ballSpeed": 244.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 400.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 272.4,
+    "ballY": 280,
+    "ballSpeed": 3.9,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 250.5,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 830.7,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": 0.4,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 250.5,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 444.7,
+    "ballY": 296.1,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 286.4
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 229.8
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 259.6
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.3,
+    "playerY": 402.8,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.8,
+    "ballX": 464,
+    "ballY": 244.4,
+    "ballSpeed": 40.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 129.4,
+      "relDeg": 166,
+      "ballY": 235.4
+     },
+     "0.3": {
+      "dist": 47.2,
+      "relDeg": 133,
+      "ballY": 181.7
+     },
+     "0.6": {
+      "dist": 74.1,
+      "relDeg": 153,
+      "ballY": 210.7
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 440.4,
+    "ballY": 296,
+    "ballSpeed": 41,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 127,
+      "relDeg": 166,
+      "ballY": 286.9
+     },
+     "0.3": {
+      "dist": 46.4,
+      "relDeg": 133,
+      "ballY": 231.6
+     },
+     "0.6": {
+      "dist": 72.2,
+      "relDeg": 153,
+      "ballY": 261.5
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 477.7,
+    "ballY": 290.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 289.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 283.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 286.6
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 544.1,
+    "ballY": 370.2,
+    "ballSpeed": 38.8,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251,
+    "at": {
+     "1": {
+      "dist": 133.1,
+      "relDeg": 165,
+      "ballY": 361.5
+     },
+     "0.3": {
+      "dist": 50.5,
+      "relDeg": 131,
+      "ballY": 309.8
+     },
+     "0.6": {
+      "dist": 77.5,
+      "relDeg": 152,
+      "ballY": 337.6
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 477.7,
+    "ballY": 210.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 209.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 203.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 206.6
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 477.7,
+    "ballY": 290.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 289.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 283.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 286.6
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 440.9,
+    "ballY": 361.2,
+    "ballSpeed": 34.4,
+    "lossSeconds": 1.2,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 255.5,
+    "at": {
+     "1": {
+      "dist": 142.7,
+      "relDeg": 163,
+      "ballY": 353.5
+     },
+     "0.3": {
+      "dist": 56.7,
+      "relDeg": 126,
+      "ballY": 309.4
+     },
+     "0.6": {
+      "dist": 85.6,
+      "relDeg": 149,
+      "ballY": 332.3
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 323.5,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 353.2,
+    "ballY": 499.6,
+    "ballSpeed": 11.4,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -1.9,
+    "goal": false,
+    "frontSeconds": 0,
+    "maxBallSpeed": 501.9,
+    "at": {
+     "1": {
+      "dist": 32,
+      "relDeg": 104,
+      "ballY": 482.5
+     },
+     "0.3": {
+      "dist": 32.4,
+      "relDeg": 20,
+      "ballY": 373.6
+     },
+     "0.6": {
+      "dist": 32.4,
+      "relDeg": 43,
+      "ballY": 429.6
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 557,
+    "playerY": 332.5,
+    "minPlayerY": 280,
+    "maxPlayerY": 332.5,
+    "ballX": 491.3,
+    "ballY": 285.9,
+    "ballSpeed": 64.8,
+    "lossSeconds": 0.4,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "0.6": {
+      "dist": 33.1,
+      "relDeg": 43,
+      "ballY": 287.2
+     },
+     "1.2": {
+      "dist": 58.2,
+      "relDeg": 163,
+      "ballY": 266.4
+     },
+     "1.85": {
+      "dist": 80.6,
+      "relDeg": 145,
+      "ballY": 285.9
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 525.1,
+    "at": {}
+   }
   },
   "120": {
-    "straight run": {
-      "playerX": 360,
-      "playerY": 400,
-      "minPlayerY": 400,
-      "maxPlayerY": 400,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "diagonal run": {
-      "playerX": 298.5,
-      "playerY": 251.5,
-      "minPlayerY": 251.5,
-      "maxPlayerY": 398.8,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "run into top boundary": {
-      "playerX": 300,
-      "playerY": 68,
-      "minPlayerY": 68,
-      "maxPlayerY": 118.3,
-      "ballX": 600,
-      "ballY": 270,
-      "ballSpeed": 0,
-      "lossSeconds": 1.5,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "dribble straight": {
-      "playerX": 465,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 495.4,
-      "ballY": 280,
-      "ballSpeed": 162.2,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "turn 90 (R→U)": {
-      "playerX": 410,
-      "playerY": 128,
-      "minPlayerY": 128,
-      "maxPlayerY": 380,
-      "ballX": 441.3,
-      "ballY": 291.1,
-      "ballSpeed": 34.8,
-      "lossSeconds": 0.7,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 132.7,
-          "relDeg": 166,
-          "ballY": 298.9
-        },
-        "0.3": {
-          "dist": 45.6,
-          "relDeg": 133,
-          "ballY": 348.2
-        },
-        "0.6": {
-          "dist": 73.8,
-          "relDeg": 154,
-          "ballY": 320.3
-        }
-      }
-    },
-    "turn 180 (R→L)": {
-      "playerX": 158,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 368.8,
-      "ballY": 280,
-      "ballSpeed": 30.8,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 175.7,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.3": {
-          "dist": 68.1,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.6": {
-          "dist": 110.7,
-          "relDeg": 180,
-          "ballY": 280
-        }
-      }
-    },
-    "top line pull down (R→D)": {
-      "playerX": 410,
-      "playerY": 332,
-      "minPlayerY": 80,
-      "maxPlayerY": 332,
-      "ballX": 441.3,
-      "ballY": 168.9,
-      "ballSpeed": 34.8,
-      "lossSeconds": 0.7,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 132.7,
-          "relDeg": 166,
-          "ballY": 161.1
-        },
-        "0.3": {
-          "dist": 45.6,
-          "relDeg": 133,
-          "ballY": 111.8
-        },
-        "0.6": {
-          "dist": 73.8,
-          "relDeg": 154,
-          "ballY": 139.7
-        }
-      }
-    },
-    "bottom line pull up (R→U)": {
-      "playerX": 410,
-      "playerY": 228,
-      "minPlayerY": 228,
-      "maxPlayerY": 480,
-      "ballX": 441.3,
-      "ballY": 391.1,
-      "ballSpeed": 34.8,
-      "lossSeconds": 0.7,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 132.7,
-          "relDeg": 166,
-          "ballY": 398.9
-        },
-        "0.3": {
-          "dist": 45.6,
-          "relDeg": 133,
-          "ballY": 448.2
-        },
-        "0.6": {
-          "dist": 73.8,
-          "relDeg": 154,
-          "ballY": 420.3
-        }
-      }
-    },
-    "short kick": {
-      "playerX": 313,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 366.6,
-      "ballY": 280,
-      "ballSpeed": 1.9,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": 15.5,
-      "goal": false,
-      "at": {}
-    },
-    "charged kick (0.5 s)": {
-      "playerX": 418,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 729.5,
-      "ballY": 280,
-      "ballSpeed": 153.3,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": 263.4,
-      "goal": false,
-      "at": {}
-    },
-    "defender contact": {
-      "playerX": 515,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 278.9,
-      "ballY": 280,
-      "ballSpeed": 0.1,
-      "lossSeconds": 0.9,
-      "contacts": 1,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "goalkeeper blocks shot": {
-      "playerX": 795,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 832.6,
-      "ballY": 280,
-      "ballSpeed": 0,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": 0,
-      "goal": false,
-      "at": {}
-    },
-    "žolík entry + expiry": {
-      "playerX": 150,
-      "playerY": 450,
-      "benchSeconds": 30,
-      "contacts": 1,
-      "at": {}
-    },
-    "temporary weakening": {
-      "benchSeconds": 10,
-      "playerX": 270,
-      "playerY": 395,
-      "maxPlayerY": 524.1,
-      "at": {}
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 398.8,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 118.3,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 495.4,
+    "ballY": 280,
+    "ballSpeed": 162.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 128,
+    "minPlayerY": 128,
+    "maxPlayerY": 380,
+    "ballX": 441.3,
+    "ballY": 291.1,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 298.9
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 348.2
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 320.3
+     }
     }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 158,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 368.8,
+    "ballY": 280,
+    "ballSpeed": 30.8,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 175.7,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 68.1,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 110.7,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332,
+    "minPlayerY": 80,
+    "maxPlayerY": 332,
+    "ballX": 441.3,
+    "ballY": 168.9,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 161.1
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 111.8
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 139.7
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 228,
+    "minPlayerY": 228,
+    "maxPlayerY": 480,
+    "ballX": 441.3,
+    "ballY": 391.1,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 398.9
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 448.2
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 420.3
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 366.6,
+    "ballY": 280,
+    "ballSpeed": 1.9,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": 15.5,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 549.5,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 729.5,
+    "ballY": 280,
+    "ballSpeed": 153.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 263.4,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 278.9,
+    "ballY": 280,
+    "ballSpeed": 0.1,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 832.6,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": 0,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 267.1,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 441.3,
+    "ballY": 288.9,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 281.1
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 231.8
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 259.7
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.3,
+    "playerY": 402.8,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.8,
+    "ballX": 458.1,
+    "ballY": 249.3,
+    "ballSpeed": 37.7,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 122.7,
+      "relDeg": 168,
+      "ballY": 240.9
+     },
+     "0.3": {
+      "dist": 39,
+      "relDeg": 135,
+      "ballY": 186.2
+     },
+     "0.6": {
+      "dist": 64.9,
+      "relDeg": 156,
+      "ballY": 217.7
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 439.9,
+    "ballY": 291.2,
+    "ballSpeed": 35.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 130.3,
+      "relDeg": 167,
+      "ballY": 283.3
+     },
+     "0.3": {
+      "dist": 43.9,
+      "relDeg": 134,
+      "ballY": 232.8
+     },
+     "0.6": {
+      "dist": 71.6,
+      "relDeg": 154,
+      "ballY": 261.5
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 447.9,
+    "ballY": 287.7,
+    "ballSpeed": 3.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 206.6,
+      "relDeg": 169,
+      "ballY": 286.9
+     },
+     "0.3": {
+      "dist": 72,
+      "relDeg": 147,
+      "ballY": 282.4
+     },
+     "0.6": {
+      "dist": 127.2,
+      "relDeg": 162,
+      "ballY": 284.8
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 542.9,
+    "ballY": 367.5,
+    "ballSpeed": 34.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 245.2,
+    "at": {
+     "1": {
+      "dist": 134.3,
+      "relDeg": 166,
+      "ballY": 359.8
+     },
+     "0.3": {
+      "dist": 46.9,
+      "relDeg": 132,
+      "ballY": 311.8
+     },
+     "0.6": {
+      "dist": 75.3,
+      "relDeg": 153,
+      "ballY": 338.8
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 447.9,
+    "ballY": 207.7,
+    "ballSpeed": 3.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 206.6,
+      "relDeg": 169,
+      "ballY": 206.9
+     },
+     "0.3": {
+      "dist": 72,
+      "relDeg": 147,
+      "ballY": 202.4
+     },
+     "0.6": {
+      "dist": 127.2,
+      "relDeg": 162,
+      "ballY": 204.8
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 449.4,
+    "ballY": 287.6,
+    "ballSpeed": 3.5,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 207,
+      "relDeg": 169,
+      "ballY": 286.8
+     },
+     "0.3": {
+      "dist": 72.7,
+      "relDeg": 147,
+      "ballY": 282.4
+     },
+     "0.6": {
+      "dist": 127.7,
+      "relDeg": 162,
+      "ballY": 284.7
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 447.3,
+    "ballY": 335.6,
+    "ballSpeed": 20.2,
+    "lossSeconds": 1.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 257.7,
+    "at": {
+     "1": {
+      "dist": 165.9,
+      "relDeg": 163,
+      "ballY": 331.1
+     },
+     "0.3": {
+      "dist": 63,
+      "relDeg": 127,
+      "ballY": 305.5
+     },
+     "0.6": {
+      "dist": 100.1,
+      "relDeg": 151,
+      "ballY": 318.8
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 323.5,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 354.1,
+    "ballY": 489,
+    "ballSpeed": 113.7,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -1.1,
+    "goal": false,
+    "frontSeconds": 0,
+    "maxBallSpeed": 509.2,
+    "at": {
+     "1": {
+      "dist": 39.3,
+      "relDeg": 128,
+      "ballY": 466
+     },
+     "0.3": {
+      "dist": 30.9,
+      "relDeg": 27,
+      "ballY": 370.5
+     },
+     "0.6": {
+      "dist": 30.6,
+      "relDeg": 64,
+      "ballY": 419.4
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 557,
+    "playerY": 332.5,
+    "minPlayerY": 280,
+    "maxPlayerY": 332.5,
+    "ballX": 480.7,
+    "ballY": 283.7,
+    "ballSpeed": 41.1,
+    "lossSeconds": 0.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "0.6": {
+      "dist": 30.8,
+      "relDeg": 33,
+      "ballY": 285.7
+     },
+     "1.2": {
+      "dist": 49.8,
+      "relDeg": 174,
+      "ballY": 272.5
+     },
+     "1.85": {
+      "dist": 90.6,
+      "relDeg": 147,
+      "ballY": 283.7
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 524.1,
+    "at": {}
+   }
   },
   "144": {
-    "straight run": {
-      "playerX": 360,
-      "playerY": 400,
-      "minPlayerY": 400,
-      "maxPlayerY": 400,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "diagonal run": {
-      "playerX": 298.5,
-      "playerY": 251.5,
-      "minPlayerY": 251.5,
-      "maxPlayerY": 399,
-      "ballX": 450,
-      "ballY": 500,
-      "ballSpeed": 0,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "run into top boundary": {
-      "playerX": 300,
-      "playerY": 68,
-      "minPlayerY": 68,
-      "maxPlayerY": 118.5,
-      "ballX": 600,
-      "ballY": 270,
-      "ballSpeed": 0,
-      "lossSeconds": 1.5,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "dribble straight": {
-      "playerX": 465,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 495.2,
-      "ballY": 280,
-      "ballSpeed": 162.2,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "turn 90 (R→U)": {
-      "playerX": 410,
-      "playerY": 127.7,
-      "minPlayerY": 127.7,
-      "maxPlayerY": 380,
-      "ballX": 441,
-      "ballY": 291.1,
-      "ballSpeed": 34.4,
-      "lossSeconds": 0.7,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 132.6,
-          "relDeg": 166,
-          "ballY": 298.8
-        },
-        "0.3": {
-          "dist": 45.2,
-          "relDeg": 134,
-          "ballY": 347.2
-        },
-        "0.6": {
-          "dist": 73.9,
-          "relDeg": 154,
-          "ballY": 319.8
-        }
-      }
-    },
-    "turn 180 (R→L)": {
-      "playerX": 157.7,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 373.8,
-      "ballY": 280,
-      "ballSpeed": 27,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 179.9,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.3": {
-          "dist": 68.3,
-          "relDeg": 180,
-          "ballY": 280
-        },
-        "0.6": {
-          "dist": 113.2,
-          "relDeg": 180,
-          "ballY": 280
-        }
-      }
-    },
-    "top line pull down (R→D)": {
-      "playerX": 410,
-      "playerY": 332.3,
-      "minPlayerY": 80,
-      "maxPlayerY": 332.3,
-      "ballX": 441,
-      "ballY": 168.9,
-      "ballSpeed": 34.4,
-      "lossSeconds": 0.7,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 132.6,
-          "relDeg": 166,
-          "ballY": 161.2
-        },
-        "0.3": {
-          "dist": 45.2,
-          "relDeg": 134,
-          "ballY": 112.8
-        },
-        "0.6": {
-          "dist": 73.9,
-          "relDeg": 154,
-          "ballY": 140.2
-        }
-      }
-    },
-    "bottom line pull up (R→U)": {
-      "playerX": 410,
-      "playerY": 227.7,
-      "minPlayerY": 227.7,
-      "maxPlayerY": 480,
-      "ballX": 441,
-      "ballY": 391.1,
-      "ballSpeed": 34.4,
-      "lossSeconds": 0.7,
-      "contacts": 0,
-      "shotTravel": null,
-      "goal": false,
-      "at": {
-        "1": {
-          "dist": 132.6,
-          "relDeg": 166,
-          "ballY": 398.8
-        },
-        "0.3": {
-          "dist": 45.2,
-          "relDeg": 134,
-          "ballY": 447.2
-        },
-        "0.6": {
-          "dist": 73.9,
-          "relDeg": 154,
-          "ballY": 419.8
-        }
-      }
-    },
-    "short kick": {
-      "playerX": 312.7,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 362.7,
-      "ballY": 280,
-      "ballSpeed": 1.6,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": 13.3,
-      "goal": false,
-      "at": {}
-    },
-    "charged kick (0.5 s)": {
-      "playerX": 417.7,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 661,
-      "ballY": 280,
-      "ballSpeed": 112.7,
-      "lossSeconds": 1,
-      "contacts": 0,
-      "shotTravel": 198.5,
-      "goal": false,
-      "at": {}
-    },
-    "defender contact": {
-      "playerX": 515,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 281.3,
-      "ballY": 280,
-      "ballSpeed": 1.1,
-      "lossSeconds": 0.9,
-      "contacts": 1,
-      "shotTravel": null,
-      "goal": false,
-      "at": {}
-    },
-    "goalkeeper blocks shot": {
-      "playerX": 795,
-      "playerY": 280,
-      "minPlayerY": 280,
-      "maxPlayerY": 280,
-      "ballX": 832.7,
-      "ballY": 280,
-      "ballSpeed": 0,
-      "lossSeconds": 0,
-      "contacts": 0,
-      "shotTravel": -2.8,
-      "goal": false,
-      "at": {}
-    },
-    "žolík entry + expiry": {
-      "playerX": 150,
-      "playerY": 450,
-      "benchSeconds": 30,
-      "contacts": 1,
-      "at": {}
-    },
-    "temporary weakening": {
-      "benchSeconds": 10,
-      "playerX": 270,
-      "playerY": 395,
-      "maxPlayerY": 525.8,
-      "at": {}
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 399,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 118.5,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 495.2,
+    "ballY": 280,
+    "ballSpeed": 162.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 127.7,
+    "minPlayerY": 127.7,
+    "maxPlayerY": 380,
+    "ballX": 441,
+    "ballY": 291.1,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 298.8
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 347.2
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 319.8
+     }
     }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 157.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 373.8,
+    "ballY": 280,
+    "ballSpeed": 27,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 179.9,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 68.3,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 113.2,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332.3,
+    "minPlayerY": 80,
+    "maxPlayerY": 332.3,
+    "ballX": 441,
+    "ballY": 168.9,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 161.2
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 112.8
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 140.2
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 227.7,
+    "minPlayerY": 227.7,
+    "maxPlayerY": 480,
+    "ballX": 441,
+    "ballY": 391.1,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 398.8
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 447.2
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 419.8
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 312.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 362.7,
+    "ballY": 280,
+    "ballSpeed": 1.6,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": 13.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 543.9,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 417.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 661,
+    "ballY": 280,
+    "ballSpeed": 112.7,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 198.5,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 281.3,
+    "ballY": 280,
+    "ballSpeed": 1.1,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 832.7,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -2.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 281,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 452.3,
+    "ballX": 441,
+    "ballY": 288.9,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 281.2
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 232.8
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 260.2
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.7,
+    "playerY": 402.9,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.9,
+    "ballX": 461,
+    "ballY": 244.9,
+    "ballSpeed": 36,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 127.1,
+      "relDeg": 167,
+      "ballY": 236.8
+     },
+     "0.3": {
+      "dist": 41.8,
+      "relDeg": 135,
+      "ballY": 185.4
+     },
+     "0.6": {
+      "dist": 69.1,
+      "relDeg": 155,
+      "ballY": 214.9
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 452.3,
+    "ballX": 439.8,
+    "ballY": 291.4,
+    "ballSpeed": 35.2,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 130.1,
+      "relDeg": 167,
+      "ballY": 283.5
+     },
+     "0.3": {
+      "dist": 43.8,
+      "relDeg": 134,
+      "ballY": 233.6
+     },
+     "0.6": {
+      "dist": 71.8,
+      "relDeg": 155,
+      "ballY": 262.1
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 446.1,
+    "ballY": 286.7,
+    "ballSpeed": 3.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.2,
+      "relDeg": 170,
+      "ballY": 286
+     },
+     "0.3": {
+      "dist": 72.6,
+      "relDeg": 149,
+      "ballY": 282.2
+     },
+     "0.6": {
+      "dist": 128.2,
+      "relDeg": 163,
+      "ballY": 284.2
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 543.6,
+    "ballY": 365.8,
+    "ballSpeed": 33.4,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 244.7,
+    "at": {
+     "1": {
+      "dist": 136,
+      "relDeg": 166,
+      "ballY": 358.3
+     },
+     "0.3": {
+      "dist": 47.8,
+      "relDeg": 132,
+      "ballY": 312
+     },
+     "0.6": {
+      "dist": 77.1,
+      "relDeg": 153,
+      "ballY": 338
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 452.3,
+    "ballX": 446.1,
+    "ballY": 206.7,
+    "ballSpeed": 3.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.2,
+      "relDeg": 170,
+      "ballY": 206
+     },
+     "0.3": {
+      "dist": 72.6,
+      "relDeg": 149,
+      "ballY": 202.2
+     },
+     "0.6": {
+      "dist": 128.2,
+      "relDeg": 163,
+      "ballY": 204.2
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 446.5,
+    "ballY": 286.6,
+    "ballSpeed": 3.2,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.3,
+      "relDeg": 170,
+      "ballY": 286
+     },
+     "0.3": {
+      "dist": 72.8,
+      "relDeg": 148,
+      "ballY": 282.2
+     },
+     "0.6": {
+      "dist": 128.3,
+      "relDeg": 163,
+      "ballY": 284.1
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 448.3,
+    "ballY": 330.3,
+    "ballSpeed": 17.3,
+    "lossSeconds": 1.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 258.1,
+    "at": {
+     "1": {
+      "dist": 170.7,
+      "relDeg": 163,
+      "ballY": 326.4
+     },
+     "0.3": {
+      "dist": 64.6,
+      "relDeg": 128,
+      "ballY": 304.7
+     },
+     "0.6": {
+      "dist": 103.7,
+      "relDeg": 151,
+      "ballY": 316
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 322.9,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 353.7,
+    "ballY": 491.8,
+    "ballSpeed": 111.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -4.4,
+    "goal": false,
+    "frontSeconds": 0,
+    "maxBallSpeed": 505.2,
+    "at": {
+     "1": {
+      "dist": 34.5,
+      "relDeg": 127,
+      "ballY": 469.5
+     },
+     "0.3": {
+      "dist": 30.5,
+      "relDeg": 24,
+      "ballY": 372
+     },
+     "0.6": {
+      "dist": 29.4,
+      "relDeg": 58,
+      "ballY": 422.4
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 555.8,
+    "playerY": 332.5,
+    "minPlayerY": 280,
+    "maxPlayerY": 332.5,
+    "ballX": 464.3,
+    "ballY": 282.5,
+    "ballSpeed": 32,
+    "lossSeconds": 0.4,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "0.6": {
+      "dist": 30.6,
+      "relDeg": 28,
+      "ballY": 283.6
+     },
+     "1.2": {
+      "dist": 50.4,
+      "relDeg": 180,
+      "ballY": 271.9
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 524.3,
+    "at": {}
+   }
   }
+ },
+ "v2-shot": {
+  "30": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 395.1,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 113,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 498.1,
+    "ballY": 280,
+    "ballSpeed": 147.4,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 128,
+    "minPlayerY": 128,
+    "maxPlayerY": 380,
+    "ballX": 448.9,
+    "ballY": 293.4,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 302.3
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 353.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 326.9
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 158,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 427.9,
+    "ballY": 280,
+    "ballSpeed": 8.3,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 229.8,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 93.5,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 151,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332,
+    "minPlayerY": 80,
+    "maxPlayerY": 332,
+    "ballX": 448.9,
+    "ballY": 166.6,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 157.7
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 106.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 133.1
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 228,
+    "minPlayerY": 228,
+    "maxPlayerY": 480,
+    "ballX": 448.9,
+    "ballY": 393.4,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 402.3
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 453.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 426.9
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 687.3,
+    "ballY": 280,
+    "ballSpeed": 190.2,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 308.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 524.7,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 894.6,
+    "ballY": 280,
+    "ballSpeed": 348.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 439.9,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 779.5,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 551.3,
+    "ballY": 280,
+    "ballSpeed": 212.8,
+    "lossSeconds": 0.7,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 274,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 826.1,
+    "ballY": 280,
+    "ballSpeed": 0.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -9.7,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 448.9,
+    "ballY": 286.6,
+    "ballSpeed": 39.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 138.1,
+      "relDeg": 163,
+      "ballY": 277.7
+     },
+     "0.3": {
+      "dist": 56,
+      "relDeg": 131,
+      "ballY": 226.5
+     },
+     "0.6": {
+      "dist": 83.6,
+      "relDeg": 151,
+      "ballY": 253.1
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 434.7,
+    "playerY": 408.7,
+    "minPlayerY": 160,
+    "maxPlayerY": 408.7,
+    "ballX": 463.2,
+    "ballY": 267.1,
+    "ballSpeed": 54.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 111.1,
+      "relDeg": 165,
+      "ballY": 252.5
+     },
+     "0.3": {
+      "dist": 42.8,
+      "relDeg": 135,
+      "ballY": 182.7
+     },
+     "0.6": {
+      "dist": 65.5,
+      "relDeg": 153,
+      "ballY": 217.6
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 439.1,
+    "ballY": 307.3,
+    "ballSpeed": 52.2,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 118.3,
+      "relDeg": 165,
+      "ballY": 295.5
+     },
+     "0.3": {
+      "dist": 48.6,
+      "relDeg": 134,
+      "ballY": 229.1
+     },
+     "0.6": {
+      "dist": 70.7,
+      "relDeg": 153,
+      "ballY": 263.1
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 514.6,
+    "ballY": 291.8,
+    "ballSpeed": 26.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 222.5,
+      "relDeg": 154,
+      "ballY": 290.7
+     },
+     "0.3": {
+      "dist": 88,
+      "relDeg": 132,
+      "ballY": 283.9
+     },
+     "0.6": {
+      "dist": 144.5,
+      "relDeg": 145,
+      "ballY": 287.4
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 553.7,
+    "ballY": 362.5,
+    "ballSpeed": 37.2,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 142.9,
+      "relDeg": 162,
+      "ballY": 354.1
+     },
+     "0.3": {
+      "dist": 59,
+      "relDeg": 129,
+      "ballY": 305.9
+     },
+     "0.6": {
+      "dist": 87.5,
+      "relDeg": 149,
+      "ballY": 330.9
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 507,
+    "ballY": 229.8,
+    "ballSpeed": 26.1,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 205.1,
+      "relDeg": 153,
+      "ballY": 226.7
+     },
+     "0.3": {
+      "dist": 83.1,
+      "relDeg": 131,
+      "ballY": 208.9
+     },
+     "0.6": {
+      "dist": 133.1,
+      "relDeg": 144,
+      "ballY": 218.2
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 514.6,
+    "ballY": 291.8,
+    "ballSpeed": 26.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 222.5,
+      "relDeg": 154,
+      "ballY": 290.7
+     },
+     "0.3": {
+      "dist": 88,
+      "relDeg": 132,
+      "ballY": 283.9
+     },
+     "0.6": {
+      "dist": 144.5,
+      "relDeg": 145,
+      "ballY": 287.4
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 430.6,
+    "ballY": 373.5,
+    "ballSpeed": 43.9,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.1,
+    "at": {
+     "1": {
+      "dist": 130.3,
+      "relDeg": 166,
+      "ballY": 363.7
+     },
+     "0.3": {
+      "dist": 52.3,
+      "relDeg": 134,
+      "ballY": 306.5
+     },
+     "0.6": {
+      "dist": 77.7,
+      "relDeg": 154,
+      "ballY": 336.4
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 327,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 475.3,
+    "ballY": 396.6,
+    "ballSpeed": 115.5,
+    "lossSeconds": 1.2,
+    "contacts": 0,
+    "shotTravel": 88.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 491.5,
+    "at": {
+     "1": {
+      "dist": 152.2,
+      "relDeg": 118,
+      "ballY": 418.9
+     },
+     "0.3": {
+      "dist": 112,
+      "relDeg": 30,
+      "ballY": 440
+     },
+     "0.6": {
+      "dist": 121.9,
+      "relDeg": 53,
+      "ballY": 480.2
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 564,
+    "playerY": 336,
+    "minPlayerY": 280,
+    "maxPlayerY": 336,
+    "ballX": 482.3,
+    "ballY": 296.5,
+    "ballSpeed": 36.9,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "0.6": {
+      "dist": 35.9,
+      "relDeg": 42,
+      "ballY": 295.4
+     },
+     "1.2": {
+      "dist": 58.1,
+      "relDeg": 153,
+      "ballY": 256.3
+     },
+     "1.85": {
+      "dist": 80.7,
+      "relDeg": 149,
+      "ballY": 294.3
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 526.2,
+    "at": {}
+   }
+  },
+  "60": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 397.5,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 116.5,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 497.4,
+    "ballY": 280,
+    "ballSpeed": 166.8,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 128,
+    "minPlayerY": 128,
+    "maxPlayerY": 380,
+    "ballX": 444.7,
+    "ballY": 283.9,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 293.6
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 350.2
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 320.4
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 158,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 383.5,
+    "ballY": 280,
+    "ballSpeed": 27.7,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 189.7,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 78.3,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 122.8,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332,
+    "minPlayerY": 80,
+    "maxPlayerY": 332,
+    "ballX": 444.7,
+    "ballY": 176.1,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 166.4
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 109.8
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 139.6
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 228,
+    "minPlayerY": 228,
+    "maxPlayerY": 480,
+    "ballX": 444.7,
+    "ballY": 383.9,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 393.6
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 450.2
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 420.4
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 706.9,
+    "ballY": 280,
+    "ballSpeed": 202.8,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 328.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 569.3,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 895,
+    "ballY": 280,
+    "ballSpeed": 351.5,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 432.8,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 272.4,
+    "ballY": 280,
+    "ballSpeed": 3.9,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 250.5,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 825.1,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -5.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 250.5,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 444.7,
+    "ballY": 296.1,
+    "ballSpeed": 43.5,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 128.5,
+      "relDeg": 164,
+      "ballY": 286.4
+     },
+     "0.3": {
+      "dist": 50.7,
+      "relDeg": 131,
+      "ballY": 229.8
+     },
+     "0.6": {
+      "dist": 75.9,
+      "relDeg": 151,
+      "ballY": 259.6
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.3,
+    "playerY": 402.8,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.8,
+    "ballX": 464,
+    "ballY": 244.4,
+    "ballSpeed": 40.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 129.4,
+      "relDeg": 166,
+      "ballY": 235.4
+     },
+     "0.3": {
+      "dist": 47.2,
+      "relDeg": 133,
+      "ballY": 181.7
+     },
+     "0.6": {
+      "dist": 74.1,
+      "relDeg": 153,
+      "ballY": 210.7
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 440.4,
+    "ballY": 296,
+    "ballSpeed": 41,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 127,
+      "relDeg": 166,
+      "ballY": 286.9
+     },
+     "0.3": {
+      "dist": 46.4,
+      "relDeg": 133,
+      "ballY": 231.6
+     },
+     "0.6": {
+      "dist": 72.2,
+      "relDeg": 153,
+      "ballY": 261.5
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 477.7,
+    "ballY": 290.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 289.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 283.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 286.6
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 544.1,
+    "ballY": 370.2,
+    "ballSpeed": 38.8,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251,
+    "at": {
+     "1": {
+      "dist": 133.1,
+      "relDeg": 165,
+      "ballY": 361.5
+     },
+     "0.3": {
+      "dist": 50.5,
+      "relDeg": 131,
+      "ballY": 309.8
+     },
+     "0.6": {
+      "dist": 77.5,
+      "relDeg": 152,
+      "ballY": 337.6
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 477.7,
+    "ballY": 210.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 209.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 203.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 206.6
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 477.7,
+    "ballY": 290.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 289.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 283.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 286.6
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 440.9,
+    "ballY": 361.2,
+    "ballSpeed": 34.4,
+    "lossSeconds": 1.2,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 255.5,
+    "at": {
+     "1": {
+      "dist": 142.7,
+      "relDeg": 163,
+      "ballY": 353.5
+     },
+     "0.3": {
+      "dist": 56.7,
+      "relDeg": 126,
+      "ballY": 309.4
+     },
+     "0.6": {
+      "dist": 85.6,
+      "relDeg": 149,
+      "ballY": 332.3
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 323.5,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 426.2,
+    "ballY": 387.9,
+    "ballSpeed": 112.2,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": 54.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 501.9,
+    "at": {
+     "1": {
+      "dist": 122,
+      "relDeg": 130,
+      "ballY": 411.3
+     },
+     "0.3": {
+      "dist": 106.6,
+      "relDeg": 21,
+      "ballY": 442.3
+     },
+     "0.6": {
+      "dist": 96.6,
+      "relDeg": 44,
+      "ballY": 475.6
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 557,
+    "playerY": 332.5,
+    "minPlayerY": 280,
+    "maxPlayerY": 332.5,
+    "ballX": 491.3,
+    "ballY": 285.9,
+    "ballSpeed": 64.8,
+    "lossSeconds": 0.4,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "0.6": {
+      "dist": 33.1,
+      "relDeg": 43,
+      "ballY": 287.2
+     },
+     "1.2": {
+      "dist": 58.2,
+      "relDeg": 163,
+      "ballY": 266.4
+     },
+     "1.85": {
+      "dist": 80.6,
+      "relDeg": 145,
+      "ballY": 285.9
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 526.2,
+    "at": {}
+   }
+  },
+  "120": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 398.8,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 118.3,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 495.4,
+    "ballY": 280,
+    "ballSpeed": 162.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 128,
+    "minPlayerY": 128,
+    "maxPlayerY": 380,
+    "ballX": 441.3,
+    "ballY": 291.1,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 298.9
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 348.2
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 320.3
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 158,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 368.8,
+    "ballY": 280,
+    "ballSpeed": 30.8,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 175.7,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 68.1,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 110.7,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332,
+    "minPlayerY": 80,
+    "maxPlayerY": 332,
+    "ballX": 441.3,
+    "ballY": 168.9,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 161.1
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 111.8
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 139.7
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 228,
+    "minPlayerY": 228,
+    "maxPlayerY": 480,
+    "ballX": 441.3,
+    "ballY": 391.1,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 398.9
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 448.2
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 420.3
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 689.7,
+    "ballY": 280,
+    "ballSpeed": 194,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 317.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 549.5,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 891.8,
+    "ballY": 280,
+    "ballSpeed": 345.4,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 441.9,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 278.9,
+    "ballY": 280,
+    "ballSpeed": 0.1,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 826.9,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -5.6,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 267.1,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 441.3,
+    "ballY": 288.9,
+    "ballSpeed": 34.8,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 132.7,
+      "relDeg": 166,
+      "ballY": 281.1
+     },
+     "0.3": {
+      "dist": 45.6,
+      "relDeg": 133,
+      "ballY": 231.8
+     },
+     "0.6": {
+      "dist": 73.8,
+      "relDeg": 154,
+      "ballY": 259.7
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.3,
+    "playerY": 402.8,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.8,
+    "ballX": 458.1,
+    "ballY": 249.3,
+    "ballSpeed": 37.7,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 122.7,
+      "relDeg": 168,
+      "ballY": 240.9
+     },
+     "0.3": {
+      "dist": 39,
+      "relDeg": 135,
+      "ballY": 186.2
+     },
+     "0.6": {
+      "dist": 64.9,
+      "relDeg": 156,
+      "ballY": 217.7
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 439.9,
+    "ballY": 291.2,
+    "ballSpeed": 35.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 130.3,
+      "relDeg": 167,
+      "ballY": 283.3
+     },
+     "0.3": {
+      "dist": 43.9,
+      "relDeg": 134,
+      "ballY": 232.8
+     },
+     "0.6": {
+      "dist": 71.6,
+      "relDeg": 154,
+      "ballY": 261.5
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 447.9,
+    "ballY": 287.7,
+    "ballSpeed": 3.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 206.6,
+      "relDeg": 169,
+      "ballY": 286.9
+     },
+     "0.3": {
+      "dist": 72,
+      "relDeg": 147,
+      "ballY": 282.4
+     },
+     "0.6": {
+      "dist": 127.2,
+      "relDeg": 162,
+      "ballY": 284.8
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 542.9,
+    "ballY": 367.5,
+    "ballSpeed": 34.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 245.2,
+    "at": {
+     "1": {
+      "dist": 134.3,
+      "relDeg": 166,
+      "ballY": 359.8
+     },
+     "0.3": {
+      "dist": 46.9,
+      "relDeg": 132,
+      "ballY": 311.8
+     },
+     "0.6": {
+      "dist": 75.3,
+      "relDeg": 153,
+      "ballY": 338.8
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 447.9,
+    "ballY": 207.7,
+    "ballSpeed": 3.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 206.6,
+      "relDeg": 169,
+      "ballY": 206.9
+     },
+     "0.3": {
+      "dist": 72,
+      "relDeg": 147,
+      "ballY": 202.4
+     },
+     "0.6": {
+      "dist": 127.2,
+      "relDeg": 162,
+      "ballY": 204.8
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 449.4,
+    "ballY": 287.6,
+    "ballSpeed": 3.5,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 207,
+      "relDeg": 169,
+      "ballY": 286.8
+     },
+     "0.3": {
+      "dist": 72.7,
+      "relDeg": 147,
+      "ballY": 282.4
+     },
+     "0.6": {
+      "dist": 127.7,
+      "relDeg": 162,
+      "ballY": 284.7
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 447.3,
+    "ballY": 335.6,
+    "ballSpeed": 20.2,
+    "lossSeconds": 1.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 257.7,
+    "at": {
+     "1": {
+      "dist": 165.9,
+      "relDeg": 163,
+      "ballY": 331.1
+     },
+     "0.3": {
+      "dist": 63,
+      "relDeg": 127,
+      "ballY": 305.5
+     },
+     "0.6": {
+      "dist": 100.1,
+      "relDeg": 151,
+      "ballY": 318.8
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 323.5,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 476,
+    "ballY": 402.8,
+    "ballSpeed": 117,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": 97.5,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 509.2,
+    "at": {
+     "1": {
+      "dist": 153,
+      "relDeg": 115,
+      "ballY": 424.8
+     },
+     "0.3": {
+      "dist": 107.2,
+      "relDeg": 32,
+      "ballY": 433.4
+     },
+     "0.6": {
+      "dist": 127.4,
+      "relDeg": 51,
+      "ballY": 485.5
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 557,
+    "playerY": 332.5,
+    "minPlayerY": 280,
+    "maxPlayerY": 332.5,
+    "ballX": 480.7,
+    "ballY": 283.7,
+    "ballSpeed": 41.1,
+    "lossSeconds": 0.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "0.6": {
+      "dist": 30.8,
+      "relDeg": 33,
+      "ballY": 285.7
+     },
+     "1.2": {
+      "dist": 49.8,
+      "relDeg": 174,
+      "ballY": 272.5
+     },
+     "1.85": {
+      "dist": 90.6,
+      "relDeg": 147,
+      "ballY": 283.7
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 525.7,
+    "at": {}
+   }
+  },
+  "144": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 399,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 118.5,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 495.2,
+    "ballY": 280,
+    "ballSpeed": 162.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 127.7,
+    "minPlayerY": 127.7,
+    "maxPlayerY": 380,
+    "ballX": 441,
+    "ballY": 291.1,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 298.8
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 347.2
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 319.8
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 157.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 373.8,
+    "ballY": 280,
+    "ballSpeed": 27,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 179.9,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 68.3,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 113.2,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 332.3,
+    "minPlayerY": 80,
+    "maxPlayerY": 332.3,
+    "ballX": 441,
+    "ballY": 168.9,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 161.2
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 112.8
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 140.2
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 227.7,
+    "minPlayerY": 227.7,
+    "maxPlayerY": 480,
+    "ballX": 441,
+    "ballY": 391.1,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 398.8
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 447.2
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 419.8
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 312.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 685.2,
+    "ballY": 280,
+    "ballSpeed": 191.8,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 315.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 543.9,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 417.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 890.4,
+    "ballY": 280,
+    "ballSpeed": 345.9,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 439.5,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 281.3,
+    "ballY": 280,
+    "ballSpeed": 1.1,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 827.4,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -8.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 281,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 452.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 452.3,
+    "ballX": 441,
+    "ballY": 288.9,
+    "ballSpeed": 34.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 132.6,
+      "relDeg": 166,
+      "ballY": 281.2
+     },
+     "0.3": {
+      "dist": 45.2,
+      "relDeg": 134,
+      "ballY": 232.8
+     },
+     "0.6": {
+      "dist": 73.9,
+      "relDeg": 154,
+      "ballY": 260.2
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.7,
+    "playerY": 402.9,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.9,
+    "ballX": 461,
+    "ballY": 244.9,
+    "ballSpeed": 36,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 127.1,
+      "relDeg": 167,
+      "ballY": 236.8
+     },
+     "0.3": {
+      "dist": 41.8,
+      "relDeg": 135,
+      "ballY": 185.4
+     },
+     "0.6": {
+      "dist": 69.1,
+      "relDeg": 155,
+      "ballY": 214.9
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 452.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 452.3,
+    "ballX": 439.8,
+    "ballY": 291.4,
+    "ballSpeed": 35.2,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 130.1,
+      "relDeg": 167,
+      "ballY": 283.5
+     },
+     "0.3": {
+      "dist": 43.8,
+      "relDeg": 134,
+      "ballY": 233.6
+     },
+     "0.6": {
+      "dist": 71.8,
+      "relDeg": 155,
+      "ballY": 262.1
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 446.1,
+    "ballY": 286.7,
+    "ballSpeed": 3.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.2,
+      "relDeg": 170,
+      "ballY": 286
+     },
+     "0.3": {
+      "dist": 72.6,
+      "relDeg": 149,
+      "ballY": 282.2
+     },
+     "0.6": {
+      "dist": 128.2,
+      "relDeg": 163,
+      "ballY": 284.2
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 543.6,
+    "ballY": 365.8,
+    "ballSpeed": 33.4,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 244.7,
+    "at": {
+     "1": {
+      "dist": 136,
+      "relDeg": 166,
+      "ballY": 358.3
+     },
+     "0.3": {
+      "dist": 47.8,
+      "relDeg": 132,
+      "ballY": 312
+     },
+     "0.6": {
+      "dist": 77.1,
+      "relDeg": 153,
+      "ballY": 338
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 452.3,
+    "ballX": 446.1,
+    "ballY": 206.7,
+    "ballSpeed": 3.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.2,
+      "relDeg": 170,
+      "ballY": 206
+     },
+     "0.3": {
+      "dist": 72.6,
+      "relDeg": 149,
+      "ballY": 202.2
+     },
+     "0.6": {
+      "dist": 128.2,
+      "relDeg": 163,
+      "ballY": 204.2
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 446.5,
+    "ballY": 286.6,
+    "ballSpeed": 3.2,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.3,
+      "relDeg": 170,
+      "ballY": 286
+     },
+     "0.3": {
+      "dist": 72.8,
+      "relDeg": 148,
+      "ballY": 282.2
+     },
+     "0.6": {
+      "dist": 128.3,
+      "relDeg": 163,
+      "ballY": 284.1
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 448.3,
+    "ballY": 330.3,
+    "ballSpeed": 17.3,
+    "lossSeconds": 1.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 258.1,
+    "at": {
+     "1": {
+      "dist": 170.7,
+      "relDeg": 163,
+      "ballY": 326.4
+     },
+     "0.3": {
+      "dist": 64.6,
+      "relDeg": 128,
+      "ballY": 304.7
+     },
+     "0.6": {
+      "dist": 103.7,
+      "relDeg": 151,
+      "ballY": 316
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 322.9,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 468,
+    "ballY": 403.3,
+    "ballSpeed": 115.2,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": 91.7,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 505.2,
+    "at": {
+     "1": {
+      "dist": 146.6,
+      "relDeg": 116,
+      "ballY": 425.5
+     },
+     "0.3": {
+      "dist": 106.4,
+      "relDeg": 31,
+      "ballY": 434.9
+     },
+     "0.6": {
+      "dist": 123.3,
+      "relDeg": 50,
+      "ballY": 485.3
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 555.8,
+    "playerY": 332.5,
+    "minPlayerY": 280,
+    "maxPlayerY": 332.5,
+    "ballX": 464.3,
+    "ballY": 282.5,
+    "ballSpeed": 32,
+    "lossSeconds": 0.4,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "0.6": {
+      "dist": 30.6,
+      "relDeg": 28,
+      "ballY": 283.6
+     },
+     "1.2": {
+      "dist": 50.4,
+      "relDeg": 180,
+      "ballY": 271.9
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 524.3,
+    "at": {}
+   }
+  }
+ },
+ "v2-turn": {
+  "30": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 395.1,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 113,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 498.1,
+    "ballY": 280,
+    "ballSpeed": 147.4,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 154.7,
+    "minPlayerY": 154.7,
+    "maxPlayerY": 380,
+    "ballX": 444.9,
+    "ballY": 295.7,
+    "ballSpeed": 45.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 115,
+      "relDeg": 162,
+      "ballY": 305.9
+     },
+     "0.3": {
+      "dist": 47.3,
+      "relDeg": 117,
+      "ballY": 362.4
+     },
+     "0.6": {
+      "dist": 66.3,
+      "relDeg": 144,
+      "ballY": 334
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 174,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 418.9,
+    "ballY": 280,
+    "ballSpeed": 13.8,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 206.1,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 76.9,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 130.6,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 305.3,
+    "minPlayerY": 80,
+    "maxPlayerY": 305.3,
+    "ballX": 444.9,
+    "ballY": 164.3,
+    "ballSpeed": 45.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 115,
+      "relDeg": 162,
+      "ballY": 154.1
+     },
+     "0.3": {
+      "dist": 47.3,
+      "relDeg": 117,
+      "ballY": 97.6
+     },
+     "0.6": {
+      "dist": 66.3,
+      "relDeg": 144,
+      "ballY": 126
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 254.7,
+    "minPlayerY": 254.7,
+    "maxPlayerY": 480,
+    "ballX": 444.9,
+    "ballY": 395.7,
+    "ballSpeed": 45.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 115,
+      "relDeg": 162,
+      "ballY": 405.9
+     },
+     "0.3": {
+      "dist": 47.3,
+      "relDeg": 117,
+      "ballY": 462.4
+     },
+     "0.6": {
+      "dist": 66.3,
+      "relDeg": 144,
+      "ballY": 434
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 687.3,
+    "ballY": 280,
+    "ballSpeed": 190.2,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 308.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 524.7,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 894.6,
+    "ballY": 280,
+    "ballSpeed": 348.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 439.9,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 779.5,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 551.3,
+    "ballY": 280,
+    "ballSpeed": 212.8,
+    "lossSeconds": 0.7,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 274,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 826.1,
+    "ballY": 280,
+    "ballSpeed": 0.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -9.7,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 425.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 425.3,
+    "ballX": 444.9,
+    "ballY": 284.3,
+    "ballSpeed": 45.4,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 115,
+      "relDeg": 162,
+      "ballY": 274.1
+     },
+     "0.3": {
+      "dist": 47.3,
+      "relDeg": 117,
+      "ballY": 217.6
+     },
+     "0.6": {
+      "dist": 66.3,
+      "relDeg": 144,
+      "ballY": 246
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 434.7,
+    "playerY": 408.7,
+    "minPlayerY": 160,
+    "maxPlayerY": 408.7,
+    "ballX": 463.2,
+    "ballY": 267.1,
+    "ballSpeed": 54.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 111.1,
+      "relDeg": 165,
+      "ballY": 252.5
+     },
+     "0.3": {
+      "dist": 42.8,
+      "relDeg": 135,
+      "ballY": 182.7
+     },
+     "0.6": {
+      "dist": 65.5,
+      "relDeg": 153,
+      "ballY": 217.6
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 425.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 425.3,
+    "ballX": 437.4,
+    "ballY": 299.9,
+    "ballSpeed": 56.5,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 100.4,
+      "relDeg": 163,
+      "ballY": 287.1
+     },
+     "0.3": {
+      "dist": 39.3,
+      "relDeg": 118,
+      "ballY": 220.2
+     },
+     "0.6": {
+      "dist": 56.9,
+      "relDeg": 146,
+      "ballY": 252
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 514.6,
+    "ballY": 291.8,
+    "ballSpeed": 26.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 222.5,
+      "relDeg": 154,
+      "ballY": 290.7
+     },
+     "0.3": {
+      "dist": 88,
+      "relDeg": 132,
+      "ballY": 283.9
+     },
+     "0.6": {
+      "dist": 144.5,
+      "relDeg": 145,
+      "ballY": 287.4
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 548.1,
+    "ballY": 359.7,
+    "ballSpeed": 41.9,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 119.7,
+      "relDeg": 161,
+      "ballY": 350.3
+     },
+     "0.3": {
+      "dist": 50.4,
+      "relDeg": 115,
+      "ballY": 297.5
+     },
+     "0.6": {
+      "dist": 69.6,
+      "relDeg": 142,
+      "ballY": 324.3
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 507,
+    "ballY": 229.8,
+    "ballSpeed": 26.1,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 205.1,
+      "relDeg": 153,
+      "ballY": 226.7
+     },
+     "0.3": {
+      "dist": 83.1,
+      "relDeg": 131,
+      "ballY": 208.9
+     },
+     "0.6": {
+      "dist": 133.1,
+      "relDeg": 144,
+      "ballY": 218.2
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 514.6,
+    "ballY": 291.8,
+    "ballSpeed": 26.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "1": {
+      "dist": 222.5,
+      "relDeg": 154,
+      "ballY": 290.7
+     },
+     "0.3": {
+      "dist": 88,
+      "relDeg": 132,
+      "ballY": 283.9
+     },
+     "0.6": {
+      "dist": 144.5,
+      "relDeg": 145,
+      "ballY": 287.4
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 430.6,
+    "ballY": 373.5,
+    "ballSpeed": 43.9,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.1,
+    "at": {
+     "1": {
+      "dist": 130.3,
+      "relDeg": 166,
+      "ballY": 363.7
+     },
+     "0.3": {
+      "dist": 52.3,
+      "relDeg": 134,
+      "ballY": 306.5
+     },
+     "0.6": {
+      "dist": 77.7,
+      "relDeg": 154,
+      "ballY": 336.4
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 327,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 475.2,
+    "ballY": 403.5,
+    "ballSpeed": 115.4,
+    "lossSeconds": 1.2,
+    "contacts": 0,
+    "shotTravel": 88.7,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 491.3,
+    "at": {
+     "1": {
+      "dist": 147.9,
+      "relDeg": 115,
+      "ballY": 425.7
+     },
+     "0.3": {
+      "dist": 111.9,
+      "relDeg": 30,
+      "ballY": 437.3
+     },
+     "0.6": {
+      "dist": 127.9,
+      "relDeg": 49,
+      "ballY": 487
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 564,
+    "playerY": 314.7,
+    "minPlayerY": 280,
+    "maxPlayerY": 314.7,
+    "ballX": 536.2,
+    "ballY": 289,
+    "ballSpeed": 117.6,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": 0.8,
+    "maxBallSpeed": 252.1,
+    "at": {
+     "0.6": {
+      "dist": 42.4,
+      "relDeg": 64,
+      "ballY": 287.6
+     },
+     "1.2": {
+      "dist": 50.8,
+      "relDeg": 128,
+      "ballY": 265.8
+     },
+     "1.85": {
+      "dist": 34.2,
+      "relDeg": 130,
+      "ballY": 288.4
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 526.3,
+    "at": {}
+   }
+  },
+  "60": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 397.5,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 116.5,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 497.4,
+    "ballY": 280,
+    "ballSpeed": 166.8,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 153.3,
+    "minPlayerY": 153.3,
+    "maxPlayerY": 380,
+    "ballX": 443.8,
+    "ballY": 293.1,
+    "ballSpeed": 44.3,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 113.1,
+      "relDeg": 162,
+      "ballY": 303.1
+     },
+     "0.3": {
+      "dist": 42.9,
+      "relDeg": 117,
+      "ballY": 360.8
+     },
+     "0.6": {
+      "dist": 62.7,
+      "relDeg": 145,
+      "ballY": 330.4
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 179.3,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 397.7,
+    "ballY": 280,
+    "ballSpeed": 22.1,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 181.3,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 62.7,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 111,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 306.7,
+    "minPlayerY": 80,
+    "maxPlayerY": 306.7,
+    "ballX": 443.8,
+    "ballY": 166.9,
+    "ballSpeed": 44.3,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 113.1,
+      "relDeg": 162,
+      "ballY": 156.9
+     },
+     "0.3": {
+      "dist": 42.9,
+      "relDeg": 117,
+      "ballY": 99.2
+     },
+     "0.6": {
+      "dist": 62.7,
+      "relDeg": 145,
+      "ballY": 129.6
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 253.3,
+    "minPlayerY": 253.3,
+    "maxPlayerY": 480,
+    "ballX": 443.8,
+    "ballY": 393.1,
+    "ballSpeed": 44.3,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 113.1,
+      "relDeg": 162,
+      "ballY": 403.1
+     },
+     "0.3": {
+      "dist": 42.9,
+      "relDeg": 117,
+      "ballY": 460.8
+     },
+     "0.6": {
+      "dist": 62.7,
+      "relDeg": 145,
+      "ballY": 430.4
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 706.9,
+    "ballY": 280,
+    "ballSpeed": 202.8,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 328.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 569.3,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 895,
+    "ballY": 280,
+    "ballSpeed": 351.5,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 432.8,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 272.4,
+    "ballY": 280,
+    "ballSpeed": 3.9,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 250.5,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 825.1,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -5.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 250.5,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 426.7,
+    "minPlayerY": 200,
+    "maxPlayerY": 426.7,
+    "ballX": 443.8,
+    "ballY": 286.9,
+    "ballSpeed": 44.3,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 113.1,
+      "relDeg": 162,
+      "ballY": 276.9
+     },
+     "0.3": {
+      "dist": 42.9,
+      "relDeg": 117,
+      "ballY": 219.2
+     },
+     "0.6": {
+      "dist": 62.7,
+      "relDeg": 145,
+      "ballY": 249.6
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.3,
+    "playerY": 402.8,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.8,
+    "ballX": 464,
+    "ballY": 244.4,
+    "ballSpeed": 40.1,
+    "lossSeconds": 0.8,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 129.4,
+      "relDeg": 166,
+      "ballY": 235.4
+     },
+     "0.3": {
+      "dist": 47.2,
+      "relDeg": 133,
+      "ballY": 181.7
+     },
+     "0.6": {
+      "dist": 74.1,
+      "relDeg": 153,
+      "ballY": 210.7
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 426.7,
+    "minPlayerY": 200,
+    "maxPlayerY": 426.7,
+    "ballX": 440.2,
+    "ballY": 298.7,
+    "ballSpeed": 53.7,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 102.8,
+      "relDeg": 163,
+      "ballY": 286.6
+     },
+     "0.3": {
+      "dist": 38.4,
+      "relDeg": 118,
+      "ballY": 221
+     },
+     "0.6": {
+      "dist": 57.3,
+      "relDeg": 146,
+      "ballY": 253.4
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 477.7,
+    "ballY": 290.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 289.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 283.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 286.6
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 543.6,
+    "ballY": 366.9,
+    "ballSpeed": 44.3,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251,
+    "at": {
+     "1": {
+      "dist": 113.1,
+      "relDeg": 162,
+      "ballY": 356.9
+     },
+     "0.3": {
+      "dist": 42.8,
+      "relDeg": 118,
+      "ballY": 299.2
+     },
+     "0.6": {
+      "dist": 62.7,
+      "relDeg": 145,
+      "ballY": 329.6
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 477.7,
+    "ballY": 210.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 209.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 203.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 206.6
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 477.7,
+    "ballY": 290.7,
+    "ballSpeed": 11.4,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "1": {
+      "dist": 210.8,
+      "relDeg": 162,
+      "ballY": 289.6
+     },
+     "0.3": {
+      "dist": 79.2,
+      "relDeg": 139,
+      "ballY": 283.4
+     },
+     "0.6": {
+      "dist": 133.2,
+      "relDeg": 154,
+      "ballY": 286.6
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 440.9,
+    "ballY": 361.2,
+    "ballSpeed": 34.4,
+    "lossSeconds": 1.2,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 255.5,
+    "at": {
+     "1": {
+      "dist": 142.7,
+      "relDeg": 163,
+      "ballY": 353.5
+     },
+     "0.3": {
+      "dist": 56.7,
+      "relDeg": 126,
+      "ballY": 309.4
+     },
+     "0.6": {
+      "dist": 85.6,
+      "relDeg": 149,
+      "ballY": 332.3
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 323.5,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 426.2,
+    "ballY": 394.1,
+    "ballSpeed": 110,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": 54.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 491.4,
+    "at": {
+     "1": {
+      "dist": 117.6,
+      "relDeg": 128,
+      "ballY": 416.9
+     },
+     "0.3": {
+      "dist": 103.9,
+      "relDeg": 22,
+      "ballY": 438.1
+     },
+     "0.6": {
+      "dist": 100.6,
+      "relDeg": 42,
+      "ballY": 479.7
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 557,
+    "playerY": 292.5,
+    "minPlayerY": 260,
+    "maxPlayerY": 312.5,
+    "ballX": 545.3,
+    "ballY": 259.1,
+    "ballSpeed": 114.7,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": 0.8,
+    "maxBallSpeed": 251.2,
+    "at": {
+     "0.6": {
+      "dist": 31.8,
+      "relDeg": 67,
+      "ballY": 279
+     },
+     "1.2": {
+      "dist": 42.2,
+      "relDeg": 115,
+      "ballY": 267.9
+     },
+     "1.85": {
+      "dist": 35.4,
+      "relDeg": 109,
+      "ballY": 259.1
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 526.2,
+    "at": {}
+   }
+  },
+  "120": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 398.8,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 118.3,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 495.4,
+    "ballY": 280,
+    "ballSpeed": 162.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 152,
+    "minPlayerY": 152,
+    "maxPlayerY": 380,
+    "ballX": 441.2,
+    "ballY": 289.3,
+    "ballSpeed": 45.1,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 110,
+      "relDeg": 163,
+      "ballY": 299.4
+     },
+     "0.3": {
+      "dist": 38.2,
+      "relDeg": 120,
+      "ballY": 359.9
+     },
+     "0.6": {
+      "dist": 58.9,
+      "relDeg": 147,
+      "ballY": 327.1
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 182,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 377.6,
+    "ballY": 280,
+    "ballSpeed": 30.4,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 160.4,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 52.7,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 95.1,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 308,
+    "minPlayerY": 80,
+    "maxPlayerY": 308,
+    "ballX": 441.2,
+    "ballY": 170.7,
+    "ballSpeed": 45.1,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 110,
+      "relDeg": 163,
+      "ballY": 160.6
+     },
+     "0.3": {
+      "dist": 38.2,
+      "relDeg": 120,
+      "ballY": 100.1
+     },
+     "0.6": {
+      "dist": 58.9,
+      "relDeg": 147,
+      "ballY": 132.9
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 252,
+    "minPlayerY": 252,
+    "maxPlayerY": 480,
+    "ballX": 441.2,
+    "ballY": 389.3,
+    "ballSpeed": 45.1,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 110,
+      "relDeg": 163,
+      "ballY": 399.4
+     },
+     "0.3": {
+      "dist": 38.2,
+      "relDeg": 120,
+      "ballY": 459.9
+     },
+     "0.6": {
+      "dist": 58.9,
+      "relDeg": 147,
+      "ballY": 427.1
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 313,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 689.7,
+    "ballY": 280,
+    "ballSpeed": 194,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 317.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 549.5,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 418,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 891.8,
+    "ballY": 280,
+    "ballSpeed": 345.4,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 441.9,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 278.9,
+    "ballY": 280,
+    "ballSpeed": 0.1,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 826.9,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -5.6,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 267.1,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 428,
+    "minPlayerY": 200,
+    "maxPlayerY": 428,
+    "ballX": 441.2,
+    "ballY": 290.7,
+    "ballSpeed": 45.1,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 110,
+      "relDeg": 163,
+      "ballY": 280.6
+     },
+     "0.3": {
+      "dist": 38.2,
+      "relDeg": 120,
+      "ballY": 220.1
+     },
+     "0.6": {
+      "dist": 58.9,
+      "relDeg": 147,
+      "ballY": 252.9
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.3,
+    "playerY": 402.8,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.8,
+    "ballX": 458.1,
+    "ballY": 249.3,
+    "ballSpeed": 37.7,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 122.7,
+      "relDeg": 168,
+      "ballY": 240.9
+     },
+     "0.3": {
+      "dist": 39,
+      "relDeg": 135,
+      "ballY": 186.2
+     },
+     "0.6": {
+      "dist": 64.9,
+      "relDeg": 156,
+      "ballY": 217.7
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 428,
+    "minPlayerY": 200,
+    "maxPlayerY": 428,
+    "ballX": 439.7,
+    "ballY": 288.2,
+    "ballSpeed": 40.4,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 110.9,
+      "relDeg": 164,
+      "ballY": 279.2
+     },
+     "0.3": {
+      "dist": 36.4,
+      "relDeg": 119,
+      "ballY": 221.1
+     },
+     "0.6": {
+      "dist": 56.8,
+      "relDeg": 147,
+      "ballY": 254.4
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 447.9,
+    "ballY": 287.7,
+    "ballSpeed": 3.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 206.6,
+      "relDeg": 169,
+      "ballY": 286.9
+     },
+     "0.3": {
+      "dist": 72,
+      "relDeg": 147,
+      "ballY": 282.4
+     },
+     "0.6": {
+      "dist": 127.2,
+      "relDeg": 162,
+      "ballY": 284.8
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 542.7,
+    "ballY": 364.6,
+    "ballSpeed": 38.9,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 245.2,
+    "at": {
+     "1": {
+      "dist": 114.9,
+      "relDeg": 163,
+      "ballY": 355.9
+     },
+     "0.3": {
+      "dist": 39.7,
+      "relDeg": 118,
+      "ballY": 300.1
+     },
+     "0.6": {
+      "dist": 60.5,
+      "relDeg": 146,
+      "ballY": 332
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452,
+    "minPlayerY": 200,
+    "maxPlayerY": 452,
+    "ballX": 447.9,
+    "ballY": 207.7,
+    "ballSpeed": 3.6,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 206.6,
+      "relDeg": 169,
+      "ballY": 206.9
+     },
+     "0.3": {
+      "dist": 72,
+      "relDeg": 147,
+      "ballY": 202.4
+     },
+     "0.6": {
+      "dist": 127.2,
+      "relDeg": 162,
+      "ballY": 204.8
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 449.4,
+    "ballY": 287.6,
+    "ballSpeed": 3.5,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.7,
+    "at": {
+     "1": {
+      "dist": 207,
+      "relDeg": 169,
+      "ballY": 286.8
+     },
+     "0.3": {
+      "dist": 72.7,
+      "relDeg": 147,
+      "ballY": 282.4
+     },
+     "0.6": {
+      "dist": 127.7,
+      "relDeg": 162,
+      "ballY": 284.7
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 447.3,
+    "ballY": 335.6,
+    "ballSpeed": 20.2,
+    "lossSeconds": 1.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 257.7,
+    "at": {
+     "1": {
+      "dist": 165.9,
+      "relDeg": 163,
+      "ballY": 331.1
+     },
+     "0.3": {
+      "dist": 63,
+      "relDeg": 127,
+      "ballY": 305.5
+     },
+     "0.6": {
+      "dist": 100.1,
+      "relDeg": 151,
+      "ballY": 318.8
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 323.5,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 476,
+    "ballY": 402.8,
+    "ballSpeed": 117,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": 97.5,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 509.2,
+    "at": {
+     "1": {
+      "dist": 152.7,
+      "relDeg": 115,
+      "ballY": 424.8
+     },
+     "0.3": {
+      "dist": 107.2,
+      "relDeg": 32,
+      "ballY": 432.8
+     },
+     "0.6": {
+      "dist": 127.8,
+      "relDeg": 51,
+      "ballY": 485.5
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 557,
+    "playerY": 292.5,
+    "minPlayerY": 260,
+    "maxPlayerY": 312.5,
+    "ballX": 529.9,
+    "ballY": 262.3,
+    "ballSpeed": 114.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": 0.8,
+    "maxBallSpeed": 243.9,
+    "at": {
+     "0.6": {
+      "dist": 30.3,
+      "relDeg": 58,
+      "ballY": 275.6
+     },
+     "1.2": {
+      "dist": 42,
+      "relDeg": 130,
+      "ballY": 259.1
+     },
+     "1.85": {
+      "dist": 40.6,
+      "relDeg": 132,
+      "ballY": 262.3
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 525.3,
+    "at": {}
+   }
+  },
+  "144": {
+   "straight run": {
+    "playerX": 360,
+    "playerY": 400,
+    "minPlayerY": 400,
+    "maxPlayerY": 400,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "diagonal run": {
+    "playerX": 298.5,
+    "playerY": 251.5,
+    "minPlayerY": 251.5,
+    "maxPlayerY": 399,
+    "ballX": 450,
+    "ballY": 500,
+    "ballSpeed": 0,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "run into top boundary": {
+    "playerX": 300,
+    "playerY": 68,
+    "minPlayerY": 68,
+    "maxPlayerY": 118.5,
+    "ballX": 600,
+    "ballY": 270,
+    "ballSpeed": 0,
+    "lossSeconds": 1.5,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 0,
+    "at": {}
+   },
+   "dribble straight": {
+    "playerX": 465,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 495.2,
+    "ballY": 280,
+    "ballSpeed": 162.2,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {}
+   },
+   "turn 90 (R→U)": {
+    "playerX": 410,
+    "playerY": 152.2,
+    "minPlayerY": 152.2,
+    "maxPlayerY": 380,
+    "ballX": 440.8,
+    "ballY": 294.3,
+    "ballSpeed": 39.3,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 113,
+      "relDeg": 164,
+      "ballY": 303.1
+     },
+     "0.3": {
+      "dist": 37.7,
+      "relDeg": 120,
+      "ballY": 359.3
+     },
+     "0.6": {
+      "dist": 58.8,
+      "relDeg": 147,
+      "ballY": 327
+     }
+    }
+   },
+   "turn 180 (R→L)": {
+    "playerX": 182.2,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 374.8,
+    "ballY": 280,
+    "ballSpeed": 31.5,
+    "lossSeconds": 0.9,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 157.5,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.3": {
+      "dist": 52.1,
+      "relDeg": 180,
+      "ballY": 280
+     },
+     "0.6": {
+      "dist": 93.5,
+      "relDeg": 180,
+      "ballY": 280
+     }
+    }
+   },
+   "top line pull down (R→D)": {
+    "playerX": 410,
+    "playerY": 307.8,
+    "minPlayerY": 80,
+    "maxPlayerY": 307.8,
+    "ballX": 440.8,
+    "ballY": 165.7,
+    "ballSpeed": 39.3,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 113,
+      "relDeg": 164,
+      "ballY": 156.9
+     },
+     "0.3": {
+      "dist": 37.7,
+      "relDeg": 120,
+      "ballY": 100.7
+     },
+     "0.6": {
+      "dist": 58.8,
+      "relDeg": 147,
+      "ballY": 133
+     }
+    }
+   },
+   "bottom line pull up (R→U)": {
+    "playerX": 410,
+    "playerY": 252.2,
+    "minPlayerY": 252.2,
+    "maxPlayerY": 480,
+    "ballX": 440.8,
+    "ballY": 394.3,
+    "ballSpeed": 39.3,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 113,
+      "relDeg": 164,
+      "ballY": 403.1
+     },
+     "0.3": {
+      "dist": 37.7,
+      "relDeg": 120,
+      "ballY": 459.3
+     },
+     "0.6": {
+      "dist": 58.8,
+      "relDeg": 147,
+      "ballY": 427
+     }
+    }
+   },
+   "short kick": {
+    "playerX": 312.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 685.2,
+    "ballY": 280,
+    "ballSpeed": 191.8,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 315.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 543.9,
+    "at": {}
+   },
+   "charged kick (0.5 s)": {
+    "playerX": 417.7,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 890.4,
+    "ballY": 280,
+    "ballSpeed": 345.9,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": 439.5,
+    "goal": true,
+    "frontSeconds": null,
+    "maxBallSpeed": 800,
+    "at": {}
+   },
+   "defender contact": {
+    "playerX": 515,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 281.3,
+    "ballY": 280,
+    "ballSpeed": 1.1,
+    "lossSeconds": 0.9,
+    "contacts": 1,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {}
+   },
+   "goalkeeper blocks shot": {
+    "playerX": 795,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 827.4,
+    "ballY": 280,
+    "ballSpeed": 0,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": -8.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 281,
+    "at": {}
+   },
+   "turn 90 (R→D)": {
+    "playerX": 410,
+    "playerY": 427.8,
+    "minPlayerY": 200,
+    "maxPlayerY": 427.8,
+    "ballX": 440.8,
+    "ballY": 285.7,
+    "ballSpeed": 39.3,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 113,
+      "relDeg": 164,
+      "ballY": 276.9
+     },
+     "0.3": {
+      "dist": 37.7,
+      "relDeg": 120,
+      "ballY": 220.7
+     },
+     "0.6": {
+      "dist": 58.8,
+      "relDeg": 147,
+      "ballY": 253
+     }
+    }
+   },
+   "diagonal change (R→RD→D)": {
+    "playerX": 432.7,
+    "playerY": 402.9,
+    "minPlayerY": 160,
+    "maxPlayerY": 402.9,
+    "ballX": 461,
+    "ballY": 244.9,
+    "ballSpeed": 36,
+    "lossSeconds": 0.7,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 127.1,
+      "relDeg": 167,
+      "ballY": 236.8
+     },
+     "0.3": {
+      "dist": 41.8,
+      "relDeg": 135,
+      "ballY": 185.4
+     },
+     "0.6": {
+      "dist": 69.1,
+      "relDeg": 155,
+      "ballY": 214.9
+     }
+    }
+   },
+   "stop and restart (R, stop, D)": {
+    "playerX": 410,
+    "playerY": 427.8,
+    "minPlayerY": 200,
+    "maxPlayerY": 427.8,
+    "ballX": 439.7,
+    "ballY": 288.1,
+    "ballSpeed": 40.1,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 110.6,
+      "relDeg": 164,
+      "ballY": 279.1
+     },
+     "0.3": {
+      "dist": 36.3,
+      "relDeg": 120,
+      "ballY": 221.5
+     },
+     "0.6": {
+      "dist": 56.8,
+      "relDeg": 147,
+      "ballY": 254.7
+     }
+    }
+   },
+   "turn with defender ahead": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 446.1,
+    "ballY": 286.7,
+    "ballSpeed": 3.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.2,
+      "relDeg": 170,
+      "ballY": 286
+     },
+     "0.3": {
+      "dist": 72.6,
+      "relDeg": 149,
+      "ballY": 282.2
+     },
+     "0.6": {
+      "dist": 128.2,
+      "relDeg": 163,
+      "ballY": 284.2
+     }
+    }
+   },
+   "turn with defender behind": {
+    "playerX": 510,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 543.4,
+    "ballY": 363.1,
+    "ballSpeed": 38.1,
+    "lossSeconds": 0.6,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 244.7,
+    "at": {
+     "1": {
+      "dist": 116.1,
+      "relDeg": 163,
+      "ballY": 354.5
+     },
+     "0.3": {
+      "dist": 40.3,
+      "relDeg": 119,
+      "ballY": 300.2
+     },
+     "0.6": {
+      "dist": 61.7,
+      "relDeg": 146,
+      "ballY": 331.3
+     }
+    }
+   },
+   "turn with defender beside": {
+    "playerX": 410,
+    "playerY": 452.3,
+    "minPlayerY": 200,
+    "maxPlayerY": 452.3,
+    "ballX": 446.1,
+    "ballY": 206.7,
+    "ballSpeed": 3.3,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.2,
+      "relDeg": 170,
+      "ballY": 206
+     },
+     "0.3": {
+      "dist": 72.6,
+      "relDeg": 149,
+      "ballY": 202.2
+     },
+     "0.6": {
+      "dist": 128.2,
+      "relDeg": 163,
+      "ballY": 204.2
+     }
+    }
+   },
+   "turn between two defenders": {
+    "playerX": 410,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 446.5,
+    "ballY": 286.6,
+    "ballSpeed": 3.2,
+    "lossSeconds": 1,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "1": {
+      "dist": 207.3,
+      "relDeg": 170,
+      "ballY": 286
+     },
+     "0.3": {
+      "dist": 72.8,
+      "relDeg": 148,
+      "ballY": 282.2
+     },
+     "0.6": {
+      "dist": 128.3,
+      "relDeg": 163,
+      "ballY": 284.1
+     }
+    }
+   },
+   "turn after rebound (ball arriving)": {
+    "playerX": 400,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 448.3,
+    "ballY": 330.3,
+    "ballSpeed": 17.3,
+    "lossSeconds": 1.3,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 258.1,
+    "at": {
+     "1": {
+      "dist": 170.7,
+      "relDeg": 163,
+      "ballY": 326.4
+     },
+     "0.3": {
+      "dist": 64.6,
+      "relDeg": 128,
+      "ballY": 304.7
+     },
+     "0.6": {
+      "dist": 103.7,
+      "relDeg": 151,
+      "ballY": 316
+     }
+    }
+   },
+   "turn right after a shot": {
+    "playerX": 322.9,
+    "playerY": 492,
+    "minPlayerY": 280,
+    "maxPlayerY": 492,
+    "ballX": 468,
+    "ballY": 403.3,
+    "ballSpeed": 115.2,
+    "lossSeconds": 1.1,
+    "contacts": 0,
+    "shotTravel": 91.7,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 505.2,
+    "at": {
+     "1": {
+      "dist": 146.3,
+      "relDeg": 116,
+      "ballY": 425.5
+     },
+     "0.3": {
+      "dist": 106.4,
+      "relDeg": 31,
+      "ballY": 434.3
+     },
+     "0.6": {
+      "dist": 123.6,
+      "relDeg": 50,
+      "ballY": 485.3
+     }
+    }
+   },
+   "rapid direction changes": {
+    "playerX": 531.4,
+    "playerY": 292.5,
+    "minPlayerY": 260,
+    "maxPlayerY": 312.5,
+    "ballX": 509.6,
+    "ballY": 263,
+    "ballSpeed": 114,
+    "lossSeconds": 0,
+    "contacts": 0,
+    "shotTravel": null,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 242.8,
+    "at": {
+     "0.6": {
+      "dist": 30.4,
+      "relDeg": 54,
+      "ballY": 273
+     },
+     "1.2": {
+      "dist": 40,
+      "relDeg": 139,
+      "ballY": 256.1
+     }
+    }
+   },
+   "žolík entry + expiry": {
+    "playerX": 150,
+    "playerY": 450,
+    "benchSeconds": 30,
+    "contacts": 1,
+    "at": {}
+   },
+   "temporary weakening": {
+    "benchSeconds": 10,
+    "playerX": 270,
+    "playerY": 395,
+    "maxPlayerY": 525,
+    "at": {}
+   }
+  }
+ }
 }

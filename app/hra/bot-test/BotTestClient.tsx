@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import MatchPageClient from '@/components/game/MatchPageClient';
+import type { DribbleStatus } from '@/components/game/GameCanvas';
 import { VALID_MODES, MODE_CONFIG, PHYSICS_OPTIONS, resolveBotTestProfile } from './botTestModes';
 import type { BotTestMode, BotTestPhysics } from './botTestModes';
 
@@ -11,10 +12,18 @@ interface Props {
   homeClubSlug?: string;
 }
 
+// Small V3 indicator next to the physics select (never over the pitch).
+const DRIBBLE_STATUS: Record<DribbleStatus, { label: string; color: string }> = {
+  control: { label: 'vedení', color: '#6dbf8a' },
+  prep: { label: 'příprava otočky', color: '#d6a94a' },
+  loose: { label: 'míč volný', color: 'rgba(209,250,229,0.4)' },
+};
+
 export default function BotTestClient({ initialMode, initialPhysics, homeClubSlug }: Props) {
   const [runtimeMode, setRuntimeMode] = useState<BotTestMode>(initialMode);
   const [physics, setPhysics] = useState<BotTestPhysics>(initialPhysics);
   const [bounceTimeActive, setBounceTimeActive] = useState(false);
+  const [dribbleStatus, setDribbleStatus] = useState<DribbleStatus>('loose');
 
   const config = MODE_CONFIG[runtimeMode];
   // Applied live to the running match (GameCanvas) — no restart.
@@ -86,6 +95,11 @@ export default function BotTestClient({ initialMode, initialPhysics, homeClubSlu
             ))}
           </select>
           {physicsLocked && <span style={{ color: 'rgba(209,250,229,0.3)' }}>(bounce)</span>}
+          {gameplayProfile === 'v3-dribble' && (
+            <span data-dribble-status={dribbleStatus} style={{ color: DRIBBLE_STATUS[dribbleStatus].color, minWidth: 92 }}>
+              · {DRIBBLE_STATUS[dribbleStatus].label}
+            </span>
+          )}
         </label>
         <p style={{ fontSize: 10, color: 'rgba(209,250,229,0.3)', fontFamily: 'monospace', margin: 0, textAlign: 'center' }}>
           Mění se hned, bez restartu · délka zápasu až po R
@@ -99,6 +113,7 @@ export default function BotTestClient({ initialMode, initialPhysics, homeClubSlu
         gameplayProfile={gameplayProfile}
         enableBounceTimeDebug={config.enableBounceTimeDebug}
         onBounceTimeChange={handleBounceTimeChange}
+        onDribbleStatusChange={setDribbleStatus}
       />
     </>
   );

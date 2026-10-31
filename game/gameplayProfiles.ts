@@ -9,9 +9,10 @@ import { BALL_WALL_RESTITUTION } from './constants';
 //
 // `v2-shot` / `v2-turn` are EXPERIMENTAL ball-control variants (see
 // docs/gameplay-physics-contract.md) — test-only, never a production default:
-//   v2-shot = classic + kickSelfTrapProtection
-//   v2-turn = v2-shot + turnAssist
-export type GameplayProfile = 'classic' | 'v2' | 'bounce' | 'v2-shot' | 'v2-turn';
+//   v2-shot    = classic + kickSelfTrapProtection
+//   v2-turn    = v2-shot + turnAssist
+//   v3-dribble = v2-shot + dribblePrep (NOT turnAssist — no double slow-down)
+export type GameplayProfile = 'classic' | 'v2' | 'bounce' | 'v2-shot' | 'v2-turn' | 'v3-dribble';
 
 export interface GameplayProfileConfig {
   profile: GameplayProfile;
@@ -33,7 +34,55 @@ export interface GameplayProfileConfig {
   // with no opponent close, the active player is briefly slowed so the
   // existing ball control can bring the ball round to the new side.
   turnAssistEnabled: boolean;
+  // EXPERIMENTAL V3 — "prepared turn" (game/dribblePrep.ts): on a sharp
+  // turn while really dribbling with no opponent near, the player briefly
+  // slows and a time-normalized spring-damper carries the ball round the
+  // player along an arc into the new direction; then speed recovers.
+  dribblePrepEnabled: boolean;
 }
+
+// Tunables for the experimental V3 dribblePrep flag — one place, not final.
+export const BALL_PHYSICS_V3 = {
+  // Controlled dribble: ball this close, moving with the player (relative
+  // speed below), for at least this long — a loose ball rolling past never
+  // qualifies.
+  dribbleControlRadius: 57,
+  dribbleMaxRelativeSpeed: 160,
+  dribbleMinControlSeconds: 0.12,
+  // Opponent this close to the ball → no prep / prep aborted (duels stay real).
+  noOpponentRadius: 70,
+  // Prep starts when the ball sits at least this far off the new direction.
+  turnMinAngleDeg: 60,
+  // Prep window: base, growing linearly to the 180° value (s).
+  prepSeconds: 0.35,
+  prepSeconds180: 0.55,
+  // Player speed while preparing (px/s) and the time to ramp back to full.
+  prepPlayerSpeed: 90,
+  recoverSeconds: 0.15,
+  // A chain of turns (incl. re-aiming mid-prep) may use at most this much
+  // prep time; then at least chainResetSeconds without any prep — rapid
+  // zig-zags can't keep the assist running forever.
+  maxChainSeconds: 1.2,
+  chainResetSeconds: 0.3,
+  // Re-aim a running prep when the held direction moves this far.
+  reaimMinAngleDeg: 45,
+  // Where the ball should end up: distance in front of the player (px).
+  targetDistance: 34,
+  // Ball carried round the player: desired velocity RELATIVE to the player
+  // = tangential (along the arc, slowing as the remaining angle shrinks)
+  // + radial (holds targetDistance, keeps it off the player's body); the
+  // ball's relative velocity approaches it at velocityBlendRate (1/s,
+  // exp-based) with at most maxAccel — all scaled by dt.
+  arcSpeed: 280,
+  angularGain: 8,
+  radialGain: 10,
+  maxRadialSpeed: 150,
+  velocityBlendRate: 30,
+  maxAccel: 3000,
+  // Prep ends early once the ball is this well in front and settled.
+  settledAngleDeg: 25,
+  settledRelativeSpeed: 90,
+} as const;
 
 // Tunables for the experimental V2 flags above — one place, not final.
 export const BALL_PHYSICS_V2 = {
@@ -66,6 +115,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     teammateReceiveEnabled: true,
     kickSelfTrapProtectionEnabled: false,
     turnAssistEnabled: false,
+    dribblePrepEnabled: false,
   },
   // Placeholder for a future simpler/fairer engine tune — intentionally
   // identical to classic for now. Exists so /hra/bot-dis?profile=v2 already
@@ -80,6 +130,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     teammateReceiveEnabled: true,
     kickSelfTrapProtectionEnabled: false,
     turnAssistEnabled: false,
+    dribblePrepEnabled: false,
   },
   // Pongier/pinball-ier: near-elastic wall bounces, no kick, no soft
   // ball-control trap, no retention, no teammate receive — ball just bounces.
@@ -93,6 +144,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     teammateReceiveEnabled: false,
     kickSelfTrapProtectionEnabled: false,
     turnAssistEnabled: false,
+    dribblePrepEnabled: false,
   },
   'v2-shot': {
     profile: 'v2-shot',
@@ -104,6 +156,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     teammateReceiveEnabled: true,
     kickSelfTrapProtectionEnabled: true,
     turnAssistEnabled: false,
+    dribblePrepEnabled: false,
   },
   'v2-turn': {
     profile: 'v2-turn',
@@ -115,6 +168,19 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     teammateReceiveEnabled: true,
     kickSelfTrapProtectionEnabled: true,
     turnAssistEnabled: true,
+    dribblePrepEnabled: false,
+  },
+  'v3-dribble': {
+    profile: 'v3-dribble',
+    wallRestitution: BALL_WALL_RESTITUTION,
+    playerBallRestitution: 0,
+    kickEnabled: true,
+    ballControlEnabled: true,
+    ballRetentionEnabled: true,
+    teammateReceiveEnabled: true,
+    kickSelfTrapProtectionEnabled: true,
+    turnAssistEnabled: false,
+    dribblePrepEnabled: true,
   },
 };
 
@@ -123,7 +189,7 @@ export const DEFAULT_GAMEPLAY_PROFILE: GameplayProfile = 'classic';
 // Parses a `?profile=` query value; any unrecognized value falls back to
 // the default profile rather than erroring.
 export function resolveGameplayProfile(value: string | undefined | null): GameplayProfile {
-  if (value === 'classic' || value === 'v2' || value === 'bounce' || value === 'v2-shot' || value === 'v2-turn') return value;
+  if (value === 'classic' || value === 'v2' || value === 'bounce' || value === 'v2-shot' || value === 'v2-turn' || value === 'v3-dribble') return value;
   return DEFAULT_GAMEPLAY_PROFILE;
 }
 

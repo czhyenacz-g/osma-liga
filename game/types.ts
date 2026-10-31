@@ -144,6 +144,29 @@ export interface GameState {
   // assist (s) for the active player.
   lastMoveDir: Vec2 | null;
   turnAssistRemaining: number;
+  // EXPERIMENTAL V3 prepared turn (dribblePrep.ts) — only read when
+  // dribblePrepEnabled.
+  dribblePrep: DribblePrepState;
+}
+
+export interface DribblePrepState {
+  // Active player this bookkeeping belongs to — a player switch resets it.
+  playerId: string | null;
+  // How long the active player has had the ball under control (s).
+  controlSeconds: number;
+  phase: 'none' | 'prep' | 'recover';
+  // Remaining time of the current phase (s).
+  remaining: number;
+  recoverTotal: number;
+  // Arc side chosen at prep start (+1/-1) — fixed so the ball can't flip
+  // back and forth around the player.
+  side: number;
+  // Direction the current prep is aiming for (re-aimed on a new turn).
+  prepDir: Vec2 | null;
+  // Prep time spent in the current chain of turns, and how long no prep
+  // has run (a long enough gap resets the chain) — bounds the assist.
+  chainSeconds: number;
+  idleSeconds: number;
 }
 
 export interface InputState {

@@ -52,24 +52,27 @@ for (const sc of CONTRACT_SCENARIOS) {
   }
   const st = createInitialState(NOREM); st.status = 'playing';
   const me = st.players.find((p: any) => p.team === 'home' && p.role === 'field_player' && p.matchStatus === 'field')!;
-  const def = st.players.find((p: any) => p.team === 'away' && p.role === 'field_player' && p.matchStatus === 'field')!;
+  const [def, def2] = st.players.filter((p: any) => p.team === 'away' && p.role === 'field_player' && p.matchStatus === 'field');
   for (const p of st.players as any[]) {
-    const keep = p === me || (sc.defender && p === def) || (sc.goalkeeper && p.role === 'goalkeeper' && p.team === 'away');
+    const keep = p === me || (sc.defender && p === def) || (sc.defender2 && p === def2)
+      || (sc.goalkeeper && p.role === 'goalkeeper' && p.team === 'away');
     if (!keep) { p.matchStatus = 'bench'; p.x = -500; p.y = -500; p.baseX = -500; p.baseY = -500; }
   }
   me.x = sc.start.x; me.y = sc.start.y;
-  st.ball.x = sc.start.x + sc.ball.x; st.ball.y = sc.start.y + sc.ball.y; st.ball.vx = 0; st.ball.vy = 0;
+  st.ball.x = sc.start.x + sc.ball.x; st.ball.y = sc.start.y + sc.ball.y; st.ball.vx = sc.ballVel?.x ?? 0; st.ball.vy = sc.ballVel?.y ?? 0;
   const defPos = sc.defender ? { x: sc.start.x + sc.defender.x, y: sc.start.y + sc.defender.y } : null;
+  const defPos2 = sc.defender2 ? { x: sc.start.x + sc.defender2.x, y: sc.start.y + sc.defender2.y } : null;
   const goals0 = st.score.home;
   out[sc.name] = runContractScenario(sc, {
     step(i: Record<string, boolean | undefined>, dt: number) {
       st.inputs.home = { ...idle(), ...i } as any; st.inputs.guest = idle() as any;
       tickGame(st, dt, DEFAULT_BEHAVIOR_CONFIG, NOREM);
       if (defPos) { def.x = defPos.x; def.y = defPos.y; }
+      if (defPos2) { def2.x = defPos2.x; def2.y = defPos2.y; }
     },
     player: () => ({ x: me.x, y: me.y }),
     ball: () => ({ x: st.ball.x, y: st.ball.y, vx: st.ball.vx, vy: st.ball.vy }),
-    defender: () => (defPos ? { x: def.x, y: def.y } : null),
+    defenders: () => [defPos && { x: def.x, y: def.y }, defPos2 && { x: def2.x, y: def2.y }].filter(Boolean) as { x: number; y: number }[],
     scored: () => st.score.home > goals0,
     controlRadius: C.BALL_CONTROL_RADIUS,
     contactDist: C.PLAYER_RADIUS + C.BALL_RADIUS,

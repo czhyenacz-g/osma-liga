@@ -24,6 +24,10 @@ export interface ContractScenario {
   ball: { x: number; y: number };
   // Static opponent field player, relative to the player's start.
   defender?: { x: number; y: number };
+  // A second static opponent (relative to the player's start).
+  defender2?: { x: number; y: number };
+  // Initial ball velocity (px/s), e.g. a ball arriving off a rebound.
+  ballVel?: { x: number; y: number };
   // Keep the away goalkeeper in play.
   goalkeeper?: boolean;
   steps: ContractStep[];
@@ -42,6 +46,11 @@ export interface ContractMetrics {
   // Ball x travel 0.9 s after the kick button was released.
   shotTravel?: number | null;
   goal?: boolean;
+  // Seconds after the marked step until the ball sits in front of the
+  // player (≤ 30° off the held direction, ≤ 50 px) and stays there 0.2 s;
+  // null = never within the scenario.
+  frontSeconds?: number | null;
+  maxBallSpeed?: number;
   benchSeconds?: number;
   at: Record<string, { dist: number; relDeg: number; ballY: number }>;
 }
@@ -64,6 +73,17 @@ export const CONTRACT_SCENARIOS: ContractScenario[] = [
   { name: 'charged kick (0.5 s)', start: { x: 250, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 0.5 }, { input: {}, seconds: 1 }] },
   { name: 'defender contact', start: { x: 200, y: 280 }, ball: FWD_BALL, defender: { x: 140, y: 0 }, steps: [{ input: R, seconds: 1.5 }] },
   { name: 'goalkeeper blocks shot', start: { x: 690, y: 280 }, ball: FWD_BALL, goalkeeper: true, steps: [{ input: R, seconds: 0.2 }, { input: { right: true, kick: true }, seconds: 0.3 }, { input: {}, seconds: 1.2 }] },
+  // V3 prepared-turn set (also measured for every profile).
+  { name: 'turn 90 (R→D)', start: { x: 200, y: 200 }, ball: FWD_BALL, steps: [{ input: R, seconds: 1 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'diagonal change (R→RD→D)', start: { x: 200, y: 160 }, ball: FWD_BALL, steps: [{ input: R, seconds: 1 }, { input: { right: true, down: true }, seconds: 0.15, mark: true }, { input: D, seconds: 1.05 }], probes: TURN_PROBES },
+  { name: 'stop and restart (R, stop, D)', start: { x: 200, y: 200 }, ball: FWD_BALL, steps: [{ input: R, seconds: 1 }, { input: {}, seconds: 0.5 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'turn with defender ahead', start: { x: 200, y: 280 }, ball: FWD_BALL, defender: { x: 230, y: 50 }, steps: [{ input: R, seconds: 1 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'turn with defender behind', start: { x: 300, y: 280 }, ball: FWD_BALL, defender: { x: 150, y: 40 }, steps: [{ input: R, seconds: 1 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'turn with defender beside', start: { x: 200, y: 200 }, ball: FWD_BALL, defender: { x: 220, y: 60 }, steps: [{ input: R, seconds: 1 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'turn between two defenders', start: { x: 200, y: 280 }, ball: FWD_BALL, defender: { x: 230, y: 55 }, defender2: { x: 250, y: -45 }, steps: [{ input: R, seconds: 1 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'turn after rebound (ball arriving)', start: { x: 400, y: 280 }, ball: { x: 120, y: 0 }, ballVel: { x: -260, y: 0 }, steps: [{ input: {}, seconds: 0.6 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'turn right after a shot', start: { x: 250, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 0.05 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
+  { name: 'rapid direction changes', start: { x: 200, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.6 }, { input: D, seconds: 0.25, mark: true }, { input: R, seconds: 0.25 }, { input: U, seconds: 0.25 }, { input: R, seconds: 0.25 }, { input: D, seconds: 0.25 }, { input: R, seconds: 0.6 }], probes: ['0.6', '1.2', '1.85'] },
   { name: 'žolík entry + expiry', kind: 'bench', start: { x: 0, y: 0 }, ball: NO_BALL, steps: [] },
   { name: 'temporary weakening', kind: 'removal', start: { x: 0, y: 0 }, ball: NO_BALL, steps: [] },
 ];
@@ -94,4 +114,15 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   'charged kick (0.5 s)': { metrics: ['*'], why: 'KICK_MAX_CHARGE_MS 500 vs 1500 + local own-shot braking' },
   'defender contact': { metrics: ['*'], why: 'control/retention radii differ (57/55 vs 44/42)' },
   'goalkeeper blocks shot': { metrics: ['*'], why: 'shot power differs (charge curve, own-shot braking)' },
+  // V3 scenario set (2026-10-31) — same root causes, measured for the record.
+  'turn 90 (R→D)': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
+  'diagonal change (R→RD→D)': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
+  'stop and restart (R, stop, D)': { metrics: ['*'], why: 'control radii + server player runs past the bottom line (no clamp)' },
+  'turn with defender ahead': { metrics: ['*'], why: 'retention radii 55 vs 42 + server player not clamped' },
+  'turn with defender behind': { metrics: ['*'], why: 'retention radii 55 vs 42 + server player not clamped' },
+  'turn with defender beside': { metrics: ['*'], why: 'retention radii 55 vs 42' },
+  'turn between two defenders': { metrics: ['*'], why: 'retention radii 55 vs 42 + server player not clamped' },
+  'turn after rebound (ball arriving)': { metrics: ['*'], why: 'control radius 57 vs 44 decides whether the ball is trapped + no clamp' },
+  'turn right after a shot': { metrics: ['*'], why: 'KICK_RANGE 57 vs 40 + own-shot braking + no clamp' },
+  'rapid direction changes': { metrics: ['*'], why: 'control radii 57 vs 44 + per-frame vs per-tick damping' },
 };
