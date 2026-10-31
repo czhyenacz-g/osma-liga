@@ -1,98 +1,108 @@
 # Fyzikální kontrakt Osmé ligy
 
-Stav k 2026-10-31. Lokální engine: `osma-liga` (`game/updateGame.ts`), server:
-`project-hub-api` `eaa1539` (`src/gameEngine/tick.ts`).
+Stav k 2026-10-31. Lokální engine `osma-liga` (`game/updateGame.ts`,
+proměnné `dt` z `requestAnimationFrame`, max 0,05 s), server
+`project-hub-api` `d5375bc` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
 
-Tři herní režimy:
+| Režim | Engine | Kdo hraje |
+|---|---|---|
+| `/hra/bot` | lokální, `LIVE_GAMEPLAY_PROFILE` = `v3-dribble` | člověk vs. lokální bot |
+| tréninková výzva | server `tickGame`, `TRAINING_CHALLENGE_BEHAVIOR_CONFIG` | serverový bot (home) vs. člověk |
+| multiplayer | server `tickGame`, `DEFAULT_BEHAVIOR_CONFIG` | člověk vs. člověk |
 
-- **Lokální engine:** proti botovi (`/hra/bot`, `/hra/bot-test`).
-- **Serverový engine:** automatická tréninková výzva a multiplayer.
+Fyzikální zákony (míč, kolize, kop, kontrola, V3) platí pro člověka
+v obou enginech stejně. **Obtížnost bota** je vědomě oddělený parametr
+(viz poslední řádky tabulky), ne fyzika.
 
-Výzva i multiplayer volají stejný `tickGame` se stejnými konstantami. Liší
-se jen tím, kdo ovládá tým `away`: serverový bot (`ai.ts`) nebo druhý člověk.
-Serverový bot používá stejný vstupní kanál, rychlost, dosah kopu i cooldown
-jako člověk.
+## Pravidla V3
 
-> **Tento dokument NEZNAMENÁ, že se enginy sjednotily.** Popisuje obě
-> implementace vedle sebe a výslovně značí nesoulady (❌). Cílové hodnoty
-> jsou návrh, nic z nich zatím není nasazené.
+„Test“ = scénář v `game/physicsContract/spec.ts`, ✔ = lokál (60 Hz) i server
+v toleranci, ≈ = rozdíl jen ve velikosti kroku (viz *Známé rozdíly*).
 
-Měří se to automaticky v `game/physicsContract/`, viz poslední sekci.
+| Parametr | Hodnota | Lokálně | Server | Test | Výjimka |
+|---|---|---|---|---|---|
+| Rychlost hráče | 210 px/s (GK 150) | `stats.speed` | `movePlayerByInput` | `straight run` ✔ | – |
+| Hranice ovládaného hráče | `FIELD ± PLAYER_RADIUS` | `clampPos` | `clamp` | `run into top boundary` ✔ | – |
+| Tření míče | `0.35^dt`, nejdřív posun, pak tření | `updateGame` | `updateBallPhysics` (od `d5375bc`) | `short kick` ✔ | – |
+| Max. rychlost míče / odraz od stěn | 800 / 0,75 | `constants.ts` | `constants.ts` | – | – |
+| Kontrola míče: poloměr | 57 | `BALL_CONTROL_RADIUS` | `BALL_CONTROL_RADIUS` (od `49c9614`) | `dribble straight` ≈ | bot výzvy 44 |
+| Kontrola: síla / offset / útlum | 130 / 210 / 34, útlum 0,86 na krok | `updateGame` | `tick.ts` | otočky ≈ | – |
+| Retence | poloměr 55, soupeř < 70, blend 0,14 na krok | `updateGame` | `tick.ts` | `defender contact` ≈ | bot výzvy bez retence |
+| Vzdálenost míče se měří | z pozice hráče **před** pohybem v kroku | `activeDist` | `preMoveBallDist` | `kick at the edge of reach` ✔ | bot výzvy po pohybu |
+| Dosah kopu | 57 (≥ poloměr kontroly) | `PLAYER_RADIUS + 39` | `KICK_RANGE` | `kick at the edge of reach (50 px)` ✔, `no kick out of reach (75 px)` ✔ | bot výzvy 40 |
+| Síla kopu | 486 × 0,9 (tap) … 1,5 | `KICK_FORCE` | `KICK_FORCE` | `charge tap … 1500 ms` ✔/≈ | – |
+| Plné nabití | 500 ms, delší držení nic nepřidá | `KICK_MAX_CHARGE_MS` | `KICK_MAX_CHARGE_MS` | `charge 1000/1500 ms` ✔ | bot výzvy kope hned |
+| Cooldown kopu | 0,25 s (bot 0,85) | | | – | – |
+| Ochrana vlastní střely | 0,25 s po kopu bez kontroly míče střelcem | `kickSelfTrap*` | `kickSelfTrap` per tým | `short kick` ✔ | – |
+| V3 příprava otočky | `BALL_PHYSICS_V3` (níže) | `game/dribblePrep.ts` | `src/gameEngine/dribblePrep.ts` | otočky, `shot after a 180° turn` ≈ | bot výzvy `preparedTurns=false` |
+| Náraz hráč→míč | `BUMP_FORCE` 110 na krok | `updateGame` | `tick.ts` | `defender *` ≈ | – |
+| Brankář | zóna, 150 px/s, reakce 390 px, útlum 0,18 + bump 60 | `goalkeeperAI.ts` | `goalkeeperAI.ts` | `goalkeeper blocks shot` (vyřazeno, viz níže) | – |
+| Žolík | 30 s, jednorázový, vstup (150, 450), role útočník/obránce | `bench*.ts` | `bench*.ts` | `žolík entry + expiry` ✔ | – |
+| Dočasné oslabení | 10 s pod spodní čarou | `temporaryRemoval.ts` | `temporaryRemoval.ts` | `temporary weakening` ✔ | – |
+| **Bot: rychlost** | lokální bot 165, bot výzvy 210 | `BOT_SPEED` | `ai.ts` | – | obtížnost |
+| **Bot: dosah / kontrola** | 40 / 44, kop bez nabíjení, bez V3 | `BOT_KICK_RANGE` | `AI_KICK_RANGE`, `AI_BALL_CONTROL_RADIUS` | `ballHandling.test.ts` | obtížnost |
 
-## Legenda
+## Známé ponechané rozdíly
 
-- **=** obě implementace se shodují.
-- **❌** nesoulad, který nikdo neschválil.
-- **≈** záměrný rozdíl.
-- **Lok / Srv** lokální / serverová implementace.
+Všechny jsou v `KNOWN_DIVERGENCES` s úzkým výčtem metrik a jsou seskupené
+podle příčiny:
 
-## Pohyb a hráči
+- **STEP — velikost kroku.** Útlum kontroly (0,86), blend retence (0,14),
+  `BALL_STOP_DAMPING` a `BUMP_FORCE` se aplikují *na krok*. Server dělá krok
+  33 ms, lokál typicky 16,7 ms, takže dráha míče při vedení se liší o pár
+  px a pár stupňů. Server@30 Hz ≈ lokál@30–60 Hz. Na 120/144 Hz drží
+  lokál míč po otočce víc stranou (≈ 16° vs 5° v 0,6 s) a blíž (30 vs
+  33 px). **Nenormalizováno záměrně:** dt-normalizace by změnila pocit
+  na 120/144 Hz, který hráči už znají, a fixed timestep je mimo rozsah.
+- **CHARGE.** Nabíjení se počítá po krocích, takže stejná doba držení
+  dá na serveru o krok jinou sílu (rozdíl jen v `ballX`).
+- **BUMP.** Odraz od obránce je v jednom kroku 110 px/s; na 30 Hz je
+  chaotičtější. Rozdíl je jen v poloze/rychlosti míče, ne v tom, kdo míč má.
+- **GK — sdílená chyba tunelování.** Střela zblízka (kontaktní posun
+  12 px) může míč v jednom kroku dostat *za* brankáře a překryv ho vyřeší
+  do branky. Stává se v obou enginech: 18–26 gólů ze 180 lokálně, 34 ze
+  180 na serveru. Brankář se v tomto kroku nepřepisoval; oprava = kontrola
+  průchodu (swept collision) v obou enginech zároveň.
 
-| Položka | Lokální | Server | Hodnoty | Stav | Cíl | Testy |
-|---|---|---|---|---|---|---|
-| Rychlost člověka | `updateGame` → `stats.speed` | `movePlayerByInput` → `stats.speed` | 210 / 210 px/s | = | 210 | `straight run` |
-| Rychlost bota | `ai.ts` `BOT_SPEED` | `ai.ts` → `stats.speed` (jako člověk) | 165 / 210 px/s | ≈ obtížnost AI | ponechat jako explicitní parametr obtížnosti | – |
-| PlayerStats | `game/playerStats.ts` | `src/gameEngine/playerStats.ts` | hráč 210/shot 1/stop 0/r 18; GK 150/1/1/r 20,7 | = | – | – |
-| 8 směrů | normalizovaná diagonála | normalizovaná diagonála | | = | – | `diagonal run` |
-| Hranice hřiště (ovládaný hráč) | `clampPos` na `FIELD ± PLAYER_RADIUS` | `clamp` na `FIELD ± PLAYER_RADIUS` (od 1b3c957, dřív bez clampu: −192) | y_min 68 / 68 | = | – | `run into top boundary` |
-| Oddělení spoluhráčů | 42 px / 0,5 | 42 px / 0,5 | | = | – | – |
-| Podpůrní hráči | 120 px/s | 120 px/s | | = | – | – |
+## Jak fyziku bezpečně rozšířit
 
-## Míč
+1. Novou konstantu přidej do **obou** `constants.ts` (nebo
+   `BALL_PHYSICS_V3`) se stejnou hodnotou a komentářem „mirrors …“.
+2. Logiku piš jako čistou funkci nad stavem a `dt`, port 1:1 do
+   `src/gameEngine/` (vzor: `dribblePrep.ts`).
+3. Obtížnost bota drž zvlášť (`AI_*`, `TeamBehaviorConfig`), ne změnou
+   sdílené konstanty.
+4. Přidej scénář do `spec.ts`, přegeneruj obě baseline a projdi diff.
+   Nový rozdíl dej do `KNOWN_DIVERGENCES` jen s konkrétními metrikami a
+   příčinou, nikdy `'*'` bez zdůvodnění.
+5. Ověř 30/60/120/144 Hz (drift test v `physicsContract.test.ts`).
 
-| Položka | Lokální | Server | Hodnoty | Stav | Cíl | Testy |
-|---|---|---|---|---|---|---|
-| Tření | `0.35^dt` | `0.35^dt` | | = | – | – |
-| Max. rychlost | 800 | 800 | | = | – | – |
-| Odraz od stěn | 0,75 | 0,75 | | = | – | – |
-| Náraz hráč→míč (`BUMP_FORCE`) | 110, **není škálováno dt** | 110 na tick | | ≈ dt-závislé lokálně | normalizovat při fixed-timestep | – |
-| Kontrola míče: poloměr | 57 | **44** | | ❌ | rozhodnout po testu V2 | `dribble straight`, otočky |
-| Kontrola míče: síla/offset/útlum | 130 / 210 / 34, útlum 0,86 **na frame** | stejné hodnoty, útlum 0,86 **na tick (30 Hz)** | | ❌ (Hz) | útlum přepočítat na `pow(x, dt·30)` | otočky × Hz |
-| Retence: poloměr | 55 | **42** | | ❌ | sjednotit s kontrolou | `defender contact` |
-| Retence: soupeř blíž než | 70 | 70 | | = | – | – |
-| Retence: blend | 0,14 **na frame** | 0,14 na tick | | ❌ (Hz) | dt-normalizace | – |
+## Jak spustit kontraktní testy
 
-## Kop
+```
+npx vitest run game/physicsContract          # lokál vs server + drift profilů
+# po změně serverového enginu (lokální checkout backendu):
+npx tsx scripts/physics-contract-server-baseline.mts ../project-hub-api \
+  > game/physicsContract/server-baseline.json
+# backend:
+npx vitest run src/gameEngine                # engine (bez DB)
+DATABASE_URL=… PROJECT_HUB_API_KEY=… NOCNI_HLIDAC_API_TOKEN=… npx vitest run src
+```
 
-| Položka | Lokální | Server | Hodnoty | Stav | Cíl | Testy |
-|---|---|---|---|---|---|---|
-| Dosah kopu | `PLAYER_RADIUS + 39` = 57 | **40** | | ❌ server < kontrola míče (44) → tichý nevystřelený kop | ≥ poloměr kontroly | `short kick` |
-| Síla kopu | 486 × (0,9 … 1,5) | 486 × (0,9 … 1,5) | | = | – | `short kick`, `charged kick` |
-| Nabíjení do max. | **500 ms** | **1500 ms** | | ❌ | jedna hodnota pro všechny režimy | `charged kick (0.5 s)` |
-| Cooldown kopu | 0,25 s | 0,25 s | | = | – | – |
-| Vlastní střelu brzdí kontrola míče | ano, závisí na Hz | ano, jen 1–2 ticky | 0,9 s po tapu: 263 / 208 / 16 / 13 px (30/60/120/144 Hz) | ❌ **hlavní Hz bug** | V2-shot: 0,25 s bez kontroly po kopu | `short kick` × Hz |
-| Cooldown bota | 0,85 | 0,85 | | = | – | – |
+Celý backend `vitest run src` potřebuje PostgreSQL; stačí lokální
+kontejner s `prisma migrate deploy`, **nikdy** produkční DB.
 
-## Brankář
+## Checklist před deployem
 
-| Položka | Lokální | Server | Stav |
-|---|---|---|---|
-| Zóna, rychlost 150, hloubka 34, reakce 390 px | `goalkeeperAI.ts` | `goalkeeperAI.ts` | = |
-| Útlum míče 0,18 + bump 60 | ano | ano | = |
-| Test | `goalkeeper blocks shot` | | rozdíl jen síly střely (viz nabíjení) |
+- [ ] `server-baseline.json` je z commitu, který se nasazuje (`commit` v souboru).
+- [ ] `npx vitest run` (frontend) a `npx vitest run src` (backend) zelené.
+- [ ] `tsc`, lint, `npm run build` v obou repech.
+- [ ] Žádná nová položka v `KNOWN_DIVERGENCES` bez příčiny.
+- [ ] Backend: žádná probíhající hra ani aktivní výzva (`GET /api/osma-liga/online-games`),
+      rollback image otagovaná, existující záloha DB ověřená, restart jen `project-hub-api`.
+- [ ] Po deployi `/health` a smoke test `/hra/bot` + online lobby.
 
-## Žolík a dočasné oslabení
-
-| Položka | Lokální | Server | Stav | Testy |
-|---|---|---|---|---|
-| Žolík: délka | 30 s | 30 s | = | `žolík entry + expiry` |
-| Žolík: jednorázový | ano | ano | = | `žolík entry + expiry` |
-| Žolík: vstupní bod | (150, 450) | (150, 450) | = | `žolík entry + expiry` |
-| Žolík: role útočník/obránce | ano | ano | = | – |
-| Oslabení: 10 s na lavičce pod spodní čarou | ano | ano (`eaa1539` zatím **nenasazen** na VPS) | = v kódu | `temporary weakening` |
-
-## Frekvence fyziky
-
-- **Lokálně:** proměnné `dt` z `requestAnimationFrame`, max 0,05 s.
-- **Server:** pevný tick 30 Hz.
-- **Normalizace dt:** tření, rychlosti a síly kontroly míče jsou × dt. Útlum
-  kontroly, blend retence a `BUMP_FORCE` jsou na frame.
-
-**V2 neřeší úplnou normalizaci.** Odstraňuje jen závislost střel na Hz.
-Otočky, vedení a odrazy od hráče zůstávají mírně Hz-závislé: ztráta při
-otočce 90° je 0,9 s na 30 Hz a 0,7 s na 144 Hz.
-
-## Profily V2 a V3 (V3 je od 2026-10-31 ostrá, viz níže)
+## Profily V2 a V3 (V3 je od 2026-10-31 ostrá ve všech režimech)
 
 Profily patří do existujícího `GameplayProfileConfig`
 (`game/gameplayProfiles.ts`). Konstanty jsou v `BALL_PHYSICS_V2` a
@@ -201,30 +211,17 @@ ztratí pokaždé.
 
 `game/physicsContract/` (vitest, běží v `npm test`):
 
-- **`spec.ts`** obsahuje deklarativní scénáře (start, offset míče, držené
-  vstupy), tolerance a `KNOWN_DIVERGENCES`.
-- **`runner.ts`** je měřicí smyčka nezávislá na enginu.
-- **`harness.ts`** napojuje scénáře na lokální engine.
-- **`server-baseline.json`** obsahuje výsledky stejných scénářů na
-  serverovém enginu, s commitem uvnitř souboru. Generuje se stejným
-  `runner.ts` nad `project-hub-api`.
-- **`local-baseline.json`** je baseline `classic`, `v2-shot` a `v2-turn`
-  pro 30/60/120/144 Hz. Je vygenerovaná z enginu **před** zavedením V3,
-  takže hlídá, že se V3 nedotkla starších profilů.
-- **`game/dribblePrep.test.ts`** kontroluje u V3:
-  - frekvenční stabilitu;
-  - že 180° je pomalejší než 90°;
-  - že soupeř asistenci vypne;
-  - stažení míče od napadajícího soupeře, oblouk na volnou stranu, žádnou
-    asistenci při otočce do soupeře nebo u míče, kterého se soupeř dotýká;
-  - že se míč neotáčí kolem hráče (orbit);
-  - že asistence není nekonečná (limit řetězce);
-  - že rychlost a zrychlení míče jsou omezené;
-  - že se nepřitahuje volný míč;
-  - reset při přepnutí profilu;
-  - V3 proti aktivnímu botovi.
-
-**Tolerance:**
+- **`spec.ts`** — scénáře (start, offset míče, držené vstupy), tolerance a
+  `KNOWN_DIVERGENCES`.
+- **`runner.ts`** — měřicí smyčka nezávislá na enginu (ztráta kontroly se
+  měří vlastním `controlRadius` adaptéru).
+- **`harness.ts`** — napojení na lokální engine.
+- **`server-baseline.json`** — stejné scénáře na serverovém enginu,
+  commit uvnitř souboru.
+- **`local-baseline.json`** — `classic`, `v2-shot`, `v2-turn`,
+  `v3-dribble` pro 30/60/120/144 Hz; hlídá, že se profily nehnou.
+- **`game/dribblePrep.test.ts`** a backend `dribblePrep.test.ts`,
+  `ballHandling.test.ts` — V3 a dosah/nabíjení kopu.
 
 | Metrika | Tolerance |
 |---|---|
@@ -234,69 +231,6 @@ ztratí pokaždé.
 | Úhel | 20° |
 | Lavička | 0,1 s |
 
-**Jak se výsledky vyhodnocují:**
-
-- **Nový rozdíl lokál↔server** mimo `KNOWN_DIVERGENCES` znamená selhání
-  testu, tedy regresi.
-- **Známý rozdíl** test toleruje. Když zmizí, test vypíše varování, ať se
-  scénář vyřadí z `KNOWN_DIVERGENCES`.
-- **Drift `classic`** proti `local-baseline.json` znamená selhání testu.
-- **Schválená odlišnost**, například rychlost bota, se v kontraktních
-  scénářích nepoužívá.
-
-Server baseline se po každé změně serverového enginu přegeneruje stejným
-runnerem nad lokálním checkoutem backendu:
-
-```
-npx tsx scripts/physics-contract-server-baseline.mts ../project-hub-api \
-  > game/physicsContract/server-baseline.json
-```
-
-## V3 v ostrých režimech (od 2026-10-31)
-
-V3 je výchozí fyzika všech hratelných režimů. Ladění přijde později,
-teď jde o základní hratelnost.
-
-- **`/hra/bot`** (lokální engine) hraje `LIVE_GAMEPLAY_PROFILE` =
-  `v3-dribble` (`game/gameplayProfiles.ts`).
-- **Multiplayer a tréninková výzva** (server, `tickGame`): lidské týmy mají
-  `TeamBehaviorConfig.preparedTurns = true`. Patří k tomu
-  `src/gameEngine/dribblePrep.ts`, port 1:1 se stejnými konstantami
-  (`BALL_PHYSICS_V3` v `constants.ts`), a ochrana vlastní střely
-  (`KICK_SELF_TRAP_PROTECTION_SECONDS` 0,25 s). Stav je zvlášť pro každý tým:
-  `OnlineGameState.dribblePrep` a `kickSelfTrap`.
-- **Bot výzvy** (`trainingChallengeAi`) má `preparedTurns = false`, takže
-  hraje beze změny.
-- **Clamp hráče na serveru:** ovládaný hráč se nově drží uvnitř hřiště
-  stejně jako lokálně.
-- **`/hra/bot-test`** dál umožňuje přepínat všechny profily, classic zůstává
-  pro srovnání.
-- **Kontrakt:** test „local vs server“ teď porovnává `LIVE_GAMEPLAY_PROFILE`
-  se serverem. `server-baseline.json` je z commitu `1b3c957`.
-- **Výsledky na serveru (30 Hz):**
-  - 90° a stažení od čáry: před hráčem za 0,3 s, ztráta 0;
-  - 180°: 0,5 s, ztráta 0;
-  - diagonála: 0,4 s;
-  - obránce zepředu nebo zboku: beze změny;
-  - rychlé změny směru: ztráta 0,7 s (lokálně 0 s, rozdíl dělá poloměr
-    kontroly 44 vs 57).
-
-Zbývající rozdíly lokál↔server jsou poloměry kontroly a retence,
-`KICK_RANGE`, nabíjení kopu a útlum za frame proti útlumu za tick.
-
-## Původní plán přenosu V3 na server (proveden, viz výše)
-
-1. **Modul.** `dribblePrep.ts` je čistá funkce nad stavem a `dt`. Na server
-   se přenese jako `src/gameEngine/dribblePrep.ts` se stejnými konstantami.
-   Pro každý tým stačí `DribblePrepState` v `OnlineGameState`.
-2. **Napojení.** V `movePlayerByInput` (`tick.ts`) se omezí rychlost
-   ovládaného hráče. V bloku kontroly míče se během přípravy nahradí
-   klasická kontrola. Je to stejné místo jako lokálně.
-3. **Předpoklad.** Nejdřív sjednotit poloměry kontroly a retence a
-   `KICK_RANGE`, a opravit clamp hráče. Jinak V3 na serveru startuje
-   z jiného výchozího stavu.
-4. **Ověření.** Stejné kontraktní scénáře se na serveru spustí přes
-   `scripts/physics-contract-server-baseline.mts`. Rozdíl lokál↔server
-   u V3 scénářů pak musí být v toleranci, ne v `KNOWN_DIVERGENCES`.
-5. **Výzva a multiplayer.** Obojí volá `tickGame`, takže profil musí být
-   parametr stavu zápasu a pro oba režimy stejný.
+- Nový rozdíl lokál↔server mimo `KNOWN_DIVERGENCES` = selhání (regrese).
+- Známý rozdíl, který zmizí, vypíše varování → vyřadit ze seznamu.
+- Drift profilu proti `local-baseline.json` = selhání.
