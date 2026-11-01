@@ -1,6 +1,7 @@
 import type { Player, Ball } from './types';
 import { clampPos } from './physics';
 import { computeBenchRoleTarget } from './benchDeployment';
+import { capOffBallTarget } from './attackZone';
 import {
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CY,
   PLAYER_RADIUS, SUPPORT_PLAYER_SPEED,
@@ -23,7 +24,7 @@ export function applySupportPositioning(
 
   for (const sub of homePlayers) {
     if (sub === active || sub.matchStatus !== 'temporarily_deployed') continue;
-    const target = computeBenchRoleTarget('home', sub.benchRole ?? 'attacker', ball.pos);
+    const target = capOffBallTarget('home', computeBenchRoleTarget('home', sub.benchRole ?? 'attacker', ball.pos));
     const sdx = target.x - sub.pos.x;
     const sdy = target.y - sub.pos.y;
     const sd  = Math.sqrt(sdx * sdx + sdy * sdy);
@@ -69,7 +70,8 @@ export function applySupportPositioning(
 
   if (runner) {
     const vertOffset = ball.pos.y < FIELD_CY ? 80 : -80;
-    const runX = sc(ball.pos.x + 120, FIELD_L + FIELD_W * 0.45, FIELD_R - 60);
+    // Never into the last eighth before the opponent's goal (attackZone.ts).
+    const runX = capOffBallTarget('home', { x: sc(ball.pos.x + 120, FIELD_L + FIELD_W * 0.45, FIELD_R - 60), y: 0 }).x;
     let   runY = sc(ball.pos.y + vertOffset, FIELD_T + 50, FIELD_B - 50);
 
     // Nudge away from active player if too close

@@ -8,6 +8,7 @@ import { dist, normalize, clampPos, separateSameTeamPlayers } from './physics';
 import {
   isSelectableFieldPlayer, canDeployFromBench, deployBenchPlayer, computeBenchRoleTarget, chooseBotBenchRole,
 } from './benchDeployment';
+import { capOffBallTarget } from './attackZone';
 
 // Trivial, deterministic bot bench usage: once the away team has less than
 // half the match left, bring on its bench player (if any, if not already
@@ -164,9 +165,11 @@ export function updateAI(state: GameState, dt: number): void {
       // ── Return to base ───────────────────────────────────────────────────
       // A deployed substitute's basePos is its off-pitch bench spot — it
       // heads for its role position instead (same speed as returning).
-      const home = p.matchStatus === 'temporarily_deployed'
+      // Off-ball: never targets the last eighth before the home goal
+      // (attackZone.ts) — the chaser above is exempt.
+      const home = capOffBallTarget('away', p.matchStatus === 'temporarily_deployed'
         ? computeBenchRoleTarget('away', p.benchRole ?? 'attacker', ball.pos)
-        : p.basePos;
+        : p.basePos);
       const d = dist(p.pos, home);
       if (d > 5) {
         const dir = normalize({ x: home.x - p.pos.x, y: home.y - p.pos.y });
