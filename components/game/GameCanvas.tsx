@@ -410,6 +410,7 @@ export default function GameCanvas({
       renderGame(ctx, gameState, homeTeamName, ballRotation);
       playerRendererRef.current?.update(
         animateSubstitutions(gameState.players, resolveBotPlayerRenderStates(gameState, facingTracker), now),
+        { x: gameState.ball.pos.x, y: gameState.ball.pos.y, rotation: ballRotation },
       );
 
       if (onBenchStateChange && now - lastBenchUiUpdate >= BENCH_UI_THROTTLE_MS) {

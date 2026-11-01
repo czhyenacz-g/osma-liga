@@ -3,7 +3,8 @@ import { render } from '@testing-library/react';
 import { createRef } from 'react';
 import { getFootballerVariantV5, lightenHex, FIELD_ARCHETYPES_V5 } from './footballerVariantsV5';
 import SvgFootballerPlayerV5 from './SvgFootballerPlayerV5';
-import PlayerVisualContainer, { type PlayerVisualContainerHandle } from '../PlayerVisualContainer';
+import PlayerVisualContainer, { type PlayerVisualContainerHandle, v5LabelY } from '../PlayerVisualContainer';
+import PlayerRenderer, { type PlayerRendererHandle } from '../PlayerRenderer';
 import { TEAM_COLORS } from '../playerVisualConfig';
 import type { PlayerRenderState, PlayerTeam } from '../playerVisualTypes';
 
@@ -66,6 +67,17 @@ describe('svg-footballers-v5 colours', () => {
     expect(draw('GK', 'home', true).querySelector('[data-archetype]')!.getAttribute('data-archetype')).toBe('goalkeeper');
   });
 
+  it('the goalkeeper has big gloves and a chest band; field players have neither', () => {
+    const gk = draw('GK', 'home', true);
+    const gloves = [...gk.querySelectorAll('circle[fill="#f8fafc"]')];
+    expect(gloves.length).toBeGreaterThan(0);
+    for (const g of gloves) expect(Number(g.getAttribute('r'))).toBeGreaterThanOrEqual(2.8);
+    expect(gk.querySelector(`rect[fill="${TEAM_COLORS.home.secondary}"][height="2"]`)).not.toBeNull();
+    const field = draw('N1');
+    expect(field.querySelector('[fill="#f8fafc"]')).toBeNull();
+    expect(field.querySelector(`rect[fill="${TEAM_COLORS.home.secondary}"][height="2"]`)).toBeNull();
+  });
+
   it('lightenHex mixes toward white', () => {
     expect(lightenHex('#000000', 0.5)).toBe('#808080');
     expect(lightenHex('#22c55e', 0)).toBe('#22c55e');
@@ -111,5 +123,53 @@ describe('svg-footballers-v5 in the shared container', () => {
     expect(Number(ring.getAttribute('cy'))).toBeGreaterThan(10);
     expect(Number(ring.getAttribute('stroke-width'))).toBeGreaterThan(2);
     expect(ring.parentElement!.getAttribute('opacity')).toBe('1');
+  });
+
+  it('the label keeps one gap above the head and rises with the body while charging', () => {
+    const ref = createRef<PlayerVisualContainerHandle>();
+    const { container } = render(
+      <svg>
+        <PlayerVisualContainer ref={ref} template="svg-footballers-v5" team="home" label="N1" primaryColor="#22c55e" secondaryColor="#15803d" hitboxRadiusPx={18} />
+      </svg>,
+    );
+    const label = container.querySelector('.player-visual-label')!;
+    ref.current!.update(state({}));
+    const idleY = Number(label.getAttribute('y'));
+    expect(idleY).toBeCloseTo(v5LabelY(1.42));
+    ref.current!.update(state({ isCharging: true, chargeProgress: 1 }));
+    expect(Number(label.getAttribute('y'))).toBeCloseTo(v5LabelY(1.42 * 1.2));
+    expect(Number(label.getAttribute('y'))).toBeLessThan(idleY);
+    // Tallest hair (local y = -31) never reaches the label baseline.
+    expect(v5LabelY(1.42 * 1.2)).toBeLessThan(-31 * 1.42 * 1.2);
+  });
+});
+
+describe('svg-footballers-v5 ball readability', () => {
+  const player = (o: Partial<PlayerRenderState> = {}): PlayerRenderState => ({
+    id: 'n1', team: 'home', label: 'N1', x: 100, y: 100, vx: 0, vy: 0, primaryColor: '#22c55e', secondaryColor: '#15803d',
+    isActive: true, isMine: true, isMoving: false, facingDirection: 1, orientation: 'back', isCharging: false, chargeProgress: 0,
+    isKicking: false, hasBall: true, isRemoved: false, isGoalkeeper: false, sizeScale: 1, ...o,
+  });
+  const mount = (template: 'svg-footballers-v5' | 'svg-footballers-v4') => {
+    const ref = createRef<PlayerRendererHandle>();
+    const { container } = render(
+      <PlayerRenderer ref={ref} template={template} viewBoxWidth={960} viewBoxHeight={540} hitboxRadiusPx={18} initialPlayers={[player()]} />,
+    );
+    return { ref, container };
+  };
+
+  it('draws the ball above a player only while it overlaps the body', () => {
+    const { ref, container } = mount('svg-footballers-v5');
+    const ball = container.querySelector('.player-visual-ball-overlay')!;
+    ref.current!.update([player()], { x: 100, y: 75, rotation: 0 }); // dribbling upward: ball over the torso
+    expect(ball.getAttribute('opacity')).toBe('1');
+    expect(ball.getAttribute('transform')).toBe('translate(100 75) rotate(0)');
+    ref.current!.update([player()], { x: 200, y: 100, rotation: 0 }); // free on the grass
+    expect(ball.getAttribute('opacity')).toBe('0');
+  });
+
+  it('is v5-only — the other styles are unchanged', () => {
+    const { container } = mount('svg-footballers-v4');
+    expect(container.querySelector('.player-visual-ball-overlay')).toBeNull();
   });
 });

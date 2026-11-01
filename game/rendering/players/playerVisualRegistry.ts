@@ -24,7 +24,7 @@ export const playerVisualRegistry: Record<PlayerVisualTemplate, React.ComponentT
   'svg-footballers-v5': SvgFootballerPlayerV5,
 };
 
-// Looks up a template, falling back to the default (pixel-characters) for
+// Looks up a template, falling back to the default (svg-footballers-v5) for
 // any unknown/missing key — mirrors normalizePlayerVisualTemplate's fallback
 // so a bad value can never fail to render.
 export function resolvePlayerVisualComponent(

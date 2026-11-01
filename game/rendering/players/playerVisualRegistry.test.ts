@@ -33,9 +33,9 @@ describe('playerVisualRegistry', () => {
     expect(resolvePlayerVisualComponent('svg-footballers-v5')).toBe(SvgFootballerPlayerV5);
   });
 
-  it('falls back to pixel-characters for a missing/unknown template key', () => {
+  it('falls back to the default (svg-footballers-v5) for a missing/unknown template key', () => {
     const bogus = 'nonexistent-template' as PlayerVisualTemplate;
-    expect(resolvePlayerVisualComponent(bogus)).toBe(PixelCharacterPlayer);
+    expect(resolvePlayerVisualComponent(bogus)).toBe(SvgFootballerPlayerV5);
   });
 
   it('only legacy is excluded from the shared active indicator', () => {

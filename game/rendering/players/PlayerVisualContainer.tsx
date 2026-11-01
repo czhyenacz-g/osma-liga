@@ -28,6 +28,16 @@ export interface PlayerVisualContainerProps {
 // (see playerVisualAnimations.css .is-almost-charged).
 const ALMOST_CHARGED_THRESHOLD = 0.85;
 
+// v5 label: baseline a fixed gap above the tallest hairstyle (local y ≈ -31
+// after SvgFootballerPlayerV5's HAIR_BALANCE), at the player's current scale
+// — so P1/N1/GK sit at the same distance from every head, and move up with
+// the body while a shot is charging instead of overlapping the hair.
+const V5_HEAD_TOP = 31;
+const V5_LABEL_GAP_PX = 4;
+export function v5LabelY(bodyScale: number): number {
+  return -V5_HEAD_TOP * bodyScale - V5_LABEL_GAP_PX;
+}
+
 // The one shared container every template is drawn through, for every game
 // mode. Owns exactly the 4 transform layers described in the task:
 //   1. outer  — position on the pitch (translate)
@@ -48,6 +58,7 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
     const animationRef = useRef<SVGGElement>(null);
     const uiRef = useRef<SVGGElement>(null);
     const ringRef = useRef<SVGEllipseElement>(null);
+    const labelRef = useRef<SVGTextElement>(null);
     const legacyRef = useRef<LegacyPlayerVisualHandle>(null);
 
     const config = PLAYER_VISUAL_CONFIG[template];
@@ -75,7 +86,9 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
 
         if (sharedActive) {
           const chargeGrowth = 1 + state.chargeProgress * (config.maxChargeScale - 1);
-          animation.setAttribute('transform', `scale(${config.visualRadiusScale * chargeGrowth * sizeScale})`);
+          const bodyScale = config.visualRadiusScale * chargeGrowth * sizeScale;
+          animation.setAttribute('transform', `scale(${bodyScale})`);
+          labelRef.current?.setAttribute('y', String(v5LabelY(bodyScale)));
           animation.style.setProperty('--step-duration', `${config.stepDurationMs}ms`);
 
           const classes = ['player-visual-anim'];
@@ -140,9 +153,10 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
         )}
         {isV5 && (
           <text
+            ref={labelRef}
             className="player-visual-label"
             x={0}
-            y={-31 * config.visualRadiusScale * sizeScale - 3}
+            y={v5LabelY(config.visualRadiusScale * sizeScale)}
             textAnchor="middle"
             fontSize={10}
             fontWeight="bold"

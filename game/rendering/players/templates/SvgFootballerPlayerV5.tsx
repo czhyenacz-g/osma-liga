@@ -16,7 +16,7 @@ import { getFootballerVariantV5, lightenHex, type ArchetypeV5 } from './football
 // body, kit and proportions are shared. Kit colours always come from the
 // team: jersey = primaryColor, shorts = secondaryColor, socks white with a
 // primaryColor band; the goalkeeper wears a lighter shade of the team
-// colour with dark shorts and white gloves.
+// colour with a chest band, dark shorts and big white gloves.
 const INK = '#0b1210';
 const OUTLINE = 1.3;
 const OUTLINE_THIN = 0.9;
@@ -24,16 +24,26 @@ const BOOT = '#151a18';
 const SOCK = '#f4f6f5';
 const GLOVE = '#f8fafc';
 
+// The two bigger hairstyles (curly, messy spikes) are squashed a little
+// around the head centre so every archetype ends at a similar height and
+// width — the label above the head then sits at one shared offset.
+const HAIR_BALANCE: Partial<Record<ArchetypeV5, string>> = {
+  messy: 'translate(0 -17.6) scale(1 0.9) translate(0 17.6)',
+  curly: 'translate(0 -17.6) scale(0.95 0.9) translate(0 17.6)',
+};
+
 interface Kit {
   jersey: string;
   trim: string;
   shorts: string;
   sockBand: string;
+  // Goalkeeper only: a horizontal chest band in the team's second colour.
+  band?: string;
 }
 
 function kitFor(primary: string, secondary: string, isGoalkeeper: boolean): Kit {
   if (isGoalkeeper) {
-    return { jersey: lightenHex(primary, 0.45), trim: secondary, shorts: '#1f2933', sockBand: secondary };
+    return { jersey: lightenHex(primary, 0.45), trim: secondary, shorts: '#1f2933', sockBand: secondary, band: secondary };
   }
   return { jersey: primary, trim: secondary, shorts: secondary, sockBand: primary };
 }
@@ -42,8 +52,6 @@ export default function SvgFootballerPlayerV5({ team, label, primaryColor, secon
   // Both goalkeepers are labelled "GK" — the team keeps their looks apart.
   const { archetype, skinTone, hairColor } = getFootballerVariantV5(isGoalkeeper ? `${team}-${label}` : label, isGoalkeeper);
   const kit = kitFor(primaryColor, secondaryColor, isGoalkeeper);
-  const hands = isGoalkeeper ? GLOVE : skinTone;
-  const handR = isGoalkeeper ? 2.4 : 1.7;
 
   return (
     <g data-archetype={archetype}>
@@ -55,13 +63,15 @@ export default function SvgFootballerPlayerV5({ team, label, primaryColor, secon
           <FrontLegs skinTone={skinTone} kit={kit} />
           <g className="footballer-hop">
             <Shorts kit={kit} />
-            <FrontArms skinTone={skinTone} kit={kit} hands={hands} handR={handR} />
+            <FrontArms skinTone={skinTone} kit={kit} gloves={isGoalkeeper} />
             <rect x={-2.4} y={-9.4} width={4.8} height={2.6} fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} />
             <Torso kit={kit} />
             <path d="M -3.2 -8 L 0 -4.4 L 3.2 -8" fill="none" stroke={kit.trim} strokeWidth={1.6} strokeLinejoin="round" />
             <Ears skinTone={skinTone} />
             <FrontHead archetype={archetype} skinTone={skinTone} />
-            <FrontHair archetype={archetype} color={hairColor} />
+            <g transform={HAIR_BALANCE[archetype]}>
+              <FrontHair archetype={archetype} color={hairColor} />
+            </g>
             <Face archetype={archetype} />
           </g>
         </g>
@@ -71,13 +81,15 @@ export default function SvgFootballerPlayerV5({ team, label, primaryColor, secon
           <FrontLegs skinTone={skinTone} kit={kit} />
           <g className="footballer-hop">
             <Shorts kit={kit} />
-            <FrontArms skinTone={skinTone} kit={kit} hands={hands} handR={handR} />
+            <FrontArms skinTone={skinTone} kit={kit} gloves={isGoalkeeper} />
             <rect x={-2.4} y={-9.4} width={4.8} height={2.6} fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} />
             <Torso kit={kit} />
             <path d="M -3.2 -7.8 Q 0 -6.6 3.2 -7.8" fill="none" stroke={kit.trim} strokeWidth={1.6} strokeLinecap="round" />
             <Ears skinTone={skinTone} />
             <FrontHead archetype={archetype} skinTone={skinTone} />
-            <BackHair archetype={archetype} color={hairColor} />
+            <g transform={HAIR_BALANCE[archetype]}>
+              <BackHair archetype={archetype} color={hairColor} />
+            </g>
           </g>
         </g>
 
@@ -96,16 +108,17 @@ export default function SvgFootballerPlayerV5({ team, label, primaryColor, secon
             <g transform="rotate(24 -1 -6)">
               <rect x={-2.6} y={-7.6} width={3.4} height={4.4} rx={1.5} fill={kit.jersey} stroke={INK} strokeWidth={OUTLINE_THIN} />
               <rect x={-2.5} y={-3.6} width={3.2} height={4.2} rx={1.5} fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} />
-              <circle cx={-0.9} cy={1} r={handR} fill={hands} stroke={INK} strokeWidth={OUTLINE_THIN} />
+              <Hand cx={-0.9} cy={1} skinTone={skinTone} gloves={isGoalkeeper} />
             </g>
             <rect x={-1.8} y={-9.4} width={3.6} height={2.6} fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} />
             <rect x={-6.4} y={-8.6} width={12.4} height={10.6} rx={4.4} fill={kit.jersey} stroke={INK} strokeWidth={OUTLINE} />
+            {kit.band && <rect x={-5.7} y={-4.6} width={11} height={2} fill={kit.band} />}
             <path d="M 1.2 -8.4 Q 3.6 -6.4 5.2 -8" fill="none" stroke={kit.trim} strokeWidth={1.5} strokeLinecap="round" />
             {/* front arm, swinging forward */}
             <g transform="rotate(-26 1 -6)">
               <rect x={-0.4} y={-7.6} width={3.4} height={4.4} rx={1.5} fill={kit.jersey} stroke={INK} strokeWidth={OUTLINE_THIN} />
               <rect x={-0.3} y={-3.6} width={3.2} height={4.2} rx={1.5} fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} />
-              <circle cx={1.3} cy={1} r={handR} fill={hands} stroke={INK} strokeWidth={OUTLINE_THIN} />
+              <Hand cx={1.3} cy={1} skinTone={skinTone} gloves={isGoalkeeper} />
             </g>
             <SideHead archetype={archetype} skinTone={skinTone} hairColor={hairColor} />
           </g>
@@ -148,7 +161,19 @@ function Shorts({ kit }: { kit: Kit }) {
   return <rect x={-7.2} y={-0.2} width={14.4} height={6.8} rx={2.6} fill={kit.shorts} stroke={INK} strokeWidth={OUTLINE} />;
 }
 
-function FrontArms({ skinTone, kit, hands, handR }: { skinTone: string; kit: Kit; hands: string; handR: number }) {
+// Field players: a small skin-tone hand. Goalkeeper: a big white glove with
+// a cuff over the wrist — the clearest goalkeeper cue at play size.
+function Hand({ cx, cy, skinTone, gloves }: { cx: number; cy: number; skinTone: string; gloves: boolean }) {
+  if (!gloves) return <circle cx={cx} cy={cy} r={1.7} fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} />;
+  return (
+    <>
+      <rect x={cx - 1.9} y={cy - 3.4} width={3.8} height={2.6} rx={0.8} fill={GLOVE} stroke={INK} strokeWidth={OUTLINE_THIN} />
+      <circle cx={cx} cy={cy} r={2.9} fill={GLOVE} stroke={INK} strokeWidth={OUTLINE} />
+    </>
+  );
+}
+
+function FrontArms({ skinTone, kit, gloves }: { skinTone: string; kit: Kit; gloves: boolean }) {
   return (
     <>
       {[-1, 1].map((s) => (
@@ -156,7 +181,7 @@ function FrontArms({ skinTone, kit, hands, handR }: { skinTone: string; kit: Kit
           <rect x={s > 0 ? 7 : -10.4} y={-8} width={3.4} height={4.2} rx={1.5} fill={kit.jersey} stroke={INK} strokeWidth={OUTLINE_THIN} />
           <rect x={s > 0 ? 7.6 : -10.2} y={-6.6} width={2.6} height={1.1} fill={kit.trim} />
           <rect x={s > 0 ? 7.1 : -10.3} y={-4.2} width={3.2} height={4.2} rx={1.5} fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} />
-          <circle cx={s * 8.7} cy={0.6} r={handR} fill={hands} stroke={INK} strokeWidth={OUTLINE_THIN} />
+          <Hand cx={s * 8.7} cy={0.6} skinTone={skinTone} gloves={gloves} />
         </g>
       ))}
     </>
@@ -168,6 +193,7 @@ function Torso({ kit }: { kit: Kit }) {
     <>
       <rect x={-7.8} y={-8.6} width={15.6} height={10.6} rx={4.6} fill={kit.jersey} stroke={INK} strokeWidth={OUTLINE} />
       <path d="M -6.6 -1.4 L 6.6 -1.4" stroke="rgba(0,0,0,0.12)" strokeWidth={1.2} />
+      {kit.band && <rect x={-7.1} y={-4.6} width={14.2} height={2} fill={kit.band} />}
     </>
   );
 }
@@ -196,7 +222,7 @@ function Face({ archetype }: { archetype: ArchetypeV5 }) {
   const mouth =
     archetype === 'messy' ? <path d="M -2.8 -13.4 Q 0 -10.4 2.8 -13.4 Z" fill="#7a2a20" stroke={INK} strokeWidth={0.7} strokeLinejoin="round" />
     : archetype === 'crop' ? <path d="M -2.4 -13 Q 0 -11.8 2.4 -13" fill="none" stroke={INK} strokeWidth={0.9} strokeLinecap="round" />
-    : <path d="M -3 -13.4 Q 0 -10.8 3 -13.4" fill="none" stroke={INK} strokeWidth={0.95} strokeLinecap="round" />;
+    : <path d="M -3 -13.4 Q 0 -10.8 3 -13.4" fill="none" stroke={INK} strokeWidth={0.9} strokeLinecap="round" />;
   const eyeR = archetype === 'curly' ? 1.45 : 1.3;
   return (
     <g>
@@ -298,7 +324,6 @@ function BackHair({ archetype, color }: { archetype: ArchetypeV5; color: string 
         <path
           {...p}
           d="M -9.2 -16 Q -9.8 -27.4 0 -27.6 Q 9.8 -27.4 9.2 -16 Q 6 -18.6 0 -18.8 Q -6 -18.6 -9.2 -16 Z"
-          opacity={0.92}
         />
       );
     case 'goalkeeper':
@@ -341,7 +366,6 @@ function SideHead({ archetype, skinTone, hairColor }: { archetype: ArchetypeV5; 
         <path
           {...p}
           d="M -8 -15.6 Q -9.4 -27.4 0.6 -27.6 Q 9 -27.2 8.8 -21.4 Q 5 -22.6 1.6 -22.2 Q -2.6 -21.6 -3.6 -17.6 Q -6 -17.8 -8 -15.6 Z"
-          opacity={0.92}
         />
       );
       break;
@@ -365,7 +389,7 @@ function SideHead({ archetype, skinTone, hairColor }: { archetype: ArchetypeV5; 
         strokeLinejoin="round"
       />
       <path d="M -0.4 -18.4 Q -2.6 -17 -0.6 -15" fill={skinTone} stroke={INK} strokeWidth={OUTLINE_THIN} strokeLinecap="round" />
-      {hair}
+      <g transform={HAIR_BALANCE[archetype]}>{hair}</g>
       <path d="M 3.4 -20.4 Q 5.2 -21.2 6.8 -20.4" fill="none" stroke={INK} strokeWidth={0.9} strokeLinecap="round" />
       <circle cx={5.4} cy={-17.6} r={1.3} fill={INK} />
       <circle cx={5.8} cy={-18.1} r={0.4} fill="#ffffff" />

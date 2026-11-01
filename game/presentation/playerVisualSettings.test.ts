@@ -17,9 +17,9 @@ describe('playerVisualSettings', () => {
     window.localStorage.clear();
   });
 
-  it('defaults to pixel-characters with no stored value (new install)', async () => {
+  it('defaults to svg-footballers-v5 with no stored value (new install)', async () => {
     const { getPlayerVisualTemplate } = await freshSettingsModule();
-    expect(getPlayerVisualTemplate()).toBe('pixel-characters');
+    expect(getPlayerVisualTemplate()).toBe('svg-footballers-v5');
   });
 
   it('loads a previously stored minimal-circles value', async () => {
@@ -28,16 +28,26 @@ describe('playerVisualSettings', () => {
     expect(getPlayerVisualTemplate()).toBe('minimal-circles');
   });
 
+  it.each(['svg-footballers-v4', 'minimal-circles', 'pixel-characters'])(
+    'keeps a previously stored %s choice (the v5 default never overrides it)',
+    async (stored) => {
+      window.localStorage.setItem(STORAGE_KEY, stored);
+      const { getPlayerVisualTemplate } = await freshSettingsModule();
+      expect(getPlayerVisualTemplate()).toBe(stored);
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBe(stored);
+    },
+  );
+
   it('loads a previously stored legacy value', async () => {
     window.localStorage.setItem(STORAGE_KEY, 'legacy');
     const { getPlayerVisualTemplate } = await freshSettingsModule();
     expect(getPlayerVisualTemplate()).toBe('legacy');
   });
 
-  it('falls back to pixel-characters for an invalid/stale stored value', async () => {
+  it('falls back to svg-footballers-v5 for an invalid/stale stored value', async () => {
     window.localStorage.setItem(STORAGE_KEY, 'circle-players-v1'); // pretend old build's key
     const { getPlayerVisualTemplate } = await freshSettingsModule();
-    expect(getPlayerVisualTemplate()).toBe('pixel-characters');
+    expect(getPlayerVisualTemplate()).toBe('svg-footballers-v5');
   });
 
   it('persists the choice across a simulated reload', async () => {
@@ -66,7 +76,7 @@ describe('playerVisualSettings', () => {
     const { setPlayerVisualTemplate, getPlayerVisualTemplate } = await freshSettingsModule();
     // @ts-expect-error deliberately passing an invalid value to prove the setter also normalizes
     setPlayerVisualTemplate('not-a-real-template');
-    expect(getPlayerVisualTemplate()).toBe('pixel-characters');
-    expect(window.localStorage.getItem(STORAGE_KEY)).toBe('pixel-characters');
+    expect(getPlayerVisualTemplate()).toBe('svg-footballers-v5');
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe('svg-footballers-v5');
   });
 });

@@ -5,8 +5,8 @@ import {
 } from './playerVisualTemplate';
 
 describe('playerVisualTemplate', () => {
-  it('defaults to pixel-characters', () => {
-    expect(DEFAULT_PLAYER_VISUAL_TEMPLATE).toBe('pixel-characters');
+  it('defaults to svg-footballers-v5', () => {
+    expect(DEFAULT_PLAYER_VISUAL_TEMPLATE).toBe('svg-footballers-v5');
   });
 
   it('accepts all eight valid templates unchanged', () => {
@@ -24,14 +24,14 @@ describe('playerVisualTemplate', () => {
     expect(normalizePlayerVisualTemplate('svg-footballers')).toBe('svg-footballers-v1');
   });
 
-  it('falls back to pixel-characters for an unknown string', () => {
-    expect(normalizePlayerVisualTemplate('some-old-value')).toBe('pixel-characters');
+  it('falls back to svg-footballers-v5 for an unknown string', () => {
+    expect(normalizePlayerVisualTemplate('some-old-value')).toBe('svg-footballers-v5');
   });
 
-  it('falls back to pixel-characters for null/undefined/non-string input', () => {
-    expect(normalizePlayerVisualTemplate(null)).toBe('pixel-characters');
-    expect(normalizePlayerVisualTemplate(undefined)).toBe('pixel-characters');
-    expect(normalizePlayerVisualTemplate(42)).toBe('pixel-characters');
-    expect(normalizePlayerVisualTemplate({})).toBe('pixel-characters');
+  it('falls back to svg-footballers-v5 for null/undefined/non-string input', () => {
+    expect(normalizePlayerVisualTemplate(null)).toBe('svg-footballers-v5');
+    expect(normalizePlayerVisualTemplate(undefined)).toBe('svg-footballers-v5');
+    expect(normalizePlayerVisualTemplate(42)).toBe('svg-footballers-v5');
+    expect(normalizePlayerVisualTemplate({})).toBe('svg-footballers-v5');
   });
 });

@@ -13,8 +13,9 @@ export type PlayerVisualTemplate =
   | 'svg-footballers-v5';
 
 // New installs and unreadable/legacy-invalid stored values both fall back
-// here — pixel-characters is the product default per spec.
-export const DEFAULT_PLAYER_VISUAL_TEMPLATE: PlayerVisualTemplate = 'pixel-characters';
+// here — Fotbal v5 is the product default. A valid stored choice (any of the
+// templates below) is always kept as is.
+export const DEFAULT_PLAYER_VISUAL_TEMPLATE: PlayerVisualTemplate = 'svg-footballers-v5';
 
 const VALID_TEMPLATES: readonly PlayerVisualTemplate[] = [
   'pixel-characters',

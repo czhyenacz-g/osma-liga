@@ -3,13 +3,17 @@ import type { CSSProperties } from 'react';
 import type { PlayerRenderState } from './playerVisualTypes';
 import type { PlayerVisualTemplate } from '../../presentation/playerVisualTemplate';
 import PlayerVisualContainer, { type PlayerVisualContainerHandle } from './PlayerVisualContainer';
+import { PLAYER_VISUAL_CONFIG } from './playerVisualConfig';
+import BallOverlay from './shared/BallOverlay';
 import './shared/playerVisualAnimations.css';
 
 export interface PlayerRendererHandle {
   // Called once per host animation frame by the game canvas — pushes fresh
   // positions/animation flags straight to each player's DOM refs. No React
   // state update happens here, so this never triggers a re-render.
-  update(states: PlayerRenderState[]): void;
+  // `ball` (render position + the canvas's cosmetic rotation) is only used
+  // by svg-footballers-v5 to keep the ball readable over a player's body.
+  update(states: PlayerRenderState[], ball?: BallRenderState): void;
   // Hides/shows the whole overlay via a direct style write (no React state,
   // same reasoning as update() above). This SVG is stacked on top of the
   // field canvas, so during full-screen canvas overlays that are drawn
@@ -19,6 +23,31 @@ export interface PlayerRendererHandle {
   // backdrop and cover the announcement text. Callers hide this overlay for
   // the duration of those phases and restore it once play resumes.
   setVisible(visible: boolean): void;
+}
+
+export interface BallRenderState {
+  x: number;
+  y: number;
+  rotation: number;
+}
+
+// v5 drawing extent in template units (SvgFootballerPlayerV5: arms ±12,
+// hair top -31, boots +15.6) plus the ball's own radius in px.
+const V5_BODY = { halfWidth: 12, top: 31, bottom: 15.6, ballPad: 9 };
+
+// True when the ball overlaps any player's v5 drawing.
+function ballUnderPlayer(states: PlayerRenderState[], ball: BallRenderState, scale: number): boolean {
+  return states.some((s) => {
+    if (s.isRemoved) return false;
+    const k = scale * s.sizeScale;
+    const dx = Math.abs(ball.x - s.x);
+    const dy = ball.y - s.y;
+    return (
+      dx < V5_BODY.halfWidth * k + V5_BODY.ballPad &&
+      dy > -V5_BODY.top * k - V5_BODY.ballPad &&
+      dy < V5_BODY.bottom * k + V5_BODY.ballPad
+    );
+  });
 }
 
 export interface PlayerRendererProps {
@@ -53,9 +82,11 @@ const PlayerRenderer = forwardRef<PlayerRendererHandle, PlayerRendererProps>(
     const [players, setPlayers] = useState(initialPlayers);
     const containerRefs = useRef(new Map<string, PlayerVisualContainerHandle>());
     const svgRef = useRef<SVGSVGElement>(null);
+    const ballRef = useRef<SVGGElement>(null);
+    const showsBallOverlay = template === 'svg-footballers-v5';
 
     useImperativeHandle(ref, () => ({
-      update(states: PlayerRenderState[]) {
+      update(states: PlayerRenderState[], ball?: BallRenderState) {
         const currentIds = new Set(players.map((p) => p.id));
         const nextIds = new Set(states.map((s) => s.id));
         let idsChanged = currentIds.size !== nextIds.size;
@@ -70,6 +101,13 @@ const PlayerRenderer = forwardRef<PlayerRendererHandle, PlayerRendererProps>(
 
         for (const state of states) {
           containerRefs.current.get(state.id)?.update(state);
+        }
+
+        const ballEl = ballRef.current;
+        if (ballEl && ball) {
+          const visible = ballUnderPlayer(states, ball, PLAYER_VISUAL_CONFIG['svg-footballers-v5'].visualRadiusScale);
+          ballEl.setAttribute('opacity', visible ? '1' : '0');
+          if (visible) ballEl.setAttribute('transform', `translate(${ball.x} ${ball.y}) rotate(${(ball.rotation * 180) / Math.PI})`);
         }
       },
       setVisible(visible: boolean) {
@@ -102,6 +140,7 @@ const PlayerRenderer = forwardRef<PlayerRendererHandle, PlayerRendererProps>(
             sizeScale={p.sizeScale}
           />
         ))}
+        {showsBallOverlay && <BallOverlay ref={ballRef} />}
       </svg>
     );
   },

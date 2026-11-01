@@ -319,6 +319,7 @@ export default function OnlineGameCanvas({
           ),
           performance.now(),
         ),
+        { x: r.ball.rx, y: r.ball.ry, rotation: ballRotation },
       );
 
       rafRef.current = requestAnimationFrame(frame);
