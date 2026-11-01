@@ -1,4 +1,6 @@
 import type { GameState, Ball } from './types';
+import { shotAimDir } from './shotAim';
+import { drawShotAimArrow } from './rendering/shotAim/drawShotAimArrow';
 import {
   CANVAS_W, CANVAS_H,
   FIELD_L, FIELD_R, FIELD_T, FIELD_B, FIELD_CX, FIELD_CY,
@@ -238,6 +240,10 @@ export function renderGame(
   // ── Ball ──────────────────────────────────────────────────────────────────
 
   drawBall(ctx, state.ball, ballRotation);
+
+  // Aim arrow while an aimed shot at goal is being charged (shotAim.ts).
+  const aimDir = state.shotAim && state.kickWasDown ? shotAimDir(state.shotAim, state.ball.pos, 1) : null;
+  if (aimDir) drawShotAimArrow(ctx, state.ball.pos, aimDir);
 
   // ── HUD ───────────────────────────────────────────────────────────────────
 

@@ -2,7 +2,7 @@
 
 Stav k 2026-11-01. Lokální engine `osma-liga` (`game/updateGame.ts`,
 proměnné `dt` z `requestAnimationFrame`, max 0,05 s), server
-`project-hub-api` `c73713b` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
+`project-hub-api` `0495557` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
 
 | Režim | Engine | Kdo hraje |
 |---|---|---|
@@ -33,6 +33,7 @@ v toleranci, ≈ = rozdíl jen ve velikosti kroku (viz *Známé rozdíly*).
 | Síla kopu | 486 × 0,9 (tap) … 1,5 | `KICK_FORCE` | `KICK_FORCE` | `charge tap … 1500 ms` ✔/≈ | – |
 | Plné nabití | 500 ms, delší držení nic nepřidá | `KICK_MAX_CHARGE_MS` | `KICK_MAX_CHARGE_MS` | `charge 1000/1500 ms` ✔ | bot výzvy kope hned |
 | Cooldown kopu | 0,25 s (bot 0,85) | | | – | – |
+| Mířená střela (od 2026-11-01) | při nabíjení s míčem: směr ze stisku, 85 % rychlosti, kontrola míče běží; ↑/↓ posouvají cíl na brankové čáře 180 px/s, rozsah branka ± 15 px, start ve středu brány, jen směrem k bráně do 420 px | `game/shotAim.ts` | `src/gameEngine/shotAim.ts` | `aimed shot from …` ≈, `shotAim.test.ts` | bot výzvy nemíří (`preparedTurns=false`) |
 | Ochrana vlastní střely | 0,25 s po kopu bez kontroly míče střelcem | `kickSelfTrap*` | `kickSelfTrap` per tým | `short kick` ✔ | – |
 | V3 příprava otočky | `BALL_PHYSICS_V3` (níže) | `game/dribblePrep.ts` | `src/gameEngine/dribblePrep.ts` | otočky, `shot after a 180° turn` ≈ | bot výzvy `preparedTurns=false` |
 | Náraz hráč→míč | `BUMP_FORCE` 110 na krok | `updateGame` | `tick.ts` | `defender *` ≈ | – |
@@ -59,6 +60,9 @@ podle příčiny:
   dá na serveru o krok jinou sílu (rozdíl jen v `ballX`).
 - **BUMP.** Odraz od obránce je v jednom kroku 110 px/s; na 30 Hz je
   chaotičtější. Rozdíl je jen v poloze/rychlosti míče, ne v tom, kdo míč má.
+- **GOAL LINE (starší, nesouvisí s mířením).** Lokální engine uzná gól,
+  jakmile čáru přejde okraj míče, server až střed. Oba gól dají, míč se
+  jen zastaví na gólovou pauzu o ~13 px jinde (`aimed shot from the … wing`).
 ## Kontakt s brankářem (od 2026-10-31)
 
 Míč nesmí projít tělem brankáře bez kontaktu. Překryv se dřív řešil jen

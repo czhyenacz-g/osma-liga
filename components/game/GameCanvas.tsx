@@ -182,8 +182,8 @@ export default function GameCanvas({
       const touch = touchInputRef?.current;
       const merged: InputState = touch
         ? {
-            up: input.up || touch.up,
-            down: input.down || touch.down,
+            up: input.up || touch.up || touch.aimUp,
+            down: input.down || touch.down || touch.aimDown,
             left: input.left || touch.left,
             right: input.right || touch.right,
             kick: input.kick || touch.kick,

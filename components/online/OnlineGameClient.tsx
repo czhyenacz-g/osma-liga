@@ -147,13 +147,17 @@ export default function OnlineGameClient({
     switchPlayer: false,
   });
 
-  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
+  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false, aimUp: false, aimDown: false });
 
-  // Reset touch on blur / tab switch / orientation change
+  // Reset touch and keyboard on blur / tab switch / orientation change — a
+  // key released while the window had no focus never sends keyup, which
+  // would otherwise leave a charge (or a direction) held forever.
   useEffect(() => {
     const reset = () => {
+      const k = keysRef.current;
+      k.up = false; k.down = false; k.left = false; k.right = false; k.kick = false; k.switchPlayer = false;
       const t = touchRef.current;
-      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false;
+      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false; t.aimUp = false; t.aimDown = false;
     };
     window.addEventListener('blur', reset);
     document.addEventListener('visibilitychange', reset);
@@ -197,8 +201,8 @@ export default function OnlineGameClient({
       const k = keysRef.current;
       const t = touchRef.current;
       sendInput({
-        up: k.up || t.up,
-        down: k.down || t.down,
+        up: k.up || t.up || t.aimUp,
+        down: k.down || t.down || t.aimDown,
         left: k.left || t.left,
         right: k.right || t.right,
         kick: k.kick || t.kick,

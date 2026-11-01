@@ -96,7 +96,7 @@ export default function MatchPageClient({
   const [fullTimeMessage, setFullTimeMessage] = useState<string | null>(null);
   const [bounceTimeActive, setBounceTimeActive] = useState(false);
   const [benchPlayers, setBenchPlayers] = useState<BenchPlayerUiState[]>([]);
-  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false });
+  const touchRef = useRef<TouchInput>({ up: false, down: false, left: false, right: false, kick: false, switchPlayer: false, aimUp: false, aimDown: false });
   const benchDeployRequestRef = useRef<BenchDeployRequest | null>(null);
   const gameWrapperRef = useRef<HTMLDivElement>(null);
   const firstGoalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -123,7 +123,7 @@ export default function MatchPageClient({
   useEffect(() => {
     const reset = () => {
       const t = touchRef.current;
-      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false;
+      t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false; t.aimUp = false; t.aimDown = false;
     };
     window.addEventListener('blur', reset);
     document.addEventListener('visibilitychange', reset);
@@ -166,7 +166,7 @@ export default function MatchPageClient({
 
   const handleRestart = useCallback(() => {
     const t = touchRef.current;
-    t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false;
+    t.up = false; t.down = false; t.left = false; t.right = false; t.kick = false; t.switchPlayer = false; t.aimUp = false; t.aimDown = false;
     setMatchScore(null);
     setGamePhase('idle');
     if (firstGoalTimeoutRef.current) clearTimeout(firstGoalTimeoutRef.current);

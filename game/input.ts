@@ -31,10 +31,22 @@ export function attachInputListeners(input: InputState): () => void {
     }
   };
 
+  // A key released while the window had no focus never sends keyup —
+  // release everything so no charge or direction stays held.
+  const releaseAll = () => {
+    input.up = false; input.down = false; input.left = false; input.right = false;
+    input.kick = false; input.restart = false; input.switchPlayer = false;
+  };
+  const onVisibility = () => { if (document.visibilityState === 'hidden') releaseAll(); };
+
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
+  window.addEventListener('blur', releaseAll);
+  document.addEventListener('visibilitychange', onVisibility);
   return () => {
     window.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('keyup', onKeyUp);
+    window.removeEventListener('blur', releaseAll);
+    document.removeEventListener('visibilitychange', onVisibility);
   };
 }

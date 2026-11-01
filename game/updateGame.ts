@@ -44,6 +44,7 @@ import {
   GameplayProfile, resolveEffectiveGameplayConfig, BALL_PHYSICS_V2, BALL_PHYSICS_V3,
 } from './gameplayProfiles';
 import { updateDribblePrep, applyDribblePrepBallControl, resetDribblePrep, carrierSpeedCap } from './dribblePrep';
+import { SHOT_AIM, startShotAim, steerShotAim, shotAimDir } from './shotAim';
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
@@ -146,6 +147,7 @@ function resetPositions(state: GameState): void {
   state.isOwnGoal = false;
   state.isConceded = false;
   state.concededMessage = '';
+  state.shotAim = null;
 }
 
 export interface GameModeConfig {
@@ -358,6 +360,26 @@ export function updateGame(
   if (input.left)  mvx -= 1;
   if (input.right) mvx += 1;
 
+  // ── Aimed charged shot (shotAim.ts) ───────────────────────────────────────
+  // Starts on the kick press with the ball at the feet; while it runs the
+  // player keeps the direction held at the press (none = stands still) and
+  // ↑/↓ steer the aim instead of moving. Kept through the release frame for
+  // the kick below, dropped as soon as the ball leaves control radius.
+  if (state.shotAim && (!gameplayConfig.shotAimEnabled || state.shotAim.playerId !== active.id || activeDist >= BALL_CONTROL_RADIUS)) {
+    state.shotAim = null;
+  }
+  if (!state.shotAim && gameplayConfig.shotAimEnabled && gameplayConfig.kickEnabled && input.kick && !state.kickWasDown
+      && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
+    const heldLen = Math.hypot(mvx, mvy);
+    state.shotAim = startShotAim(active.id, heldLen > 0 ? { x: mvx / heldLen, y: mvy / heldLen } : null, state.ball.pos, 1);
+  }
+  const aimCharging = !!state.shotAim && input.kick;
+  if (aimCharging) {
+    steerShotAim(state.shotAim!, input.up, input.down, dt);
+    mvx = state.shotAim!.moveDir?.x ?? 0;
+    mvy = state.shotAim!.moveDir?.y ?? 0;
+  }
+
   // Normalize diagonal movement
   const mvLen = Math.sqrt(mvx * mvx + mvy * mvy);
 
@@ -415,6 +437,7 @@ export function updateGame(
       state.turnAssistRemaining = 0;
     }
     speed = Math.min(speed, dribblePrepSpeed);
+    if (aimCharging) speed = Math.min(speed, active.stats.speed * SHOT_AIM.chargeSpeedFactor);
     state.lastMoveDir = dir;
     mvx = dir.x * speed;
     mvy = dir.y * speed;
@@ -440,7 +463,9 @@ export function updateGame(
   // 'bounce' profile / Bounce Time modifier) — classic/v2 keep it on.
 
   const dribblePrepHandled = gameplayConfig.dribblePrepEnabled && applyDribblePrepBallControl(state, active, dt);
-  if (!dribblePrepHandled && gameplayConfig.ballControlEnabled && !input.kick && !selfTrapProtected && activeDist < BALL_CONTROL_RADIUS) {
+  // An aimed charge keeps the normal dribble control (the shot itself is
+  // added on the release frame, after this block).
+  if (!dribblePrepHandled && gameplayConfig.ballControlEnabled && (!input.kick || aimCharging) && !selfTrapProtected && activeDist < BALL_CONTROL_RADIUS) {
     state.ball.vel.x *= BALL_CONTROL_DAMPING;
     state.ball.vel.y *= BALL_CONTROL_DAMPING;
 
@@ -499,7 +524,10 @@ export function updateGame(
   } else {
     if (state.kickWasDown && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
       let kickDir: Vec2;
-      if (mvLen > 0.1) {
+      const aimDir = state.shotAim ? shotAimDir(state.shotAim, state.ball.pos, 1) : null;
+      if (aimDir) {
+        kickDir = aimDir;
+      } else if (mvLen > 0.1) {
         kickDir = { x: mvx / speed, y: mvy / speed };
       } else {
         kickDir = normalize({
@@ -546,6 +574,7 @@ export function updateGame(
     }
     state.kickWasDown = false;
     state.kickHeldSeconds = 0;
+    state.shotAim = null;
   }
 
   // ── Support positioning for inactive home players ─────────────────────────

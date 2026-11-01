@@ -40,6 +40,10 @@ export interface GameplayProfileConfig {
   // slows and a time-normalized spring-damper carries the ball round the
   // player along an arc into the new direction; then speed recovers.
   dribblePrepEnabled: boolean;
+  // Aimed charged shot (game/shotAim.ts): while charging with the ball the
+  // player keeps its direction at 85 % speed and ↑/↓ steer the aim point
+  // on the opponent's goal line.
+  shotAimEnabled: boolean;
 }
 
 // Tunables for the experimental V3 dribblePrep flag — one place, not final.
@@ -135,6 +139,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     kickSelfTrapProtectionEnabled: false,
     turnAssistEnabled: false,
     dribblePrepEnabled: false,
+    shotAimEnabled: false,
   },
   // Placeholder for a future simpler/fairer engine tune — intentionally
   // identical to classic for now. Exists so /hra/bot-dis?profile=v2 already
@@ -150,6 +155,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     kickSelfTrapProtectionEnabled: false,
     turnAssistEnabled: false,
     dribblePrepEnabled: false,
+    shotAimEnabled: false,
   },
   // Pongier/pinball-ier: near-elastic wall bounces, no kick, no soft
   // ball-control trap, no retention, no teammate receive — ball just bounces.
@@ -164,6 +170,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     kickSelfTrapProtectionEnabled: false,
     turnAssistEnabled: false,
     dribblePrepEnabled: false,
+    shotAimEnabled: false,
   },
   'v2-shot': {
     profile: 'v2-shot',
@@ -176,6 +183,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     kickSelfTrapProtectionEnabled: true,
     turnAssistEnabled: false,
     dribblePrepEnabled: false,
+    shotAimEnabled: false,
   },
   'v2-turn': {
     profile: 'v2-turn',
@@ -188,6 +196,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     kickSelfTrapProtectionEnabled: true,
     turnAssistEnabled: true,
     dribblePrepEnabled: false,
+    shotAimEnabled: false,
   },
   'v3-dribble': {
     profile: 'v3-dribble',
@@ -200,6 +209,7 @@ export const GAMEPLAY_PROFILES: Record<GameplayProfile, GameplayProfileConfig> =
     kickSelfTrapProtectionEnabled: true,
     turnAssistEnabled: false,
     dribblePrepEnabled: true,
+    shotAimEnabled: true,
   },
 };
 

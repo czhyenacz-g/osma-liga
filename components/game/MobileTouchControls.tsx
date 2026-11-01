@@ -13,6 +13,9 @@ const PAD_OFFSET = (PAD_HIT - PAD_VISUAL) / 2;
 
 type Dir = 'up' | 'down' | 'left' | 'right';
 
+// Kick button: vertical finger drag (px) beyond which the held kick aims up/down.
+const KICK_AIM_DEAD_ZONE = 14;
+
 function sectorFromOffset(dx: number, dy: number): Dir {
   return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
 }
@@ -55,6 +58,13 @@ export default function MobileTouchControls({
 }) {
   const t = touchRef.current;
   const activePointers = useRef<Map<number, Dir>>(new Map());
+  const kickPointer = useRef<{ id: number; startY: number } | null>(null);
+  const releaseKick = () => {
+    kickPointer.current = null;
+    t.kick = false;
+    t.aimUp = false;
+    t.aimDown = false;
+  };
 
   const recompute = () => {
     const dirs = activePointers.current;
@@ -242,11 +252,21 @@ export default function MobileTouchControls({
           e.preventDefault();
           e.stopPropagation();
           e.currentTarget.setPointerCapture(e.pointerId);
+          kickPointer.current = { id: e.pointerId, startY: e.clientY };
           t.kick = true;
         }}
-        onPointerUp={(e) => { e.preventDefault(); e.stopPropagation(); t.kick = false; }}
-        onPointerCancel={(e) => { e.stopPropagation(); t.kick = false; }}
-        onPointerLeave={(e) => { e.stopPropagation(); t.kick = false; }}
+        // Captured pointer: dragging up/down (even off the button) aims; no
+        // pointerleave release, so a drag never fires the shot by itself.
+        onPointerMove={(e) => {
+          const kp = kickPointer.current;
+          if (!kp || kp.id !== e.pointerId) return;
+          const dy = e.clientY - kp.startY;
+          t.aimUp = dy < -KICK_AIM_DEAD_ZONE;
+          t.aimDown = dy > KICK_AIM_DEAD_ZONE;
+        }}
+        onPointerUp={(e) => { e.preventDefault(); e.stopPropagation(); releaseKick(); }}
+        onPointerCancel={(e) => { e.stopPropagation(); releaseKick(); }}
+        onLostPointerCapture={() => releaseKick()}
         onTouchStart={(e) => { e.preventDefault(); }}
       >
         <span aria-hidden="true" style={NO_SELECT}>KOP</span>

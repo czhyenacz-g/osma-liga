@@ -147,5 +147,6 @@ export function createInitialState(
     lastMoveDir: null,
     turnAssistRemaining: 0,
     dribblePrep: createDribblePrepState(),
+    shotAim: null,
   };
 }

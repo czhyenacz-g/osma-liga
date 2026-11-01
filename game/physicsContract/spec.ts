@@ -96,6 +96,11 @@ export const CONTRACT_SCENARIOS: ContractScenario[] = [
   // so a long charge can lose it — the release then must not fire.
   { name: 'charge 1000 ms while running', start: { x: 100, y: 120 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 1 }, { input: R, seconds: 0.1 }, { input: {}, seconds: 0.9 }] },
   { name: 'shot after a 180° turn', start: { x: 500, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.8 }, { input: L, seconds: 0.8, mark: true }, { input: { left: true, kick: true }, seconds: 0.05 }, { input: L, seconds: 0.1 }, { input: {}, seconds: 0.9 }] },
+  // Aimed charged shot at goal (2026-11-01, shotAim.ts): press while
+  // running right, ↑/↓ steer the aim, release in front of the goalkeeper.
+  { name: 'aimed shot from the centre (↑)', start: { x: 560, y: 280 }, ball: FWD_BALL, goalkeeper: true, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 0.05 }, { input: { up: true, kick: true }, seconds: 0.3 }, { input: {}, seconds: 1.2 }] },
+  { name: 'aimed shot from the top wing (↓)', start: { x: 560, y: 200 }, ball: FWD_BALL, goalkeeper: true, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 0.05 }, { input: { down: true, kick: true }, seconds: 0.3 }, { input: {}, seconds: 1.2 }] },
+  { name: 'aimed shot from the bottom wing (↑)', start: { x: 560, y: 360 }, ball: FWD_BALL, goalkeeper: true, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 0.05 }, { input: { up: true, kick: true }, seconds: 0.3 }, { input: {}, seconds: 1.2 }] },
   { name: 'žolík entry + expiry', kind: 'bench', start: { x: 0, y: 0 }, ball: NO_BALL, steps: [] },
   { name: 'temporary weakening', kind: 'removal', start: { x: 0, y: 0 }, ball: NO_BALL, steps: [] },
 ];
@@ -140,7 +145,10 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   // 500 ms of holding reaches ~93 % at a 33 ms tick vs ~97 % at 60 Hz —
   // the ball rolls a few px less (local 30 Hz does the same).
   'charged kick (0.5 s)': { metrics: ['ballX', 'ballSpeed'], why: 'CHARGE: per-step charge count (the ball reaches the end wall; speed after the bounce)' },
-  'charge 1000 ms while running': { metrics: ['ballX'], why: 'CHARGE: per-step charge count + the end wall' },
+  'charge 1000 ms while running': { metrics: ['ballX', 'ballSpeed'], why: 'CHARGE: per-step charge count + the end wall (since the aimed charge, 2026-11-01, also the speed after the bounce; local 30 Hz 217.5 = server 219.7)' },
+  // Since the aimed charge (2026-11-01) the ball stays under dribble control
+  // during the charge, damped once per step (local 30 Hz 645 px = server 643).
+  'short kick': { metrics: ['ballX'], why: 'STEP: ball-control damping per step during the 0.05 s charge (local 30–144 Hz: 627–645 px)' },
   'charge 500 ms (standing)': { metrics: ['ballX'], why: 'CHARGE: per-step charge count' },
   // BUMP: BUMP_FORCE is applied once per step of overlap, so what happens
   // after a body contact depends on the step (local 30 vs 60 Hz differ by
@@ -151,5 +159,11 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   'turn with defender behind': { metrics: ['playerY', 'maxPlayerY', 'ballX', 'ballSpeed', 'maxBallSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
   'turn with defender beside': { metrics: ['ballX', 'ballY', 'ballSpeed', 'maxBallSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
   'turn between two defenders': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
-  'turn right after a shot': { metrics: ['ballX', 'ballY', 'ballSpeed', 'shotTravel', 'at.'], why: 'BUMP: the shot runs into the player turning after it (local 30–144 Hz: 54–98 px travel)' },
+  // GOAL LINE (older, unrelated to aiming): the bot engine counts a goal
+  // once the ball's edge crosses the line, the server once its centre does
+  // — the ball then freezes for the goal pause ~13 px apart. Both score.
+  'aimed shot from the top wing (↓)': { metrics: ['ballX', 'ballY', 'shotTravel'], why: 'GOAL LINE: ball edge (local) vs centre (server) ends the shot — both score a goal at every rate' },
+  'aimed shot from the bottom wing (↑)': { metrics: ['ballX', 'ballY', 'shotTravel'], why: 'GOAL LINE: ball edge (local) vs centre (server) ends the shot — both score a goal at every rate' },
+  'aimed shot from the centre (↑)': { metrics: ['ballY', 'shotTravel'], why: 'BUMP: the aimed shot is blocked by the goalkeeper (per-step bump; local 30–144 Hz ballY 219.7–223.4)' },
+  'turn right after a shot': { metrics: ['ballX', 'ballY', 'ballSpeed', 'shotTravel', 'lossSeconds', 'at.'], why: 'BUMP: the shot runs into the player turning after it (local 30–144 Hz: 54–98 px travel)' },
 };

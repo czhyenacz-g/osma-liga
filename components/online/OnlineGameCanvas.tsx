@@ -7,6 +7,7 @@ import { resolveOnlinePlayerRenderStates, createFacingDirectionTracker } from '@
 import { createSubstitutionAnimator } from '@/game/rendering/players/substitutionAnimation';
 import { getPlayerVisualTemplate, onPlayerVisualTemplateChange } from '@/game/presentation/playerVisualSettings';
 import { drawFootball, BALL_VISUAL_RADIUS_SCALE } from '@/game/rendering/ball/drawFootball';
+import { drawShotAimArrow } from '@/game/rendering/shotAim/drawShotAimArrow';
 
 // Constants mirroring server
 const CANVAS_W = 960;
@@ -289,6 +290,9 @@ export default function OnlineGameCanvas({
         : Math.min(1, (performance.now() - kickHeldSinceRef.current) / CHARGE_RING_MAX_MS);
 
       drawFrame(ctx!, r, target, concededMessageRef.current, ballRotation);
+      // Own aim arrow only (aimed charged shot, server-authoritative).
+      const aimDir = role ? target.shotAim?.[role === 'home' ? 'home' : 'away'] : null;
+      if (aimDir && !target.goalMessage) drawShotAimArrow(ctx!, { x: r.ball.rx, y: r.ball.ry }, aimDir);
 
       // Hide the player overlay during the goal celebration — drawFrame()
       // above dims the canvas and draws "GÓL!" on it, but this SVG is

@@ -1,4 +1,5 @@
 import type { GameplayProfile, GameplayModifier } from './gameplayProfiles';
+import type { ShotAimState } from './shotAim';
 import type { PlayerStats } from './playerStats';
 import type { BenchDeployment } from './benchDeployment';
 
@@ -151,6 +152,9 @@ export interface GameState {
   // EXPERIMENTAL V3 prepared turn (dribblePrep.ts) — only read when
   // dribblePrepEnabled.
   dribblePrep: DribblePrepState;
+  // Aimed charged shot (shotAim.ts) — only set while shotAimEnabled and the
+  // active player charges with the ball at its feet.
+  shotAim: ShotAimState | null;
 }
 
 export interface DribblePrepState {
@@ -194,4 +198,8 @@ export interface TouchInput {
   right: boolean;
   kick: boolean;
   switchPlayer: boolean;
+  // Finger dragged up/down on the held kick button — merged into up/down
+  // (aims an aimed charged shot, see game/shotAim.ts).
+  aimUp: boolean;
+  aimDown: boolean;
 }

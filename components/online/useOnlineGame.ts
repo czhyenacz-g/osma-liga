@@ -50,6 +50,9 @@ export interface OnlineSnapshot {
   lastScorer?: 'home' | 'away' | null;
   homeClubName?: string | null;
   awayClubName?: string | null;
+  // Aim direction (unit vector) of each team's aimed charged shot at goal,
+  // null when not aiming — see game/shotAim.ts. Absent on older servers.
+  shotAim?: { home: { x: number; y: number } | null; away: { x: number; y: number } | null };
 }
 
 export function useOnlineGame(gameCode: string, playerToken: string) {
