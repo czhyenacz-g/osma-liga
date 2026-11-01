@@ -1,5 +1,6 @@
 import type { GameplayProfile, GameplayModifier } from './gameplayProfiles';
 import type { ShotAimState } from './shotAim';
+import type { GoalkeeperHold } from './goalkeeperSave';
 import type { PlayerStats } from './playerStats';
 import type { BenchDeployment } from './benchDeployment';
 
@@ -155,6 +156,11 @@ export interface GameState {
   // Aimed charged shot (shotAim.ts) — only set while shotAimEnabled and the
   // active player charges with the ball at its feet.
   shotAim: ShotAimState | null;
+  // Ball caught by a goalkeeper (goalkeeperSave.ts) — pinned in front of
+  // him until `remaining` runs out, then he passes or clears it.
+  goalkeeperHold: GoalkeeperHold | null;
+  // Next save's sequence number (goalkeeperSave.ts); null until the first save.
+  goalkeeperSaveSeq: number | null;
 }
 
 export interface DribblePrepState {

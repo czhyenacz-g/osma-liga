@@ -1,5 +1,6 @@
 import type { GameState, InputState } from '../types';
 import { createInitialState } from '../createInitialState';
+import { PARRY_SAVE_SEQ } from './spec';
 import { updateGame } from '../updateGame';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG, updateTemporaryRemovals } from '../temporaryRemoval';
 import { deployBenchPlayer, updateBenchDeployments } from '../benchDeployment';
@@ -28,6 +29,7 @@ export function runLocalContractScenario(
   // off the pitch, the away GK only stays when the scenario asks for it.
   let state = createInitialState(NO_REMOVALS);
   state.gameplayProfile = profile;
+  state.goalkeeperSaveSeq = sc.saveSeq ?? PARRY_SAVE_SEQ;
   const me = state.players.find((p) => p.team === 'home' && p.role === 'field_player' && p.matchStatus === 'field')!;
   const [def, def2] = state.players.filter((p) => p.team === 'away' && p.role === 'field_player' && p.matchStatus === 'field');
   for (const p of state.players) {

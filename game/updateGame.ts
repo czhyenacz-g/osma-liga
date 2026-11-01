@@ -1,4 +1,4 @@
-import type { GameState, InputState, Vec2 } from './types';
+import type { GameState, InputState, Player, Vec2 } from './types';
 import { createInitialState } from './createInitialState';
 import { updateAI } from './ai';
 import { updateGoalkeepers } from './goalkeeperAI';
@@ -45,6 +45,7 @@ import {
 } from './gameplayProfiles';
 import { updateDribblePrep, applyDribblePrepBallControl, resetDribblePrep, carrierSpeedCap } from './dribblePrep';
 import { SHOT_AIM, startShotAim, steerShotAim, shotAimDir } from './shotAim';
+import { isShotSave, saveRoll, firstSaveSeq, saveOutcome, holdSeconds, heldBallSpot, releaseBall } from './goalkeeperSave';
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
@@ -148,6 +149,7 @@ function resetPositions(state: GameState): void {
   state.isConceded = false;
   state.concededMessage = '';
   state.shotAim = null;
+  state.goalkeeperHold = null;
 }
 
 export interface GameModeConfig {
@@ -369,7 +371,7 @@ export function updateGame(
     state.shotAim = null;
   }
   if (!state.shotAim && gameplayConfig.shotAimEnabled && gameplayConfig.kickEnabled && input.kick && !state.kickWasDown
-      && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
+      && activeDist < KICK_RANGE && active.kickCooldown <= 0 && !state.goalkeeperHold) {
     const heldLen = Math.hypot(mvx, mvy);
     state.shotAim = startShotAim(active.id, heldLen > 0 ? { x: mvx / heldLen, y: mvy / heldLen } : null, state.ball.pos, 1);
   }
@@ -522,7 +524,7 @@ export function updateGame(
     state.kickHeldSeconds = state.kickWasDown ? state.kickHeldSeconds + dt : 0;
     state.kickWasDown = true;
   } else {
-    if (state.kickWasDown && activeDist < KICK_RANGE && active.kickCooldown <= 0) {
+    if (state.kickWasDown && activeDist < KICK_RANGE && active.kickCooldown <= 0 && !state.goalkeeperHold) {
       let kickDir: Vec2;
       const aimDir = state.shotAim ? shotAimDir(state.shotAim, state.ball.pos, 1) : null;
       if (aimDir) {
@@ -603,6 +605,10 @@ export function updateGame(
 
   // ── Physics ───────────────────────────────────────────────────────────────
 
+  // Ball velocity and last toucher going into this frame's contacts — a
+  // goalkeeper save is judged on them (updateGoalkeeperSave below).
+  const shotVel = { ...state.ball.vel };
+  const touchBefore = state.lastTouchPlayerId;
   sweepBallAgainstGoalkeepers(state, ballFrom);
   // A field player's body push can also squeeze the ball across the
   // (smaller, 2026-11-01) goalkeeper — sweep that push too.
@@ -628,6 +634,7 @@ export function updateGame(
   }
 
   updateBallPhysics(state, dt, gameplayConfig.wallRestitution);
+  updateGoalkeeperSave(state, dt, shotVel, touchBefore, removedIds);
 
   // ── Corner zone clearance ─────────────────────────────────────────────────
 
@@ -700,4 +707,56 @@ export function updateGame(
   }
 
   return state;
+}
+
+// ── Goalkeeper save outcome (goalkeeperSave.ts) ──────────────────────────────
+// Runs after the frame's ball physics. A fresh real save is decided once
+// (catch / parry / clear); a caught ball stays pinned in front of the
+// goalkeeper until his hold time runs out, then he plays it out. Mirrors
+// project-hub-api src/gameEngine/tick.ts.
+function updateGoalkeeperSave(state: GameState, dt: number, shotVel: Vec2, touchBefore: string | null, removedIds: Set<string>): void {
+  const hold = state.goalkeeperHold;
+  if (hold) {
+    const gk = state.players.find((p) => p.id === hold.playerId);
+    if (!gk || gk.matchStatus === 'bench' || removedIds.has(gk.id)) {
+      state.goalkeeperHold = null;
+      return;
+    }
+    hold.remaining -= dt;
+    if (hold.remaining > 0) {
+      state.ball.pos = heldBallSpot(gk.pos, gk.team);
+      state.ball.vel = { x: 0, y: 0 };
+    } else {
+      state.goalkeeperHold = null;
+      playOutFromGoalkeeper(state, gk, removedIds, true, hold.seq);
+    }
+    return;
+  }
+
+  const gk = state.players.find((p) => p.id === state.lastTouchPlayerId && p.role === 'goalkeeper');
+  if (!gk || touchBefore === gk.id || !isShotSave(shotVel.x, shotVel.y, gk.team, state.lastKickTeam)) return;
+  const seq = state.goalkeeperSaveSeq ?? firstSaveSeq(state.timeLeft, state.ball.pos.x, state.ball.pos.y);
+  state.goalkeeperSaveSeq = seq + 1;
+  const roll = saveRoll(seq);
+  const outcome = saveOutcome(roll);
+  if (outcome === 'catch') {
+    state.goalkeeperHold = { playerId: gk.id, remaining: holdSeconds(roll), seq };
+    state.ball.pos = heldBallSpot(gk.pos, gk.team);
+    state.ball.vel = { x: 0, y: 0 };
+  } else if (outcome === 'clear') {
+    playOutFromGoalkeeper(state, gk, removedIds, false, seq);
+  }
+}
+
+function playOutFromGoalkeeper(state: GameState, gk: Player, removedIds: Set<string>, allowPass: boolean, seq: number): void {
+  const onPitch = state.players.filter((p) => p.matchStatus !== 'bench' && !removedIds.has(p.id));
+  const teammates = onPitch.filter((p) => p.team === gk.team && p.role !== 'goalkeeper').map((p) => p.pos);
+  const opponents = onPitch.filter((p) => p.team !== gk.team).map((p) => p.pos);
+  const r = releaseBall(gk.pos, gk.team, teammates, opponents, allowPass, saveRoll(seq, 1));
+  state.ball.pos = { x: r.x, y: r.y };
+  state.ball.vel = { x: r.vx, y: r.vy };
+  state.lastTouchTeam = gk.team;
+  state.lastTouchPlayerId = gk.id;
+  state.lastKickTeam = gk.team;
+  state.lastKickPlayerId = gk.id;
 }

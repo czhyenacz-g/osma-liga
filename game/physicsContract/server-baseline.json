@@ -1,6 +1,6 @@
 {
   "engine": "project-hub-api",
-  "commit": "0495557",
+  "commit": "ca5d3b7",
   "tickHz": 30,
   "scenarios": {
     "straight run": {
@@ -254,6 +254,38 @@
       "lossSeconds": 0.1,
       "contacts": 0,
       "shotTravel": 5.7,
+      "goal": false,
+      "frontSeconds": null,
+      "maxBallSpeed": 654.4,
+      "at": {}
+    },
+    "goalkeeper catches shot": {
+      "playerX": 650.4,
+      "playerY": 280,
+      "minPlayerY": 280,
+      "maxPlayerY": 280,
+      "ballX": 579.7,
+      "ballY": 406,
+      "ballSpeed": 321,
+      "lossSeconds": 1.6,
+      "contacts": 0,
+      "shotTravel": 154.8,
+      "goal": false,
+      "frontSeconds": null,
+      "maxBallSpeed": 654.4,
+      "at": {}
+    },
+    "goalkeeper clears shot": {
+      "playerX": 650.4,
+      "playerY": 280,
+      "minPlayerY": 280,
+      "maxPlayerY": 280,
+      "ballX": 444.6,
+      "ballY": 471.3,
+      "ballSpeed": 166.2,
+      "lossSeconds": 1.6,
+      "contacts": 0,
+      "shotTravel": -96.3,
       "goal": false,
       "frontSeconds": null,
       "maxBallSpeed": 654.4,
@@ -782,7 +814,7 @@
       "benchSeconds": 10,
       "playerX": 270,
       "playerY": 395,
-      "maxPlayerY": 525.9,
+      "maxPlayerY": 526.8,
       "at": {}
     }
   }

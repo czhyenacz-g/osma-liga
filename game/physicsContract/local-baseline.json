@@ -782,6 +782,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 253.9,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 568.2,
+    "ballY": 411.6,
+    "ballSpeed": 307.9,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 134.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 677.3,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 437.7,
+    "ballY": 474.6,
+    "ballSpeed": 158.4,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -118,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 677.3,
+    "at": {}
    }
   },
   "60": {
@@ -1565,6 +1597,38 @@
     "goal": false,
     "frontSeconds": null,
     "maxBallSpeed": 251,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 575.3,
+    "ballY": 408.2,
+    "ballSpeed": 313.4,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 140.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.1,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 446.1,
+    "ballY": 470.6,
+    "ballSpeed": 164,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -100.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.1,
     "at": {}
    }
   },
@@ -2350,6 +2414,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 267.1,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 824.5,
+    "ballY": 280,
+    "ballSpeed": 8,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 130.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 722.5,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 824.5,
+    "ballY": 280,
+    "ballSpeed": 8,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 130.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 722.5,
+    "at": {}
    }
   },
   "144": {
@@ -3128,6 +3224,38 @@
     "goal": false,
     "frontSeconds": null,
     "maxBallSpeed": 256.6,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 822.6,
+    "ballY": 280,
+    "ballSpeed": 9.6,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 126.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 785.4,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 822.6,
+    "ballY": 280,
+    "ballSpeed": 9.6,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 126.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 785.4,
     "at": {}
    }
   }
@@ -3915,6 +4043,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 253.9,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 559,
+    "ballY": 416,
+    "ballSpeed": 297.3,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 134.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 677.3,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 432.9,
+    "ballY": 476.9,
+    "ballSpeed": 152.9,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -127.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 677.3,
+    "at": {}
    }
   },
   "60": {
@@ -4698,6 +4858,38 @@
     "goal": false,
     "frontSeconds": null,
     "maxBallSpeed": 251,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 552.6,
+    "ballY": 419.1,
+    "ballSpeed": 287.1,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 121.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.1,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 434.2,
+    "ballY": 476.3,
+    "ballSpeed": 150.3,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -125,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.1,
     "at": {}
    }
   },
@@ -5483,6 +5675,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 267.1,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 549.5,
+    "ballY": 420.6,
+    "ballSpeed": 282.1,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 110.7,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 722.5,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 433.7,
+    "ballY": 476.6,
+    "ballSpeed": 147.7,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -130.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 722.5,
+    "at": {}
    }
   },
   "144": {
@@ -6261,6 +6485,38 @@
     "goal": false,
     "frontSeconds": null,
     "maxBallSpeed": 256.6,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 546.2,
+    "ballY": 422.2,
+    "ballSpeed": 278,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 97.5,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 785.4,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 432,
+    "ballY": 477.4,
+    "ballSpeed": 145.3,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -139.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 785.4,
     "at": {}
    }
   }
@@ -7048,6 +7304,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 253.9,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 559,
+    "ballY": 416,
+    "ballSpeed": 297.3,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 134.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 677.3,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 432.9,
+    "ballY": 476.9,
+    "ballSpeed": 152.9,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -127.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 677.3,
+    "at": {}
    }
   },
   "60": {
@@ -7831,6 +8119,38 @@
     "goal": false,
     "frontSeconds": null,
     "maxBallSpeed": 251,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 552.6,
+    "ballY": 419.1,
+    "ballSpeed": 287.1,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 121.9,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.1,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 434.2,
+    "ballY": 476.3,
+    "ballSpeed": 150.3,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -125,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.1,
     "at": {}
    }
   },
@@ -8616,6 +8936,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 267.1,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 549.5,
+    "ballY": 420.6,
+    "ballSpeed": 282.1,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 110.7,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 722.5,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 433.7,
+    "ballY": 476.6,
+    "ballSpeed": 147.7,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -130.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 722.5,
+    "at": {}
    }
   },
   "144": {
@@ -9394,6 +9746,38 @@
     "goal": false,
     "frontSeconds": null,
     "maxBallSpeed": 256.6,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 546.2,
+    "ballY": 422.2,
+    "ballSpeed": 278,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 97.5,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 785.4,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 665,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 432,
+    "ballY": 477.4,
+    "ballSpeed": 145.3,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -139.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 785.4,
     "at": {}
    }
   }
@@ -10181,6 +10565,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 687.5,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 651.4,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 568.2,
+    "ballY": 411.6,
+    "ballSpeed": 307.9,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 152.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 680.8,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 651.4,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 437.7,
+    "ballY": 474.6,
+    "ballSpeed": 158.4,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -100.8,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 680.8,
+    "at": {}
    }
   },
   "60": {
@@ -10964,6 +11380,38 @@
     "goal": true,
     "frontSeconds": null,
     "maxBallSpeed": 683.6,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 651.4,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 561.4,
+    "ballY": 414.9,
+    "ballSpeed": 297.3,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 156.3,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 691,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 651.4,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 438.8,
+    "ballY": 474.1,
+    "ballSpeed": 155.6,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -99.4,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 691,
     "at": {}
    }
   },
@@ -11749,6 +12197,38 @@
     "frontSeconds": null,
     "maxBallSpeed": 699.5,
     "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 651.3,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 549.5,
+    "ballY": 420.6,
+    "ballSpeed": 282.1,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 131.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 791.3,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 651.3,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 433.7,
+    "ballY": 476.6,
+    "ballSpeed": 147.7,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -110.5,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 791.3,
+    "at": {}
    }
   },
   "144": {
@@ -12527,6 +13007,38 @@
     "goal": true,
     "frontSeconds": null,
     "maxBallSpeed": 715.7,
+    "at": {}
+   },
+   "goalkeeper catches shot": {
+    "playerX": 651.4,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 558.8,
+    "ballY": 416.1,
+    "ballSpeed": 292.6,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": 147.2,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.6,
+    "at": {}
+   },
+   "goalkeeper clears shot": {
+    "playerX": 651.4,
+    "playerY": 280,
+    "minPlayerY": 280,
+    "maxPlayerY": 280,
+    "ballX": 438.5,
+    "ballY": 474.2,
+    "ballSpeed": 152.9,
+    "lossSeconds": 1.6,
+    "contacts": 0,
+    "shotTravel": -102.1,
+    "goal": false,
+    "frontSeconds": null,
+    "maxBallSpeed": 701.6,
     "at": {}
    }
   }

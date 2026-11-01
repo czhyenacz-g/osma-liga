@@ -7,7 +7,7 @@
 //     > game/physicsContract/server-baseline.json
 import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
-import { CONTRACT_SCENARIOS } from '../game/physicsContract/spec';
+import { CONTRACT_SCENARIOS, PARRY_SAVE_SEQ } from '../game/physicsContract/spec';
 import { runContractScenario } from '../game/physicsContract/runner';
 
 const repo = resolve(process.argv[2] ?? '../project-hub-api');
@@ -51,6 +51,7 @@ for (const sc of CONTRACT_SCENARIOS) {
     continue;
   }
   const st = createInitialState(NOREM); st.status = 'playing';
+  st.goalkeeperSaveSeq = sc.saveSeq ?? PARRY_SAVE_SEQ;
   const me = st.players.find((p: any) => p.team === 'home' && p.role === 'field_player' && p.matchStatus === 'field')!;
   const [def, def2] = st.players.filter((p: any) => p.team === 'away' && p.role === 'field_player' && p.matchStatus === 'field');
   for (const p of st.players as any[]) {

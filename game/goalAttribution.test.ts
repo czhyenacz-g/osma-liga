@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { GameState, Team } from './types';
 import { createInitialState } from './createInitialState';
+import { PARRY_SAVE_SEQ } from './physicsContract/spec';
 import { updateGame } from './updateGame';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG } from './temporaryRemoval';
 import { deployBenchPlayer } from './benchDeployment';
@@ -62,6 +63,9 @@ const AWAY_GK_ASIDE = { who: 'away:gk', x: 880, y: 120 } as const;
 function run(sc: Scenario, hz = 60) {
   const dt = 1 / hz;
   let state = createInitialState(NO_REMOVALS, undefined, LIVE_GAMEPLAY_PROFILE);
+  // Goalkeeper touches here are parries (goalkeeperSave.ts) — attribution
+  // of a caught/cleared ball is covered in goalkeeperSave.test.ts.
+  state.goalkeeperSaveSeq = PARRY_SAVE_SEQ;
   const find = (who: Who) => {
     const [team, kind, n] = who.split(':');
     return state.players.filter((p) => p.team === team

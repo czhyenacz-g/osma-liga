@@ -2,7 +2,7 @@
 
 Stav k 2026-11-01. Lokální engine `osma-liga` (`game/updateGame.ts`,
 proměnné `dt` z `requestAnimationFrame`, max 0,05 s), server
-`project-hub-api` `a04e47d` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
+`project-hub-api` `ca5d3b7` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
 
 | Režim | Engine | Kdo hraje |
 |---|---|---|
@@ -38,6 +38,7 @@ v toleranci, ≈ = rozdíl jen ve velikosti kroku (viz *Známé rozdíly*).
 | V3 příprava otočky | `BALL_PHYSICS_V3` (níže) | `game/dribblePrep.ts` | `src/gameEngine/dribblePrep.ts` | otočky, `shot after a 180° turn` ≈ | bot výzvy `preparedTurns=false` |
 | Náraz hráč→míč | `BUMP_FORCE` 110 na krok | `updateGame` | `tick.ts` | `defender *` ≈ | – |
 | Brankář | zóna, 120 px/s (do 2026-11-01 150), reakce 390 px, útlum 0,18 + bump 60 | `goalkeeperAI.ts` | `goalkeeperAI.ts` | `goalkeeper blocks shot` ✔ | – |
+| Zákrok brankáře (od 2026-11-01) | skutečný zákrok = brankář první dotkne soupeřovy rány ≥ 200 px/s mířící k jeho bráně; rozhodnutí jednou za zákrok z pořadí zákroku v zápase (`goalkeeperSaveSeq`, bez `Math.random`): 30 % chytí (drží 0,5–0,8 s, pak přihrávka volnému spoluhráči před sebou, jinak odkop), 50 % vyrazí (dosavadní odraz), 20 % hned odkopne 620 px/s dopředu | `game/goalkeeperSave.ts`, `updateGame.ts` | `src/gameEngine/goalkeeperSave.ts`, `tick.ts` | `goalkeeper catches shot` ≈, `goalkeeper clears shot` ✔, `goalkeeperSave.test.ts` | – |
 | Kontakt s brankářem | hitbox 24,4 (brankář 14,4 = 0,8 × 18 + míč 10; do 2026-11-01 28), vizuálně 0,8 × 1,15 × 18; průchod tělem hlídá swept kontrola (níže) i pro odtlačení míče tělem hráče | `sweepBallAgainstGoalkeepers` | `sweepBallAgainstGoalkeepers` | `goalkeeperCollision.test.ts` | – |
 | Žolík | 30 s, jednorázový, vstup (150, 450), role útočník/obránce | `bench*.ts` | `bench*.ts` | `žolík entry + expiry` ✔ | – |
 | Dočasné oslabení | 10 s pod spodní čarou | `temporaryRemoval.ts` | `temporaryRemoval.ts` | `temporary weakening` ✔ | – |
@@ -58,6 +59,9 @@ podle příčiny:
   na 120/144 Hz, který hráči už znají, a fixed timestep je mimo rozsah.
 - **CHARGE.** Nabíjení se počítá po krocích, takže stejná doba držení
   dá na serveru o krok jinou sílu (rozdíl jen v `ballX`).
+  Totéž u chycení brankářem (`goalkeeper catches shot`): chycení padne na
+  30Hz tick vs 60Hz snímek, takže držení a odkop začnou o snímek jinde
+  (lokál@30 Hz `ballX` 568 ≈ server 580).
 - **BUMP.** Odraz od obránce je v jednom kroku 110 px/s; na 30 Hz je
   chaotičtější. Rozdíl je jen v poloze/rychlosti míče, ne v tom, kdo míč má.
 - **GOAL LINE (starší, nesouvisí s mířením).** Lokální engine uzná gól,

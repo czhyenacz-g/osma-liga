@@ -16,6 +16,11 @@ export interface ContractStep {
   mark?: boolean;
 }
 
+// saveRoll sequence numbers with a known outcome (goalkeeperSave.ts).
+export const PARRY_SAVE_SEQ = 1;
+export const CATCH_SAVE_SEQ = 5;
+export const CLEAR_SAVE_SEQ = 0;
+
 export interface ContractScenario {
   name: string;
   kind?: 'move' | 'bench' | 'removal';
@@ -30,6 +35,9 @@ export interface ContractScenario {
   ballVel?: { x: number; y: number };
   // Keep the away goalkeeper in play.
   goalkeeper?: boolean;
+  // Goalkeeper save sequence number (goalkeeperSave.ts) — fixed so both
+  // engines draw the same outcome; default PARRY_SAVE_SEQ = the plain bounce.
+  saveSeq?: number;
   steps: ContractStep[];
   // Seconds after the marked step at which ball distance / relative angle
   // are sampled.
@@ -73,6 +81,10 @@ export const CONTRACT_SCENARIOS: ContractScenario[] = [
   { name: 'charged kick (0.5 s)', start: { x: 250, y: 280 }, ball: FWD_BALL, steps: [{ input: R, seconds: 0.3 }, { input: { right: true, kick: true }, seconds: 0.5 }, { input: {}, seconds: 1 }] },
   { name: 'defender contact', start: { x: 200, y: 280 }, ball: FWD_BALL, defender: { x: 140, y: 0 }, steps: [{ input: R, seconds: 1.5 }] },
   { name: 'goalkeeper blocks shot', start: { x: 690, y: 280 }, ball: FWD_BALL, goalkeeper: true, steps: [{ input: R, seconds: 0.2 }, { input: { right: true, kick: true }, seconds: 0.3 }, { input: {}, seconds: 1.2 }] },
+  // Goalkeeper save outcomes (2026-11-01, goalkeeperSave.ts): a shot from
+  // range, caught (held ~0.6 s, then cleared — no teammate) or cleared at once.
+  { name: 'goalkeeper catches shot', start: { x: 560, y: 280 }, ball: FWD_BALL, goalkeeper: true, saveSeq: CATCH_SAVE_SEQ, steps: [{ input: R, seconds: 0.2 }, { input: { right: true, kick: true }, seconds: 0.3 }, { input: {}, seconds: 1.6 }] },
+  { name: 'goalkeeper clears shot', start: { x: 560, y: 280 }, ball: FWD_BALL, goalkeeper: true, saveSeq: CLEAR_SAVE_SEQ, steps: [{ input: R, seconds: 0.2 }, { input: { right: true, kick: true }, seconds: 0.3 }, { input: {}, seconds: 1.6 }] },
   // V3 prepared-turn set (also measured for every profile).
   { name: 'turn 90 (R→D)', start: { x: 200, y: 200 }, ball: FWD_BALL, steps: [{ input: R, seconds: 1 }, { input: D, seconds: 1.2, mark: true }], probes: TURN_PROBES },
   { name: 'diagonal change (R→RD→D)', start: { x: 200, y: 160 }, ball: FWD_BALL, steps: [{ input: R, seconds: 1 }, { input: { right: true, down: true }, seconds: 0.15, mark: true }, { input: D, seconds: 1.05 }], probes: TURN_PROBES },
@@ -154,6 +166,7 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   // after a body contact depends on the step (local 30 vs 60 Hz differ by
   // up to ~280 px in 'defender contact').
   'defender contact': { metrics: ['ballX', 'ballY', 'ballSpeed', 'lossSeconds'], why: 'BUMP: per-step bump impulse — since the 0.9× ball carrier (2026-11-01) also where the ball ends up after running into the defender' },
+  'goalkeeper catches shot': { metrics: ['ballX', 'ballY', 'ballSpeed'], why: 'STEP: the catch lands on a 30 Hz tick vs a 60 Hz frame, so the 0.5–0.8 s hold and the clearance start a frame apart (local 30 Hz ballX 568 ≈ server 580)' },
   'goalkeeper blocks shot': { metrics: ['maxBallSpeed'], why: 'BUMP: the shot is released in contact with the goalkeeper (contact boost / bump per step)' },
   'turn with defender ahead': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
   'turn with defender behind': { metrics: ['playerY', 'maxPlayerY', 'ballX', 'ballSpeed', 'maxBallSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },

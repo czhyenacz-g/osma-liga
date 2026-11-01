@@ -148,5 +148,7 @@ export function createInitialState(
     turnAssistRemaining: 0,
     dribblePrep: createDribblePrepState(),
     shotAim: null,
+    goalkeeperHold: null,
+    goalkeeperSaveSeq: null,
   };
 }
