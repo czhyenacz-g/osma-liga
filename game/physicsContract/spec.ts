@@ -126,30 +126,30 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   // STEP: per-frame ball-control damping/force — the ball oscillates
   // ~140–250 px/s round the player while dribbling, so the sampled
   // speed/position depends on the step; server = local at 30 Hz.
-  'dribble straight': { metrics: ['ballSpeed'], why: 'STEP: control oscillation phase at the sample' },
-  'turn 90 (R→U)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
-  'turn 90 (R→D)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
+  'turn 90 (R→U)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY', 'at.1.ballY'], why: 'STEP: per-frame control damping' },
+  'turn 90 (R→D)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY', 'at.1.ballY'], why: 'STEP: per-frame control damping' },
   'turn 180 (R→L)': { metrics: ['ballY', 'ballSpeed', 'at.1.ballY'], why: 'STEP: per-frame control damping' },
-  'top line pull down (R→D)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
-  'bottom line pull up (R→U)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
+  'top line pull down (R→D)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY', 'at.1.ballY'], why: 'STEP: per-frame control damping' },
+  'bottom line pull up (R→U)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.ballY', 'at.1.ballY'], why: 'STEP: per-frame control damping' },
   'diagonal change (R→RD→D)': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.0.3.ballY'], why: 'STEP: per-frame control damping' },
-  'stop and restart (R, stop, D)': { metrics: ['playerY', 'maxPlayerY', 'ballX', 'ballSpeed'], why: 'STEP: per-frame control damping' },
-  'turn after rebound (ball arriving)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.'], why: 'STEP: per-frame control damping' },
+  'stop and restart (R, stop, D)': { metrics: ['playerY', 'maxPlayerY', 'ballX', 'ballSpeed', 'at.0.6.ballY'], why: 'STEP: per-frame control damping' },
+  'turn after rebound (ball arriving)': { metrics: ['ballX', 'ballSpeed', 'at.0.6.', 'at.1.ballY'], why: 'STEP: per-frame control damping' },
   'rapid direction changes': { metrics: ['ballSpeed', 'at.0.6.ballY', 'at.1.2.ballY'], why: 'STEP: per-frame control damping' },
   'shot after a 180° turn': { metrics: ['ballX', 'ballY'], why: 'STEP: where the ball sits at release after the turn (local 30–144 Hz: 105–149 px)' },
   // CHARGE: the charge counts per step from the press step (0 on it), so
   // 500 ms of holding reaches ~93 % at a 33 ms tick vs ~97 % at 60 Hz —
   // the ball rolls a few px less (local 30 Hz does the same).
-  'short kick': { metrics: ['ballX'], why: 'CHARGE: per-step charge count' },
-  'charged kick (0.5 s)': { metrics: ['ballX'], why: 'CHARGE: per-step charge count' },
+  'charged kick (0.5 s)': { metrics: ['ballX', 'ballSpeed'], why: 'CHARGE: per-step charge count (the ball reaches the end wall; speed after the bounce)' },
+  'charge 1000 ms while running': { metrics: ['ballX'], why: 'CHARGE: per-step charge count + the end wall' },
   'charge 500 ms (standing)': { metrics: ['ballX'], why: 'CHARGE: per-step charge count' },
   // BUMP: BUMP_FORCE is applied once per step of overlap, so what happens
   // after a body contact depends on the step (local 30 vs 60 Hz differ by
   // up to ~280 px in 'defender contact').
-  'defender contact': { metrics: ['ballX', 'ballSpeed'], why: 'BUMP: per-step bump impulse' },
-  'turn with defender ahead': { metrics: ['ballX', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
+  'defender contact': { metrics: ['ballX', 'ballY', 'ballSpeed', 'lossSeconds'], why: 'BUMP: per-step bump impulse — since the 0.9× ball carrier (2026-11-01) also where the ball ends up after running into the defender' },
+  'goalkeeper blocks shot': { metrics: ['maxBallSpeed'], why: 'BUMP: the shot is released in contact with the goalkeeper (contact boost / bump per step)' },
+  'turn with defender ahead': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
   'turn with defender behind': { metrics: ['playerY', 'maxPlayerY', 'ballX', 'ballSpeed', 'maxBallSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
-  'turn with defender beside': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
+  'turn with defender beside': { metrics: ['ballX', 'ballY', 'ballSpeed', 'maxBallSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
   'turn between two defenders': { metrics: ['ballX', 'ballY', 'ballSpeed', 'at.'], why: 'BUMP: per-step bump impulse' },
-  'turn right after a shot': { metrics: ['ballX', 'ballY', 'shotTravel', 'at.'], why: 'BUMP: the shot runs into the player turning after it (local 30–144 Hz: 54–98 px travel)' },
+  'turn right after a shot': { metrics: ['ballX', 'ballY', 'ballSpeed', 'shotTravel', 'at.'], why: 'BUMP: the shot runs into the player turning after it (local 30–144 Hz: 54–98 px travel)' },
 };

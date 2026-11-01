@@ -7,7 +7,7 @@ import { updateGame } from './updateGame';
 import { FIELD_L, FIELD_R, FIELD_T, FIELD_B, PLAYER_RADIUS, BALL_RADIUS } from './constants';
 import type { GameState, InputState } from './types';
 
-// EXPERIMENTAL V3 prepared turn (dribblePrep.ts) — behaviour checks on top
+// V3 prepared turn + ball-carrier speed (dribblePrep.ts) — behaviour checks on top
 // of the physics contract scenarios. Only the v3-dribble profile is
 // affected; classic / v2-* drift is guarded in physicsContract.test.ts.
 
@@ -47,33 +47,43 @@ describe('V3 prepared turn — open play (no opponent near)', () => {
     }
   });
 
-  it('straight dribbling is untouched (no prep starts)', () => {
+  it('straight dribbling: no prep starts, ball kept, carrier runs carrierSpeedFactor slower', () => {
     let prepFrames = 0;
     const m = v3(byName('dribble straight'), 60, (s) => { if (s.dribblePrep.phase === 'prep') prepFrames++; });
     expect(prepFrames).toBe(0);
-    expect(m).toEqual(classic(byName('dribble straight')));
+    expect(m.lossSeconds).toBe(0);
+    const start = byName('dribble straight').start.x;
+    const ratio = (m.playerX! - start) / (classic(byName('dribble straight')).playerX! - start);
+    expect(ratio).toBeCloseTo(BALL_PHYSICS_V3.carrierSpeedFactor, 1);
+  });
+
+  it('without the ball the player keeps full speed', () => {
+    expect(v3(byName('straight run'))).toEqual(classic(byName('straight run')));
   });
 });
 
 describe('V3 prepared turn — duels stay real', () => {
   for (const name of ['turn with defender ahead', 'turn with defender beside', 'turn between two defenders']) {
-    it(`${name}: no assist, identical to classic`, () => {
-      for (const hz of HZ) expect(v3(byName(name), hz), `${hz} Hz`).toEqual(classic(byName(name), hz));
+    it(`${name}: the turn into the defender is still lost, like classic`, () => {
+      for (const hz of HZ) {
+        expect(v3(byName(name), hz).lossSeconds, `${hz} Hz`).toBeGreaterThan(0.5);
+        expect(v3(byName(name), hz).frontSeconds, `${hz} Hz`).toBeNull();
+      }
     });
   }
 
   it('the assist switches off the moment an opponent gets within the radius', () => {
-    let prepNearOpponent = 0;
     for (const name of ['turn with defender ahead', 'turn with defender beside', 'turn between two defenders', 'turn with defender behind']) {
+      let prepNearOpponent = 0;
       v3(byName(name), 60, (s) => {
         if (s.dribblePrep.phase !== 'prep') return;
         const near = s.players.some((p) => p.team === 'away' && p.matchStatus !== 'bench'
           && Math.hypot(p.pos.x - s.ball.pos.x, p.pos.y - s.ball.pos.y) <= BALL_PHYSICS_V3.noOpponentRadius);
         if (near) prepNearOpponent++;
       });
+      // At most the single frame in which the opponent closes in.
+      expect(prepNearOpponent, name).toBeLessThanOrEqual(1);
     }
-    // At most the single frame in which the opponent closes in.
-    expect(prepNearOpponent).toBeLessThanOrEqual(1);
   });
 });
 
@@ -120,19 +130,29 @@ describe('V3 prepared turn — drag-back away from pressure', () => {
     };
     // Ahead and already on the ball when the player turns.
     const touching: ContractScenario = {
-      name: 'reverse with defender on the ball', start: { x: 300, y: 280 }, ball: { x: 30, y: 0 }, defender: { x: 185, y: 0 }, steps, probes: ['0.3', '0.6'],
+      name: 'reverse with defender on the ball', start: { x: 300, y: 280 }, ball: { x: 30, y: 0 }, defender: { x: 178, y: 0 }, steps, probes: ['0.3', '0.6'],
     };
     // Without the defender the same reversal is assisted — the cases below
     // are switched off by the opponent, not by anything else.
     let freePrep = 0;
     v3({ ...into, defender: undefined }, 60, (s) => { if (s.dribblePrep.phase === 'prep') freePrep++; });
     expect(freePrep).toBeGreaterThan(0);
+    // The assist may start while the opponent is still outside
+    // noOpponentRadius, but ends once it closes in — the duel is still lost.
     for (const sc of [into, touching]) {
       for (const hz of HZ) {
-        let prepFrames = 0;
-        const m = v3(sc, hz, (s) => { if (s.dribblePrep.phase === 'prep') prepFrames++; });
-        expect(prepFrames, `${sc.name} @ ${hz}`).toBe(0);
-        expect(m, `${sc.name} @ ${hz}`).toEqual(classic(sc, hz));
+        // Longest run of consecutive prep frames with an opponent on the
+        // ball (a 180° reversal runs under the shield rules once started):
+        // at most the single frame in which it closes in.
+        let run = 0, worst = 0;
+        const m = v3(sc, hz, (s) => {
+          const near = s.dribblePrep.phase === 'prep' && s.players.some((p) => p.team === 'away' && p.matchStatus !== 'bench'
+            && Math.hypot(p.pos.x - s.ball.pos.x, p.pos.y - s.ball.pos.y) <= BALL_PHYSICS_V3.shieldContactRadius);
+          run = near ? run + 1 : 0;
+          worst = Math.max(worst, run);
+        });
+        expect(worst, `${sc.name} @ ${hz}`).toBeLessThanOrEqual(1);
+        expect(m.lossSeconds, `${sc.name} @ ${hz}`).toBeGreaterThan(0.5);
       }
     }
   });

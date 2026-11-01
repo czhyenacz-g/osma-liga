@@ -51,7 +51,17 @@ export const BALL_PHYSICS_V3 = {
   dribbleMaxRelativeSpeed: 160,
   dribbleMinControlSeconds: 0.12,
   // Opponent this close to the ball → no prep / prep aborted (duels stay real).
-  noOpponentRadius: 70,
+  // 40 = just past body contact (PLAYER_RADIUS + BALL_RADIUS = 28) and the
+  // bot's kick reach — more room to dribble round a nearby opponent.
+  noOpponentRadius: 40,
+  // Ball retention (velocity blend toward the carrier) under V3 stays on
+  // until an opponent is this close to the ball (classic/v2:
+  // BALL_RETENTION_NO_OPPONENT_RADIUS = 70).
+  retentionNoOpponentRadius: 40,
+  // The player carrying the ball (close, moving with it — same test as the
+  // dribble above) runs at this fraction of stats.speed, so defenders and
+  // passes get a chance. Not applied right after the player's own shot.
+  carrierSpeedFactor: 0.9,
   // Drag-back exception: turning at least this far AWAY from every opponent
   // inside noOpponentRadius (each one on the side the player is leaving,
   // none touching the ball — centre farther than shieldContactRadius from

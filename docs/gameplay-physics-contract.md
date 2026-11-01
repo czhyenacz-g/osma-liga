@@ -1,8 +1,8 @@
 # Fyzikální kontrakt Osmé ligy
 
-Stav k 2026-10-31. Lokální engine `osma-liga` (`game/updateGame.ts`,
+Stav k 2026-11-01. Lokální engine `osma-liga` (`game/updateGame.ts`,
 proměnné `dt` z `requestAnimationFrame`, max 0,05 s), server
-`project-hub-api` `d5375bc` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
+`project-hub-api` `c73713b` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
 
 | Režim | Engine | Kdo hraje |
 |---|---|---|
@@ -27,7 +27,7 @@ v toleranci, ≈ = rozdíl jen ve velikosti kroku (viz *Známé rozdíly*).
 | Max. rychlost míče / odraz od stěn | 800 / 0,75 | `constants.ts` | `constants.ts` | – | – |
 | Kontrola míče: poloměr | 57 | `BALL_CONTROL_RADIUS` | `BALL_CONTROL_RADIUS` (od `49c9614`) | `dribble straight` ≈ | bot výzvy 44 |
 | Kontrola: síla / offset / útlum | 130 / 210 / 34, útlum 0,86 na krok | `updateGame` | `tick.ts` | otočky ≈ | – |
-| Retence | poloměr 55, soupeř < 70, blend 0,14 na krok | `updateGame` | `tick.ts` | `defender contact` ≈ | bot výzvy bez retence |
+| Retence | poloměr 55, soupeř < 40 (V3; classic/v2 < 70), blend 0,14 na krok | `updateGame` | `tick.ts` | `defender contact` ≈ | bot výzvy bez retence |
 | Vzdálenost míče se měří | z pozice hráče **před** pohybem v kroku | `activeDist` | `preMoveBallDist` | `kick at the edge of reach` ✔ | bot výzvy po pohybu |
 | Dosah kopu | 57 (≥ poloměr kontroly) | `PLAYER_RADIUS + 39` | `KICK_RANGE` | `kick at the edge of reach (50 px)` ✔, `no kick out of reach (75 px)` ✔ | bot výzvy 40 |
 | Síla kopu | 486 × 0,9 (tap) … 1,5 | `KICK_FORCE` | `KICK_FORCE` | `charge tap … 1500 ms` ✔/≈ | – |
@@ -150,8 +150,8 @@ Profily patří do existujícího `GameplayProfileConfig`
 - Míč je od ovládaného hráče blíž než 57 px.
 - Relativní rychlost míče vůči hráči je pod 160 px/s, a to aspoň 0,12 s.
 - Kop není držený a neběží ochrana vlastní střely.
-- Žádný soupeř není od míče blíž než 70 px. Výjimkou je stažení míče od
-  soupeře (viz níže).
+- Žádný soupeř není od míče blíž než 40 px (od 2026-11-01, dřív 70 px).
+  Výjimkou je stažení míče od soupeře (viz níže).
 
 Volný ani právě odkopnutý míč se nikdy nepřitahuje.
 
@@ -178,13 +178,13 @@ přímá otočka.
 - Nebo vyprší okno přípravy.
 - Potom hráč za 0,15 s lineárně zrychlí zpět na 210 px/s.
 
-**Okamžité přerušení:** soupeř do 70 px, puštění ovládání, kop nebo míč
+**Okamžité přerušení:** soupeř do 40 px, puštění ovládání, kop nebo míč
 dál než 57 px.
 
 **Stažení míče od soupeře (shield turn, od 2026-10-31):** Otočka aspoň o
 120° *od* soupeře, typicky couvnutí nebo obrat k vlastní bráně, když
-soupeř napadá zepředu, je asistovaná i se soupeřem do 70 px. Platí to,
-pokud každý soupeř do 70 px:
+soupeř napadá zepředu, je asistovaná i se soupeřem do 40 px. Platí to,
+pokud každý soupeř do 40 px:
 - stojí na straně, od které se hráč odvrací (skalární součin polohy soupeře
   vůči hráči a nového směru je záporný);
 - nedotýká se míče (střed je od míče dál než 36 px).
@@ -193,6 +193,22 @@ Ostrá otočka (≥ 120°), která začala bez soupeře, pokračuje podle stejn�
 pravidel, i když se soupeř během otáčení přiblíží. Oblouk vede na stranu
 dál od soupeře i od čáry. Otočka *do* soupeře nebo souboj o míč, kterého
 se soupeř už dotýká, zůstává beze změny jako v classic.
+
+**Hráč s míčem a poloměr soupeře (od 2026-11-01):**
+- Hráč, který vede míč (míč do 57 px, relativní rychlost pod 160 px/s,
+  neběží ochrana vlastní střely), běží 0,9 × `stats.speed` (189 px/s).
+  Bez míče běží plnou rychlostí. Strop se kombinuje s přípravou otočky
+  (platí nižší). `BALL_PHYSICS_V3.carrierSpeedFactor`.
+- Příprava otočky i retence se vypnou až se soupeřem do 40 px od míče
+  (`noOpponentRadius`, `retentionNoOpponentRadius`); dotyk těla s míčem
+  je 28 px, dosah kopu bota 40 px. Otočka může začít se soupeřem 40–70 px
+  od míče; když se přiblíží do 40 px, skončí (ostrá otočka ≥ 120° pak běží
+  podle pravidel stažení). Otočka do obránce se dál prohrává jako v classic.
+- Classic/v2 profily beze změny (retence 70 px, bez zpomalení).
+- Server: totéž pro týmy s `preparedTurns` (`carrierSpeedCap` v
+  `src/gameEngine/dribblePrep.ts`). Pomalejší hráč posunul načasování
+  kontaktů, proto má pár scénářů nové položky v `KNOWN_DIVERGENCES`
+  (STEP/CHARGE/BUMP, lokál na 30 Hz ≈ server).
 
 **Řetězec otoček:** Změna směru uprostřed přípravy ji přesměruje. Celkový
 čas přípravy v řetězci je ale omezený na 1,2 s. Potom musí přijít 0,3 s bez
@@ -213,7 +229,7 @@ asistence, takže nekonečný slalom s asistencí nejde.
 
   Neúspěch nastává jen při otočce do čáry, u které hráč stojí.
 
-**Soupeř do 70 px:** V3 se chová přesně jako classic, s výjimkou stažení
+**Soupeř do 70 px (stav před 2026-11-01):** V3 se chová přesně jako classic, s výjimkou stažení
 míče od soupeře. Couvnutí od stojícího obránce 50–90 px před míčem: V3 má
 ztrátu 0 s a míč je před hráčem za 0,5 s, classic ztratí míč na víc než
 1 s. Proti napadajícímu botovi si V3 při couvnutí míč udrží, classic ho

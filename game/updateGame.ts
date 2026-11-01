@@ -41,9 +41,9 @@ import {
   hasBallControl, findBestPassTarget, computePassVelocity, findNearestTeammateToBall,
 } from './passAndSwitch';
 import {
-  GameplayProfile, resolveEffectiveGameplayConfig, BALL_PHYSICS_V2,
+  GameplayProfile, resolveEffectiveGameplayConfig, BALL_PHYSICS_V2, BALL_PHYSICS_V3,
 } from './gameplayProfiles';
-import { updateDribblePrep, applyDribblePrepBallControl, resetDribblePrep } from './dribblePrep';
+import { updateDribblePrep, applyDribblePrepBallControl, resetDribblePrep, carrierSpeedCap } from './dribblePrep';
 
 const GOAL_MESSAGES = [
   'VAR nemáme, hraj dál.',
@@ -380,9 +380,11 @@ export function updateGame(
   // ball is carried round; Infinity = no effect.
   let dribblePrepSpeed = Infinity;
   if (gameplayConfig.dribblePrepEnabled && gameplayConfig.ballControlEnabled) {
-    dribblePrepSpeed = updateDribblePrep(
+    // V3: the ball carrier is a little slower (BALL_PHYSICS_V3.carrierSpeedFactor).
+    const carrierSpeed = carrierSpeedCap(state, active, selfTrapProtected);
+    dribblePrepSpeed = Math.min(carrierSpeed, updateDribblePrep(
       state, active, mvLen > 0 ? { x: mvx / mvLen, y: mvy / mvLen } : null, input.kick, selfTrapProtected, dt,
-    );
+    ));
   } else if (state.dribblePrep.phase !== 'none') {
     resetDribblePrep(state);
   }
@@ -470,7 +472,10 @@ export function updateGame(
     const ballSpeed = Math.hypot(state.ball.vel.x, state.ball.vel.y);
     if (gameplayConfig.ballRetentionEnabled && activeDist < BALL_RETENTION_RADIUS && ballSpeed < BALL_RETENTION_MAX_BALL_SPEED) {
       const oppDist = nearestOpponentDistance(state, state.ball.pos, 'home');
-      if (oppDist > BALL_RETENTION_NO_OPPONENT_RADIUS) {
+      const noOpponentRadius = gameplayConfig.dribblePrepEnabled
+        ? BALL_PHYSICS_V3.retentionNoOpponentRadius
+        : BALL_RETENTION_NO_OPPONENT_RADIUS;
+      if (oppDist > noOpponentRadius) {
         state.ball.vel.x += (active.vel.x - state.ball.vel.x) * BALL_RETENTION_STRENGTH;
         state.ball.vel.y += (active.vel.y - state.ball.vel.y) * BALL_RETENTION_STRENGTH;
         if (!hasInput) {

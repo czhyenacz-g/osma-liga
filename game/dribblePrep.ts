@@ -2,8 +2,8 @@ import type { DribblePrepState, GameState, Player, Vec2 } from './types';
 import { BALL_PHYSICS_V3 } from './gameplayProfiles';
 import { FIELD_L, FIELD_R, FIELD_T, FIELD_B } from './constants';
 
-// EXPERIMENTAL V3 "prepared turn" — only active with the v3-dribble profile
-// (GameplayProfileConfig.dribblePrepEnabled), i.e. only in /hra/bot-test.
+// V3 "prepared turn" — active with the v3-dribble profile
+// (GameplayProfileConfig.dribblePrepEnabled) = LIVE_GAMEPLAY_PROFILE.
 //
 // While the human really dribbles (ball close, moving with the player, for
 // a moment, no opponent near) and asks for a direction the ball is clearly
@@ -80,6 +80,18 @@ function chooseSide(player: Vec2, rel: Vec2, dir: Vec2, opponents: Vec2[]): numb
   const plus = room(1), minus = room(-1);
   if (Math.abs(plus - minus) < 1) return delta >= 0 ? 1 : -1;
   return plus > minus ? 1 : -1;
+}
+
+// Speed cap for the player carrying the ball: ball close and moving with
+// it (same test as a settled dribble), not just shot. Runs before the
+// active player moves, like updateDribblePrep. Infinity = no cap.
+export function carrierSpeedCap(state: GameState, active: Player, selfTrapProtected: boolean): number {
+  if (selfTrapProtected) return Infinity;
+  const d = Math.hypot(state.ball.pos.x - active.pos.x, state.ball.pos.y - active.pos.y);
+  const relSpeed = Math.hypot(state.ball.vel.x - active.vel.x, state.ball.vel.y - active.vel.y);
+  return d < C.dribbleControlRadius && relSpeed < C.dribbleMaxRelativeSpeed
+    ? active.stats.speed * C.carrierSpeedFactor
+    : Infinity;
 }
 
 // Runs before the active player moves. `active.vel` still holds last
