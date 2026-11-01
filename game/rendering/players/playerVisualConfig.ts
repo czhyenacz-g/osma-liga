@@ -64,6 +64,14 @@ export const PLAYER_VISUAL_CONFIG: Record<PlayerVisualTemplate, PlayerVisualTemp
     stepDurationMs: 210,
     hopHeightPx: 2,
   },
+  'svg-footballers-v5': {
+    // A touch bigger than v4 for the bigger head — presentation only, the
+    // boots still end where v4's do relative to the hitbox centre.
+    visualRadiusScale: 1.42,
+    maxChargeScale: 1.2,
+    stepDurationMs: 210,
+    hopHeightPx: 2,
+  },
 };
 
 export const TEAM_COLORS: Record<PlayerTeam, { primary: string; secondary: string }> = {

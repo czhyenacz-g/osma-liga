@@ -85,7 +85,7 @@ describe('PlayerVisualContainer — pixel-characters / minimal-circles (shared a
     expect(uiGroup.getAttribute('opacity')).toBe('1');
   });
 
-  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4'] as const)(
+  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4', 'svg-footballers-v5'] as const)(
     '%s also uses the shared ring + charge-scale (not a self-contained template like legacy)',
     (template) => {
       const ref = createRef<PlayerVisualContainerHandle>();
@@ -113,7 +113,7 @@ describe('PlayerVisualContainer — pixel-characters / minimal-circles (shared a
     },
   );
 
-  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4'] as const)(
+  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4', 'svg-footballers-v5'] as const)(
     '%s switches its orientation-* class with facing (all four footballer templates draw front/back/side)',
     (template) => {
       const ref = createRef<PlayerVisualContainerHandle>();
@@ -211,7 +211,7 @@ describe('PlayerVisualContainer — legacy (self-contained, no shared charge-sca
 });
 
 describe('all four svg-footballers templates draw a front/back/side pose (not just v3/v4)', () => {
-  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4'] as const)(
+  it.each(['svg-footballers-v1', 'svg-footballers-v2', 'svg-footballers-v3', 'svg-footballers-v4', 'svg-footballers-v5'] as const)(
     '%s renders exactly one front, one back, and one side sub-group',
     (template) => {
       const { container } = render(

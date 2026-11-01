@@ -7,6 +7,7 @@ import SvgFootballerPlayerV1 from './templates/SvgFootballerPlayerV1';
 import SvgFootballerPlayerV2 from './templates/SvgFootballerPlayerV2';
 import SvgFootballerPlayerV3 from './templates/SvgFootballerPlayerV3';
 import SvgFootballerPlayerV4 from './templates/SvgFootballerPlayerV4';
+import SvgFootballerPlayerV5 from './templates/SvgFootballerPlayerV5';
 import type { PlayerVisualTemplate } from '../../presentation/playerVisualTemplate';
 
 describe('playerVisualRegistry', () => {
@@ -18,6 +19,7 @@ describe('playerVisualRegistry', () => {
     expect(playerVisualRegistry['svg-footballers-v2']).toBe(SvgFootballerPlayerV2);
     expect(playerVisualRegistry['svg-footballers-v3']).toBe(SvgFootballerPlayerV3);
     expect(playerVisualRegistry['svg-footballers-v4']).toBe(SvgFootballerPlayerV4);
+    expect(playerVisualRegistry['svg-footballers-v5']).toBe(SvgFootballerPlayerV5);
   });
 
   it('resolvePlayerVisualComponent returns the matching component for a valid template', () => {
@@ -28,6 +30,7 @@ describe('playerVisualRegistry', () => {
     expect(resolvePlayerVisualComponent('svg-footballers-v2')).toBe(SvgFootballerPlayerV2);
     expect(resolvePlayerVisualComponent('svg-footballers-v3')).toBe(SvgFootballerPlayerV3);
     expect(resolvePlayerVisualComponent('svg-footballers-v4')).toBe(SvgFootballerPlayerV4);
+    expect(resolvePlayerVisualComponent('svg-footballers-v5')).toBe(SvgFootballerPlayerV5);
   });
 
   it('falls back to pixel-characters for a missing/unknown template key', () => {
@@ -42,6 +45,7 @@ describe('playerVisualRegistry', () => {
     expect(usesSharedActiveIndicator('svg-footballers-v2')).toBe(true);
     expect(usesSharedActiveIndicator('svg-footballers-v3')).toBe(true);
     expect(usesSharedActiveIndicator('svg-footballers-v4')).toBe(true);
+    expect(usesSharedActiveIndicator('svg-footballers-v5')).toBe(true);
     expect(usesSharedActiveIndicator('legacy')).toBe(false);
   });
 });

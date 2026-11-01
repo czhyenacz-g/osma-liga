@@ -9,7 +9,7 @@ describe('playerVisualTemplate', () => {
     expect(DEFAULT_PLAYER_VISUAL_TEMPLATE).toBe('pixel-characters');
   });
 
-  it('accepts all seven valid templates unchanged', () => {
+  it('accepts all eight valid templates unchanged', () => {
     expect(normalizePlayerVisualTemplate('pixel-characters')).toBe('pixel-characters');
     expect(normalizePlayerVisualTemplate('minimal-circles')).toBe('minimal-circles');
     expect(normalizePlayerVisualTemplate('legacy')).toBe('legacy');
@@ -17,6 +17,7 @@ describe('playerVisualTemplate', () => {
     expect(normalizePlayerVisualTemplate('svg-footballers-v2')).toBe('svg-footballers-v2');
     expect(normalizePlayerVisualTemplate('svg-footballers-v3')).toBe('svg-footballers-v3');
     expect(normalizePlayerVisualTemplate('svg-footballers-v4')).toBe('svg-footballers-v4');
+    expect(normalizePlayerVisualTemplate('svg-footballers-v5')).toBe('svg-footballers-v5');
   });
 
   it('maps the short-lived pre-v1/v2-split stored value to svg-footballers-v1', () => {

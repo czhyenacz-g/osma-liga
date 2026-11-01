@@ -57,6 +57,11 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
     // LegacyPlayerVisual.tsx. Every other template shares this container's
     // ActivePlayerRing + charge-scale mechanism instead.
     const sharedActive = usesSharedActiveIndicator(template);
+    // v5 only: a clearer gold oval under the boots (not around the waist)
+    // and the player's label above the head. Both sit in unmirrored layers,
+    // so the text never reads backwards for left-facing players.
+    const isV5 = template === 'svg-footballers-v5';
+    const ringCy = isV5 ? hitboxRadiusPx * 0.8 : 0;
 
     useImperativeHandle(ref, () => ({
       update(state: PlayerRenderState) {
@@ -79,7 +84,8 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
             template === 'svg-footballers-v1' ||
             template === 'svg-footballers-v2' ||
             template === 'svg-footballers-v3' ||
-            template === 'svg-footballers-v4'
+            template === 'svg-footballers-v4' ||
+            template === 'svg-footballers-v5'
           ) {
             classes.push('footballer-player');
           }
@@ -93,7 +99,8 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
             template === 'svg-footballers-v1' ||
             template === 'svg-footballers-v2' ||
             template === 'svg-footballers-v3' ||
-            template === 'svg-footballers-v4'
+            template === 'svg-footballers-v4' ||
+            template === 'svg-footballers-v5'
           ) {
             classes.push(`orientation-${state.orientation}`);
           }
@@ -128,8 +135,25 @@ const PlayerVisualContainer = forwardRef<PlayerVisualContainerHandle, PlayerVisu
       <g ref={outerRef}>
         {sharedActive && (
           <g ref={uiRef} opacity={0}>
-            <ActivePlayerRing ref={ringRef} rx={hitboxRadiusPx * 1.6} ry={hitboxRadiusPx * 0.7} />
+            <ActivePlayerRing ref={ringRef} rx={hitboxRadiusPx * 1.6} ry={hitboxRadiusPx * 0.7} cy={ringCy} emphasized={isV5} />
           </g>
+        )}
+        {isV5 && (
+          <text
+            className="player-visual-label"
+            x={0}
+            y={-31 * config.visualRadiusScale * sizeScale - 3}
+            textAnchor="middle"
+            fontSize={10}
+            fontWeight="bold"
+            fontFamily="system-ui, sans-serif"
+            fill="#ffffff"
+            stroke="#0b1210"
+            strokeWidth={2.4}
+            paintOrder="stroke"
+          >
+            {label}
+          </text>
         )}
         <g ref={directionRef}>
           <g ref={animationRef} className="player-visual-anim">

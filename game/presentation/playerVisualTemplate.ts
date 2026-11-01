@@ -9,7 +9,8 @@ export type PlayerVisualTemplate =
   | 'svg-footballers-v1'
   | 'svg-footballers-v2'
   | 'svg-footballers-v3'
-  | 'svg-footballers-v4';
+  | 'svg-footballers-v4'
+  | 'svg-footballers-v5';
 
 // New installs and unreadable/legacy-invalid stored values both fall back
 // here — pixel-characters is the product default per spec.
@@ -23,6 +24,7 @@ const VALID_TEMPLATES: readonly PlayerVisualTemplate[] = [
   'svg-footballers-v2',
   'svg-footballers-v3',
   'svg-footballers-v4',
+  'svg-footballers-v5',
 ];
 
 // A short-lived build's stored value from before the v1/v2 split — mapped
