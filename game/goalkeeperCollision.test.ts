@@ -5,7 +5,7 @@ import { updateGame } from './updateGame';
 import { sweepBallAgainstGoalkeepers } from './physics';
 import { DEFAULT_TEMPORARY_REMOVAL_CONFIG } from './temporaryRemoval';
 import { LIVE_GAMEPLAY_PROFILE } from './gameplayProfiles';
-import { PLAYER_RADIUS, BALL_RADIUS, GOALKEEPER_BALL_DAMPING, GOALKEEPER_BUMP_FORCE } from './constants';
+import { GOALKEEPER_RADIUS, BALL_RADIUS, GOALKEEPER_BALL_DAMPING, GOALKEEPER_BUMP_FORCE } from './constants';
 
 // Goalkeeper contact: the ball must never cross a goalkeeper's body without
 // touching him — not from a fast shot at a low frame rate, not from a kick
@@ -14,7 +14,7 @@ import { PLAYER_RADIUS, BALL_RADIUS, GOALKEEPER_BALL_DAMPING, GOALKEEPER_BUMP_FO
 // src/gameEngine/goalkeeperCollision.test.ts.
 
 const NO_REMOVALS = { ...DEFAULT_TEMPORARY_REMOVAL_CONFIG, enabled: false };
-const R = PLAYER_RADIUS + BALL_RADIUS;
+const R = GOALKEEPER_RADIUS + BALL_RADIUS; // 24.4 since the smaller goalkeeper (2026-11-01)
 const RATES = [30, 60, 120, 144];
 // GameCanvas clamps a frame to dt 0.05 — a hitch steps the ball up to 40 px,
 // enough to end past his centre.
@@ -108,7 +108,7 @@ describe('shots straight at a ready goalkeeper are stopped by his body', () => {
 });
 
 describe('the ball never passes through his body, whatever happens after contact', () => {
-  for (const off of [0, 8, 16, 22, 26]) for (const speed of [500, 800]) for (const hz of RATES) {
+  for (const off of [0, 8, 16, 20, 22]) for (const speed of [500, 800]) for (const hz of RATES) {
     for (const [side, shot] of bothSides({ side: 'right', ball: { x: GK.x - 60, y: GK.y + off }, vel: { x: speed, y: 0 }, gk: GK })) {
       it(`${speed} px/s, ${off} px off centre at ${hz} Hz, ${side}`, () => {
         const r = shoot(shot, hz);

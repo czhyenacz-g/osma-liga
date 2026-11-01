@@ -2,7 +2,7 @@
 
 Stav k 2026-11-01. Lokální engine `osma-liga` (`game/updateGame.ts`,
 proměnné `dt` z `requestAnimationFrame`, max 0,05 s), server
-`project-hub-api` `0495557` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
+`project-hub-api` `a04e47d` (`src/gameEngine/tick.ts`, pevný tick 33 ms).
 
 | Režim | Engine | Kdo hraje |
 |---|---|---|
@@ -37,8 +37,8 @@ v toleranci, ≈ = rozdíl jen ve velikosti kroku (viz *Známé rozdíly*).
 | Ochrana vlastní střely | 0,25 s po kopu bez kontroly míče střelcem | `kickSelfTrap*` | `kickSelfTrap` per tým | `short kick` ✔ | – |
 | V3 příprava otočky | `BALL_PHYSICS_V3` (níže) | `game/dribblePrep.ts` | `src/gameEngine/dribblePrep.ts` | otočky, `shot after a 180° turn` ≈ | bot výzvy `preparedTurns=false` |
 | Náraz hráč→míč | `BUMP_FORCE` 110 na krok | `updateGame` | `tick.ts` | `defender *` ≈ | – |
-| Brankář | zóna, 150 px/s, reakce 390 px, útlum 0,18 + bump 60 | `goalkeeperAI.ts` | `goalkeeperAI.ts` | `goalkeeper blocks shot` ✔ | – |
-| Kontakt s brankářem | hitbox 28 (hráč 18 + míč 10), průchod tělem hlídá swept kontrola (níže) | `sweepBallAgainstGoalkeepers` | `sweepBallAgainstGoalkeepers` | `goalkeeperCollision.test.ts` | – |
+| Brankář | zóna, 120 px/s (do 2026-11-01 150), reakce 390 px, útlum 0,18 + bump 60 | `goalkeeperAI.ts` | `goalkeeperAI.ts` | `goalkeeper blocks shot` ✔ | – |
+| Kontakt s brankářem | hitbox 24,4 (brankář 14,4 = 0,8 × 18 + míč 10; do 2026-11-01 28), vizuálně 0,8 × 1,15 × 18; průchod tělem hlídá swept kontrola (níže) i pro odtlačení míče tělem hráče | `sweepBallAgainstGoalkeepers` | `sweepBallAgainstGoalkeepers` | `goalkeeperCollision.test.ts` | – |
 | Žolík | 30 s, jednorázový, vstup (150, 450), role útočník/obránce | `bench*.ts` | `bench*.ts` | `žolík entry + expiry` ✔ | – |
 | Dočasné oslabení | 10 s pod spodní čarou | `temporaryRemoval.ts` | `temporaryRemoval.ts` | `temporary weakening` ✔ | – |
 | **Bot: rychlost** | lokální bot 165, bot výzvy 210 | `BOT_SPEED` | `ai.ts` | – | obtížnost |

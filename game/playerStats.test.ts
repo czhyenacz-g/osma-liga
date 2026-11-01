@@ -4,7 +4,7 @@ import { updateGame } from './updateGame';
 import { updateGoalkeepers } from './goalkeeperAI';
 import { resolvePlayerBallCollisions } from './physics';
 import { DEFAULT_FIELD_PLAYER_STATS, DEFAULT_GOALKEEPER_STATS } from './playerStats';
-import { PLAYER_RADIUS, BUMP_FORCE } from './constants';
+import { PLAYER_RADIUS, BUMP_FORCE, GOALKEEPER_RADIUS } from './constants';
 import type { InputState } from './types';
 
 function noInput(): InputState {
@@ -34,7 +34,8 @@ describe('PlayerStats — data model', () => {
     const gk = state.players.find((p) => p.role === 'goalkeeper')!;
     expect(gk.stats).toEqual(DEFAULT_GOALKEEPER_STATS);
     expect(gk.stats.stoppingPower).toBeGreaterThan(DEFAULT_FIELD_PLAYER_STATS.stoppingPower);
-    expect(gk.stats.size).toBeGreaterThan(DEFAULT_FIELD_PLAYER_STATS.size);
+    // 20 % smaller since 2026-11-01 (now below a field player's size).
+    expect(gk.stats.size).toBeCloseTo(PLAYER_RADIUS * 1.15 * 0.8, 6);
   });
 
   it('each player owns an independent stats object (mutating one does not affect siblings)', () => {
@@ -140,10 +141,10 @@ describe('PlayerStats — stoppingPower drives ball-collision damping', () => {
 });
 
 describe('PlayerStats — size feeds the renderer, not physical collision', () => {
-  it('goalkeeper stats.size is larger than the physical PLAYER_RADIUS hitbox', () => {
+  it('goalkeeper stats.size matches his (20 % smaller) ball hitbox scale', () => {
     const state = createInitialState();
     const gk = state.players.find((p) => p.role === 'goalkeeper')!;
-    expect(gk.stats.size).toBeGreaterThan(PLAYER_RADIUS);
+    expect(gk.stats.size / (PLAYER_RADIUS * 1.15)).toBeCloseTo(GOALKEEPER_RADIUS / PLAYER_RADIUS, 6);
   });
 
   it('field player stats.size equals the physical PLAYER_RADIUS baseline', () => {

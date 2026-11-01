@@ -604,7 +604,11 @@ export function updateGame(
   // ── Physics ───────────────────────────────────────────────────────────────
 
   sweepBallAgainstGoalkeepers(state, ballFrom);
+  // A field player's body push can also squeeze the ball across the
+  // (smaller, 2026-11-01) goalkeeper — sweep that push too.
+  const ballBeforePush = { ...state.ball.pos };
   resolvePlayerBallCollisions(state, gameplayConfig.playerBallRestitution);
+  sweepBallAgainstGoalkeepers(state, ballBeforePush);
 
   // Teammate ball receive — a slow/catchable ball contact on a non-active
   // home teammate makes them the new active player (short lock) instead of

@@ -140,10 +140,12 @@ export const GOAL_PAUSE = 2.5;
 // selection/AI-chase/substitution pools. Zone is a simple rectangle in front
 // of the GK's own goal — kept as a handful of tunable constants here rather
 // than hardcoded across the engine.
-export const GOALKEEPER_RADIUS = PLAYER_RADIUS; // physical hitbox unchanged — see GOALKEEPER_BALL_DAMPING for stopping power
+// 2026-11-01: goalkeeper body 20 % smaller (ball hitbox 14.4 + 10) and 20 %
+// slower (150 → 120 px/s), so aimed shots beat him more often.
+export const GOALKEEPER_RADIUS = PLAYER_RADIUS * 0.8; // ball hitbox; stopping power see GOALKEEPER_BALL_DAMPING
 export const GOALKEEPER_ZONE_DEPTH = 130; // px into the field from the goal line
 export const GOALKEEPER_ZONE_HEIGHT = GOAL_H + 70; // taller than the goal mouth so the GK can cover angled shots
-export const GOALKEEPER_SPEED = 150;
+export const GOALKEEPER_SPEED = 120;
 // Default position (no threat nearby): centered in goal, a little off the
 // line so it doesn't sit glued to the goal line.
 export const GOALKEEPER_DEFAULT_DEPTH = 34;

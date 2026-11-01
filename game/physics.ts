@@ -6,7 +6,7 @@ import {
   PLAYER_RADIUS, BUMP_FORCE, KICK_SNAP_CLEARANCE,
   TEAMMATE_SEPARATION_RADIUS, TEAMMATE_SEPARATION_STRENGTH,
   TEAMMATE_BALL_RECEIVE_MAX_SPEED, TEAMMATE_BALL_RECEIVE_EXTRA_RADIUS,
-  GOALKEEPER_BALL_DAMPING, GOALKEEPER_BUMP_FORCE,
+  GOALKEEPER_BALL_DAMPING, GOALKEEPER_BUMP_FORCE, GOALKEEPER_RADIUS,
 } from './constants';
 
 // ── Vec2 helpers ──────────────────────────────────────────────────────────────
@@ -162,12 +162,12 @@ export function checkGoal(state: GameState): 'home' | 'away' | null {
 // velocity component along the collision normal (bounce profile).
 export function resolvePlayerBallCollisions(state: GameState, playerRestitution = 0): void {
   const { ball, players } = state;
-  const minDist = PLAYER_RADIUS + BALL_RADIUS;
   const removedIds = new Set(state.temporaryRemovals.map((r) => r.playerId));
 
   for (const p of players) {
     if (removedIds.has(p.id)) continue;
     if (p.matchStatus === 'bench') continue;
+    const minDist = (p.role === 'goalkeeper' ? GOALKEEPER_RADIUS : PLAYER_RADIUS) + BALL_RADIUS;
     const d = dist(p.pos, ball.pos);
     if (d < minDist && d > 0.001) {
       const dir = normalize({ x: ball.pos.x - p.pos.x, y: ball.pos.y - p.pos.y });
@@ -224,12 +224,12 @@ function bounceBallOffPlayer(state: GameState, p: Player, dir: Vec2, playerResti
 // position is checked: if it entered his collision circle and either left it
 // again or got past the point closest to his centre, the ball is put back at
 // the entry point and bounces off there exactly like a normal contact (same
-// hitbox PLAYER_RADIUS + BALL_RADIUS, same damping and bump). A ball that
+// hitbox GOALKEEPER_RADIUS + BALL_RADIUS, same damping and bump). A ball that
 // only reaches into him and stays in front is left to the overlap resolution
 // as before. Mirrors project-hub-api src/gameEngine/physics.ts.
 export function sweepBallAgainstGoalkeepers(state: GameState, from: Vec2): Player | null {
   const { ball } = state;
-  const r = PLAYER_RADIUS + BALL_RADIUS;
+  const r = GOALKEEPER_RADIUS + BALL_RADIUS;
   const dx = ball.pos.x - from.x;
   const dy = ball.pos.y - from.y;
   const a = dx * dx + dy * dy;

@@ -164,6 +164,6 @@ export const KNOWN_DIVERGENCES: Record<string, { metrics: string[]; why: string 
   // — the ball then freezes for the goal pause ~13 px apart. Both score.
   'aimed shot from the top wing (↓)': { metrics: ['ballX', 'ballY', 'shotTravel'], why: 'GOAL LINE: ball edge (local) vs centre (server) ends the shot — both score a goal at every rate' },
   'aimed shot from the bottom wing (↑)': { metrics: ['ballX', 'ballY', 'shotTravel'], why: 'GOAL LINE: ball edge (local) vs centre (server) ends the shot — both score a goal at every rate' },
-  'aimed shot from the centre (↑)': { metrics: ['ballY', 'shotTravel'], why: 'BUMP: the aimed shot is blocked by the goalkeeper (per-step bump; local 30–144 Hz ballY 219.7–223.4)' },
+  'aimed shot from the centre (↑)': { metrics: ['ballX', 'ballY', 'ballSpeed', 'shotTravel'], why: 'BUMP: the aimed shot glances off the goalkeeper (per-step bump; ball speed local 30 Hz 35.8 ≈ server 33.8)' },
   'turn right after a shot': { metrics: ['ballX', 'ballY', 'ballSpeed', 'shotTravel', 'lossSeconds', 'at.'], why: 'BUMP: the shot runs into the player turning after it (local 30–144 Hz: 54–98 px travel)' },
 };

@@ -3,7 +3,7 @@ import { runLocalContractScenario } from './physicsContract/harness';
 import type { ContractInput, ContractScenario } from './physicsContract/spec';
 import { LIVE_GAMEPLAY_PROFILE } from './gameplayProfiles';
 import { SHOT_AIM } from './shotAim';
-import { PLAYER_RADIUS, BALL_RADIUS } from './constants';
+import { GOALKEEPER_RADIUS, BALL_RADIUS } from './constants';
 import type { GameState } from './types';
 
 // DIAGNOSTIC (shooting audit 2026-11-01, aimed charge since then) — prints
@@ -11,13 +11,15 @@ import type { GameState } from './types';
 // dribbles right toward the away goal with the real away goalkeeper AI,
 // then charges and shoots from (x, y). Before the aimed charge (audit, max
 // charge): straight 24 % goals / 76 % saved, best of 4 kick keys 24 %.
+// Aimed far third: 64 % with the old goalkeeper (150 px/s, hitbox 28),
+// 84 % since he is 20 % slower and smaller (2026-11-01).
 
 const HZ = 60;
 const XS = [580, 625, 670, 715, 760];
 const YS = [200, 240, 280, 320, 360];
 const RUN = 0.45;
 const CARRY = 189; // 0.9 × 210, the dribble speed before the charge
-const CONTACT = PLAYER_RADIUS + BALL_RADIUS + 0.5;
+const CONTACT = GOALKEEPER_RADIUS + BALL_RADIUS + 0.5;
 
 type Outcome = 'goal' | 'save' | 'miss' | 'noshot';
 
